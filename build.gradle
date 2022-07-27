@@ -7,6 +7,9 @@ plugins {
     id 'org.springframework.boot' version '2.7.2'
     id 'io.spring.dependency-management' version '1.0.12.RELEASE'
     id 'org.asciidoctor.convert' version '1.5.8'
+    id 'jacoco'
+    id 'org.sonarqube' version '3.4.0.2513'
+    id 'com.google.cloud.tools.jib' version '3.2.1'
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'java'
 }
@@ -62,14 +65,78 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
-tasks.named('test') {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
+jacoco {
+    toolVersion = '0.8.8'
 }
 
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
     dependsOn test
+    reports {
+        xml.required = true
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'CLASS'
+            enabled = true
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.60
+            }
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.60
+            }
+            excludes = [
+                    "com.devcourse.checkmoi.CheckmoiApplication",
+                    "com.devcourse.checkmoi.global.*"
+            ]
+        }
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "prgrms-web-devcourse_Team-Books-CheckMoi-BE"
+        property "sonar.organization", "prgrms-web-devcourse"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+}
+
+jib {
+    from {
+        image = "amazoncorretto:17.0.4-al2"
+        platforms {
+            platform {
+                architecture = "arm64"
+                os = "linux"
+            }
+            platform {
+                architecture = "amd64"
+                os = "linux"
+            }
+        }
+    }
+    to {
+        image = "zxcv9203/${project.name}"
+        tags = ["${project.version.toString().toLowerCase()}"]
+    }
+    container {
+        environment = ["PROFILE" : "local"]
+        jvmFlags = ['-Xms512m', '-Dspring.profiles.active=${PROFILE}']
+    }
 }
 //queryDSL
 def querydslDir = "$buildDir/generated/querydsl"
