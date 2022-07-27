@@ -1,8 +1,9 @@
 package com.devcourse.checkmoi.global.exception;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.validation.BindingResult;
 
 public class ErrorField extends Error {
@@ -16,7 +17,7 @@ public class ErrorField extends Error {
             .map(error ->
                 new ErrorField(
                     error.getDefaultMessage()))
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     private static Object rejectedValue(Object value) {
