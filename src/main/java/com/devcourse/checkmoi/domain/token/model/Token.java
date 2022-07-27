@@ -1,11 +1,10 @@
-package com.devcourse.checkmoi.domain.token.entity;
+package com.devcourse.checkmoi.domain.token.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

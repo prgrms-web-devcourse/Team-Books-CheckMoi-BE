@@ -3,17 +3,16 @@ package com.devcourse.checkmoi.domain.token.service;
 import com.devcourse.checkmoi.domain.token.dto.AccessTokenResponse;
 import com.devcourse.checkmoi.domain.token.dto.RefreshTokenRequest;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse;
-import com.devcourse.checkmoi.domain.token.entity.Token;
+import com.devcourse.checkmoi.domain.token.model.Token;
 import com.devcourse.checkmoi.domain.token.repository.TokenRepository;
 import com.devcourse.checkmoi.domain.user.dto.response.UserRegisterResponse;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.global.security.jwt.JwtTokenProvider;
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,8 @@ public class TokenService {
     }
 
     @Transactional
-    public AccessTokenResponse refreshAccessToken(String accessToken, RefreshTokenRequest refreshTokenRequest) {
+    public AccessTokenResponse refreshAccessToken(String accessToken,
+        RefreshTokenRequest refreshTokenRequest) {
         jwtTokenProvider.validateAccessToken(accessToken);
 
         var refreshToken = refreshTokenRequest.refreshToken();

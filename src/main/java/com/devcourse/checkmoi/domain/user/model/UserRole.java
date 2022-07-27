@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.domain.user.entity;
+package com.devcourse.checkmoi.domain.user.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

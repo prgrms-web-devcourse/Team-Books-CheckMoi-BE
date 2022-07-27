@@ -1,7 +1,7 @@
-package com.devcourse.checkmoi.domain.user.entity;
+package com.devcourse.checkmoi.domain.user.model;
 
-import java.util.Objects;
-
+import com.devcourse.checkmoi.global.model.BaseEntity;
+import com.devcourse.checkmoi.global.vo.Email;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -11,15 +11,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import com.devcourse.checkmoi.domain.user.exception.UserInvalidValueException;
-import com.devcourse.checkmoi.global.model.BaseEntity;
-import com.devcourse.checkmoi.global.vo.Email;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Getter
 @Entity
@@ -52,9 +47,10 @@ public class User extends BaseEntity {
     private UserRole userRole;
 
     private User(String oauthId, String provider, String name, Email email,
-        String profileImgUrl, UserRole userRole){
+        String profileImgUrl, UserRole userRole) {
         this(null, oauthId, provider, name, email, profileImgUrl, userRole);
     }
+
     @Builder
     public User(Long id, String oauthId, String provider, String name, Email email,
         String profileImgUrl, UserRole userRole) {
