@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,7 @@ public class Token {
         this(null, refreshToken, userId);
     }
 
+    @Builder
     public Token(Long id, String refreshToken, Long userId) {
         this.id = id;
         this.refreshToken = refreshToken;
