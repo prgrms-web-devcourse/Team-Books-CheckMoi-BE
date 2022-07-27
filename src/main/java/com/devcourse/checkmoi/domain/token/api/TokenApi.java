@@ -1,25 +1,21 @@
 package com.devcourse.checkmoi.domain.token.api;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import com.devcourse.checkmoi.domain.token.dto.AccessTokenResponse;
 import com.devcourse.checkmoi.domain.token.dto.RefreshTokenRequest;
 import com.devcourse.checkmoi.domain.token.service.TokenService;
-import com.devcourse.checkmoi.global.model.ApiResponse;
+import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import com.devcourse.checkmoi.global.security.util.AuthorizationExtractor;
-import org.springframework.http.HttpStatus;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api")
@@ -29,16 +25,18 @@ public class TokenApi {
     private final TokenService tokenService;
 
     @PostMapping("/tokens")
-    public ResponseEntity<ApiResponse<AccessTokenResponse>> refreshAccessToken(
+    public ResponseEntity<SuccessResponse<AccessTokenResponse>> refreshAccessToken(
         HttpServletRequest httpServletRequest,
         @Valid @RequestBody RefreshTokenRequest refreshToken
     ) {
         String accessToken = AuthorizationExtractor.extract(httpServletRequest);
-        return ResponseEntity.ok(new ApiResponse<>(tokenService.refreshAccessToken(accessToken, refreshToken)));
+        return ResponseEntity.ok(
+            new SuccessResponse<>(tokenService.refreshAccessToken(accessToken, refreshToken)));
     }
 
     @DeleteMapping("/tokens")
-    public ResponseEntity<Void> deleteRefreshToken(@AuthenticationPrincipal JwtAuthentication user) {
+    public ResponseEntity<Void> deleteRefreshToken(
+        @AuthenticationPrincipal JwtAuthentication user) {
         tokenService.deleteTokenByUserId(user.id());
         return ResponseEntity.noContent().build();
     }

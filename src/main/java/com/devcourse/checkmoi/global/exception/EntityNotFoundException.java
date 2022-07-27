@@ -1,11 +1,12 @@
 package com.devcourse.checkmoi.global.exception;
 
-import org.springframework.http.HttpStatus;
-
 public class EntityNotFoundException extends BusinessException {
 
     public EntityNotFoundException(String message) {
-        super(HttpStatus.NOT_FOUND, message);
+        super(message, ErrorMessage.ENTITY_NOT_FOUND);
     }
 
+    public EntityNotFoundException(String message, ErrorMessage errorMessage) {
+        super(message, errorMessage);
+    }
 }

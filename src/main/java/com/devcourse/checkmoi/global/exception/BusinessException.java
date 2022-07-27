@@ -1,17 +1,19 @@
 package com.devcourse.checkmoi.global.exception;
 
-import org.springframework.http.HttpStatus;
-
-import lombok.Getter;
-
-@Getter
 public class BusinessException extends RuntimeException {
 
-    private final HttpStatus httpStatus;
+    private final ErrorMessage errorMessage;
 
-    public BusinessException(HttpStatus httpStatus, String message) {
+    public BusinessException(String message, ErrorMessage errorMessage) {
         super(message);
-        this.httpStatus = httpStatus;
+        this.errorMessage = errorMessage;
     }
 
+    public BusinessException(ErrorMessage errorCode) {
+        this.errorMessage = errorCode;
+    }
+
+    public ErrorMessage getErrorMessage() {
+        return this.errorMessage;
+    }
 }
