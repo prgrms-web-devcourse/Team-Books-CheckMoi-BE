@@ -35,7 +35,7 @@ public class TokenService {
     public AccessTokenResponse refreshAccessToken(String accessToken, RefreshTokenRequest refreshTokenRequest) {
         jwtTokenProvider.validateAccessToken(accessToken);
 
-        var refreshToken = refreshTokenRequest.getRefreshToken();
+        var refreshToken = refreshTokenRequest.refreshToken();
         jwtTokenProvider.validateToken(refreshToken);
 
         Claims claims = jwtTokenProvider.getClaims(accessToken);
