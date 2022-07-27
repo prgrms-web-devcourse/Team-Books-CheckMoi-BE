@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Getter
 @Entity
@@ -50,50 +51,20 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    private User(String oauthId, String provider, String name, Email email,
+        String profileImgUrl, UserRole userRole){
+        this(null, oauthId, provider, name, email, profileImgUrl, userRole);
+    }
     @Builder
     public User(Long id, String oauthId, String provider, String name, Email email,
         String profileImgUrl, UserRole userRole) {
-        setOauthId(oauthId);
-        setName(name);
-        setProvider(provider);
-        setProfileImgUrl(profileImgUrl);
+        this.oauthId = oauthId;
+        this.name = name;
+        this.provider = provider;
+        this.profileImgUrl = profileImgUrl;
         this.id = id;
         this.email = email;
         this.userRole = userRole;
-    }
-
-    private void setProfileImgUrl(String imageUrl) {
-        if (Objects.isNull(imageUrl) || imageUrl.isBlank()) {
-            throw new UserInvalidValueException("이미지 URL은 비어있을 수 없습니다.");
-        }
-        this.profileImgUrl = imageUrl;
-    }
-
-    private void setProvider(String provider) {
-        if (Objects.isNull(provider) || provider.isBlank()) {
-            throw new UserInvalidValueException("제공자는 비어있을 수 없습니다.");
-        }
-        this.provider = provider;
-    }
-
-    private void setName(String name) {
-        if (Objects.isNull(name) || name.isBlank()) {
-            throw new UserInvalidValueException("이름은 비어있을 수 없습니다.");
-        }
-
-        if (name.length() > NAME_MAX_LENGTH) {
-            throw new UserInvalidValueException(
-                "이름은 %d자 이하여야 합니다. 현재 이름 길이: %d".formatted(NAME_MAX_LENGTH, name.length())
-            );
-        }
-        this.name = name;
-    }
-
-    private void setOauthId(String oauthId) {
-        if (Objects.isNull(oauthId) || oauthId.isBlank()) {
-            throw new UserInvalidValueException("인증 아이디는 비어있을 수 없습니다.");
-        }
-        this.oauthId = oauthId;
     }
 
 }
