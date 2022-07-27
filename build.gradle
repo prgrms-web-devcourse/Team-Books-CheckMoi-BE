@@ -99,7 +99,8 @@ jacocoTestCoverageVerification {
                 minimum = 0.60
             }
             excludes = [
-                    "com.devcourse.checkmoi.CheckmoiApplication"
+                    "com.devcourse.checkmoi.CheckmoiApplication",
+                    "com.devcourse.checkmoi.global.*"
             ]
         }
     }
