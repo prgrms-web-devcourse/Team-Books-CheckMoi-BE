@@ -64,35 +64,7 @@ public class Book extends BaseEntity {
         this.description = description;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getPublisher() {
-        return publisher;
-    }
-
-    public String getISBN() {
-        return isbn;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
     public PublishedDate getPublishedAt() {
         return publishedAt;
-    }
-
-    public String getDescription() {
-        return description;
     }
 }

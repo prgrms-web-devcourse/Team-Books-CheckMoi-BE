@@ -22,7 +22,7 @@ public class StudyMember {
     private Long id;
 
     @Enumerated(value = EnumType.STRING)
-    private Status status;
+    private StudyMemberStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -30,10 +30,4 @@ public class StudyMember {
     @ManyToOne(fetch = FetchType.LAZY)
     private Study study;
 
-    public enum Status {
-        PENDING,
-        ACCEPTED,
-        DENIED,
-        OWNED;
-    }
 }
