@@ -100,7 +100,8 @@ jacocoTestCoverageVerification {
             }
             excludes = [
                     "com.devcourse.checkmoi.CheckmoiApplication",
-                    "com.devcourse.checkmoi.global.*"
+                    "com.devcourse.checkmoi.global.*",
+                    "com.devcourse.checkmoi.domain.*.model.Q*"
             ]
         }
     }
@@ -134,7 +135,7 @@ jib {
         tags = ["${project.version.toString().toLowerCase()}"]
     }
     container {
-        environment = ["PROFILE" : "local"]
+        environment = ["PROFILE": "local"]
         jvmFlags = ['-Xms512m', '-Dspring.profiles.active=${PROFILE}']
     }
 }
