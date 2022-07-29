@@ -6,6 +6,8 @@ import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.global.model.BaseEntity;
 import java.time.LocalDate;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -27,7 +29,10 @@ public class Study extends BaseEntity {
     private String description;
 
     private Integer maxParticipant;
-    
+
+    @Enumerated(value = EnumType.STRING)
+    private StudyStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
 

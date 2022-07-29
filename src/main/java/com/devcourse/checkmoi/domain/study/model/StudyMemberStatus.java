@@ -4,5 +4,5 @@ public enum StudyMemberStatus {
     PENDING,
     ACCEPTED,
     DENIED,
-    OWNED;
+    OWNED
 }
