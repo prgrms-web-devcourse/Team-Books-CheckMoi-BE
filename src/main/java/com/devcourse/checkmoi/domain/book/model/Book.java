@@ -40,7 +40,7 @@ public class Book extends BaseEntity {
     @Embedded
     private PublishedDate publishedAt;
 
-    @Column(length = 500)
+    @Column(length = 10000)
     private String description;
 
     @Builder
