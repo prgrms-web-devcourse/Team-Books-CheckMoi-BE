@@ -10,7 +10,8 @@ plugins {
     id 'jacoco'
     id 'org.sonarqube' version '3.4.0.2513'
     id 'com.google.cloud.tools.jib' version '3.2.1'
-    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+    id 'com.epages.restdocs-api-spec' version '0.16.0'
     id 'java'
 }
 
@@ -42,9 +43,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // jwt
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+//    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+//    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+//    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // db
     runtimeOnly 'com.h2database:h2'
@@ -63,6 +64,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // Restdocs -> Swagger
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.16.2'
+
 }
 
 jacoco {
@@ -104,6 +109,15 @@ jacocoTestCoverageVerification {
             ]
         }
     }
+    finalizedBy 'copyAPI'
+}
+
+openapi3 {
+    server = 'http://localhost:8080'
+    title = 'Checkmoi'
+    description = 'Checkmoi API 페이지'
+    version = project.version.toString().toUpperCase()
+    format = 'yaml'
 }
 
 sonarqube {
@@ -115,6 +129,13 @@ sonarqube {
     }
 }
 
+task copyAPI {
+    dependsOn("openapi3")
+    copy {
+        from "$buildDir/api-spec/openapi3.yaml"
+        into "src/main/resources/static/docs/."
+    }
+}
 jib {
     from {
         image = "amazoncorretto:17.0.4-al2"
