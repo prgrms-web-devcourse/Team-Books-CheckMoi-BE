@@ -43,9 +43,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // jwt
-//    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-//    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-//    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     // db
     runtimeOnly 'com.h2database:h2'
@@ -84,7 +84,7 @@ jacocoTestReport {
     reports {
         xml.required = true
     }
-    finalizedBy 'jacocoTestCoverageVerification'
+    finalizedBy jacocoTestCoverageVerification
 }
 
 jacocoTestCoverageVerification {
@@ -109,11 +109,11 @@ jacocoTestCoverageVerification {
             ]
         }
     }
-    finalizedBy 'copyAPI'
+    finalizedBy 'copyDocument'
 }
 
 openapi3 {
-    server = 'http://localhost:8080'
+    server = "$System.env.SERVER_NAME"
     title = 'Checkmoi'
     description = 'Checkmoi API 페이지'
     version = project.version.toString().toUpperCase()
@@ -129,13 +129,13 @@ sonarqube {
     }
 }
 
-task copyAPI {
-    dependsOn("openapi3")
-    copy {
-        from "$buildDir/api-spec/openapi3.yaml"
-        into "src/main/resources/static/docs/."
-    }
+task copyDocument(type: Copy) {
+    dependsOn ("openapi3")
+    from file("$buildDir/api-spec/openapi3.yaml")
+    into file("src/main/resources/static/docs/.")
 }
+
+
 jib {
     from {
         image = "amazoncorretto:17.0.4-al2"

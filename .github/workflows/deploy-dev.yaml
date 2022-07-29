@@ -30,11 +30,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: export SERVER_NAME
+        run: export ${{ secrets.DEV_SERVER_NAME }}
+
+      - name: OpenAPI Spec Create
+        run: ./gradlew test copyDocument
+
       - name: Execute Gradle build and analyze
         run: ./gradlew jib
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: jenkins deploy
         uses: appleboy/jenkins-action@master
