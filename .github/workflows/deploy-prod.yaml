@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: export SERVER_NAME
-        run: export ${{ secrets.PROD_SERVER_NAME }}
+        run: export SERVER_NAME=${{ secrets.PROD_SERVER_NAME }}
 
       - name: OpenAPI Spec Create
         run: ./gradlew test copyDocument
