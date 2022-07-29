@@ -113,6 +113,13 @@ sonarqube {
         property "sonar.organization", "prgrms-web-devcourse"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.exclusions",
+                """
+                src/main/java/com/devcourse/checkmoi/global/util/ApiUtil.java, 
+                src/main/java/com/devcourse/checkmoi/global/exception/EntityNotFoundException.java,
+                src/main/java/com/devcourse/checkmoi/global/exception/ErrorMessage.java,
+                src/main/java/com/devcourse/checkmoi/global/model/BaseEntity.java
+                """
     }
 }
 
