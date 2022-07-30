@@ -29,7 +29,7 @@ public class TokenService {
         String accessToken = jwtTokenProvider.createAccessToken(user.id(), user.role());
         String refreshToken = jwtTokenProvider.createRefreshToken();
         Token token = tokenRepository.findTokenByUserId(user.id())
-            .orElse(tokenRepository.save(new Token(refreshToken, user.id())));
+            .orElseGet(() -> tokenRepository.save(new Token(refreshToken, user.id())));
 
         token.refresh(refreshToken);
 
