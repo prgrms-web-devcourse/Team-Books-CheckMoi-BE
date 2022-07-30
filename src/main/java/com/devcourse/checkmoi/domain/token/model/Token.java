@@ -36,4 +36,8 @@ public class Token {
         this.userId = userId;
     }
 
+    public void refresh(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 }
