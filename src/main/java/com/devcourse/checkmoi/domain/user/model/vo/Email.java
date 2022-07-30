@@ -1,12 +1,10 @@
-package com.devcourse.checkmoi.global.vo;
-
-import java.util.Objects;
-import java.util.regex.Pattern;
-
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+package com.devcourse.checkmoi.domain.user.model.vo;
 
 import com.devcourse.checkmoi.domain.user.exception.UserInvalidValueException;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,8 +17,11 @@ import lombok.NoArgsConstructor;
 public class Email {
 
     private static final int EMAIL_MAX_LENGTH = 100;
-    private static final String EMAIL_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
-        + "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
+
+    private static final String EMAIL_REGEX =
+        "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
+            + "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
+
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 
     @Column(name = "email", length = EMAIL_MAX_LENGTH, nullable = false, unique = true)
