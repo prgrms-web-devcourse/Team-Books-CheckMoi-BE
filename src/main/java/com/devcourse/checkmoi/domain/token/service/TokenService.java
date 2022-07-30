@@ -1,11 +1,11 @@
 package com.devcourse.checkmoi.domain.token.service;
 
-import com.devcourse.checkmoi.domain.token.dto.AccessTokenResponse;
-import com.devcourse.checkmoi.domain.token.dto.RefreshTokenRequest;
-import com.devcourse.checkmoi.domain.token.dto.TokenResponse;
+import com.devcourse.checkmoi.domain.token.dto.TokenRequest;
+import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
+import com.devcourse.checkmoi.domain.token.dto.TokenResponse.Tokens;
 import com.devcourse.checkmoi.domain.token.model.Token;
 import com.devcourse.checkmoi.domain.token.repository.TokenRepository;
-import com.devcourse.checkmoi.domain.user.dto.response.UserRegisterResponse;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.Register;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.global.security.jwt.JwtTokenProvider;
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
@@ -20,26 +20,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class TokenService {
 
     private final TokenRepository tokenRepository;
+
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public TokenResponse createToken(UserRegisterResponse user) {
-        var accessToken = jwtTokenProvider.createAccessToken(user.id(), user.role());
-        var refreshToken = jwtTokenProvider.createRefreshToken();
+    public Tokens createToken(Register user) {
+        String accessToken = jwtTokenProvider.createAccessToken(user.id());
+        String refreshToken = jwtTokenProvider.createRefreshToken();
         tokenRepository.save(new Token(refreshToken, user.id()));
-        return new TokenResponse(accessToken, refreshToken);
+        return new Tokens(accessToken, refreshToken);
     }
 
     @Transactional
-    public AccessTokenResponse refreshAccessToken(String accessToken,
-        RefreshTokenRequest refreshTokenRequest) {
+    public AccessToken refreshAccessToken(String accessToken,
+        TokenRequest.RefreshToken refreshTokenRequest) {
         jwtTokenProvider.validateAccessToken(accessToken);
 
-        var refreshToken = refreshTokenRequest.refreshToken();
+        String refreshToken = refreshTokenRequest.refreshToken();
         jwtTokenProvider.validateToken(refreshToken);
 
         Claims claims = jwtTokenProvider.getClaims(accessToken);
-        var userId = claims.get("userId", Long.class);
+        Long userId = claims.get("userId", Long.class);
         var findRefreshToken = tokenRepository.findTokenByUserId(userId)
             .map(Token::getRefreshToken)
             .orElseThrow(InvalidTokenException::new);
@@ -48,9 +49,8 @@ public class TokenService {
             throw new InvalidTokenException();
         }
 
-        var role = claims.get("role", String.class);
-        var newAccessToken = jwtTokenProvider.createAccessToken(userId, role);
-        return new AccessTokenResponse(newAccessToken);
+        var newAccessToken = jwtTokenProvider.createAccessToken(userId);
+        return new AccessToken(newAccessToken);
     }
 
     @Transactional

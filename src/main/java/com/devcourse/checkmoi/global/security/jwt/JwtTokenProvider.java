@@ -1,10 +1,5 @@
 package com.devcourse.checkmoi.global.security.jwt;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
-
 import com.devcourse.checkmoi.global.security.jwt.exception.ExpiredTokenException;
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
@@ -12,6 +7,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +18,11 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
     private final String issuer;
+
     private final String secretKey;
+
     private final long accessTokenValidityInMilliseconds;
+
     private final long refreshTokenValidityInMilliseconds;
 
     public JwtTokenProvider(
@@ -34,8 +36,8 @@ public class JwtTokenProvider {
         this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
     }
 
-    public String createAccessToken(long payload, String role) {
-        Map<String, Object> claims = Map.of("userId", payload, "role", role);
+    public String createAccessToken(long payload) {
+        Map<String, Object> claims = Map.of("userId", payload);
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + accessTokenValidityInMilliseconds);
 

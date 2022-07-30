@@ -1,6 +1,6 @@
 package com.devcourse.checkmoi.domain.user.api;
 
-import com.devcourse.checkmoi.domain.user.dto.response.MyUserInfoResponse;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.service.UserService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
@@ -23,7 +23,7 @@ public class UserApi {
     private final UserService userService;
 
     @GetMapping("/users/{userId}")
-    ResponseEntity<SuccessResponse<MyUserInfoResponse>> myPage(
+    ResponseEntity<SuccessResponse<UserInfo>> myPage(
         @PathVariable Long userId, @AuthenticationPrincipal JwtAuthentication user) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(userService.findUserInfo(user.id())));

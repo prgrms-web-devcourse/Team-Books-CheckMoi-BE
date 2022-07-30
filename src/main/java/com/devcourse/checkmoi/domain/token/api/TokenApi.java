@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.token.api;
 
-import com.devcourse.checkmoi.domain.token.dto.AccessTokenResponse;
-import com.devcourse.checkmoi.domain.token.dto.RefreshTokenRequest;
+import com.devcourse.checkmoi.domain.token.dto.TokenRequest;
+import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
 import com.devcourse.checkmoi.domain.token.service.TokenService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
@@ -25,9 +25,9 @@ public class TokenApi {
     private final TokenService tokenService;
 
     @PostMapping("/tokens")
-    public ResponseEntity<SuccessResponse<AccessTokenResponse>> refreshAccessToken(
+    public ResponseEntity<SuccessResponse<AccessToken>> refreshAccessToken(
         HttpServletRequest httpServletRequest,
-        @Valid @RequestBody RefreshTokenRequest refreshToken
+        @Valid @RequestBody TokenRequest.RefreshToken refreshToken
     ) {
         String accessToken = AuthorizationExtractor.extract(httpServletRequest);
         return ResponseEntity.ok(

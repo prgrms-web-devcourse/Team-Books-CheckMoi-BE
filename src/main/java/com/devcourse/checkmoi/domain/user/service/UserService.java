@@ -1,34 +1,41 @@
 package com.devcourse.checkmoi.domain.user.service;
 
-import com.devcourse.checkmoi.domain.user.dto.response.MyUserInfoResponse;
-import com.devcourse.checkmoi.domain.user.dto.response.UserRegisterResponse;
+import com.devcourse.checkmoi.domain.user.converter.UserConverter;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.Register;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
+import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.global.security.oauth.UserProfile;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
 
+    private final UserConverter userConverter;
+
     private final UserRepository userRepository;
 
     @Transactional
-    public UserRegisterResponse register(UserProfile userProfile) {
-        var user = userRepository.findByOauthId(String.valueOf(userProfile.getOauthId()))
+    public Register register(UserProfile userProfile) {
+        User user = userRepository.findByOauthId(String.valueOf(userProfile.getOauthId()))
             .orElseGet(() -> userRepository.save(userProfile.toUser()));
-        return new UserRegisterResponse(user.getId(), user.getUserRole().getGrantedAuthority());
+
+        return Register.builder()
+            .id(user.getId())
+            .email(user.getEmail().getValue())
+            .profileImageUrl(user.getProfileImgUrl())
+            .build();
     }
 
-    public MyUserInfoResponse findUserInfo(Long userId) {
-        var findUser = userRepository.findById(userId)
+    public UserInfo findUserInfo(Long userId) {
+        User findUser = userRepository.findById(userId)
             .orElseThrow(UserNotFoundException::new);
-        return MyUserInfoResponse.from(findUser);
+        return userConverter.userToUserInfo(findUser);
     }
 
     @Transactional
