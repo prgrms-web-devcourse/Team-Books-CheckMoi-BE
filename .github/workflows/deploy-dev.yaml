@@ -33,6 +33,15 @@ jobs:
       - name: export SERVER_NAME
         run: export SERVER_NAME=${{ secrets.DEV_SERVER_NAME }}
 
+      - name: export KAKAO_CLIENT_ID
+        run: export KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+
+      - name: export KAKAO_CLIENT_SECRET
+        run: export KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+
+      - name: export JWT_SECRET_KEY
+        run: export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+
       - name: OpenAPI Spec Create
         run: ./gradlew test copyDocument
 

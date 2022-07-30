@@ -5,10 +5,10 @@ spring:
         registration:
           kakao:
             client-name: Kakao
-            client-id: # {client-id}
-            client-secret: # {client-secret}
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             scope: profile_nickname, profile_image, account_email, birthday
-            redirect-uri: http://localhost:8080/login/oauth2/code/{registrationId}
+            redirect-uri: ${SERVER_NAME}/login/oauth2/code/{registrationId}
             client-authentication-method: POST
             authorization-grant-type: authorization_code
         provider:
@@ -19,8 +19,8 @@ spring:
             user_name_attribute: id
 
 jwt:
-  issuer: test
-  secret-key: test
+  issuer: checkMoi
+  secret-key: ${JWT_SECRET_KEY}
   access-token:
     expire-length: 3600000
   refresh-token:
