@@ -12,8 +12,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
+import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
-import com.devcourse.checkmoi.template.ApiTest;
+import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
@@ -22,29 +23,28 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 
-@WebMvcTest(StudyApi.class)
-class StudyApiTest extends ApiTest {
+class StudyApiTest extends IntegrationTest {
 
     @MockBean
     private StudyCommandService studyCommandService;
 
     @Nested
-    @DisplayName("스터디 등록 (개설) #5")
+    @DisplayName("스터디 등록 #5")
     class Create {
 
         @Test
-        @WithMockUser
         @DisplayName("S 스터디를 등록할 수 있다")
         void createStudy() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+
             StudyRequest.Create request = StudyRequest.Create.builder()
                 .bookId(1L)
                 .name("스터디 이름")
@@ -59,8 +59,10 @@ class StudyApiTest extends ApiTest {
 
             when(studyCommandService.createStudy(any(StudyRequest.Create.class))).thenReturn(
                 createdStudyId);
+
             MvcResult result = mockMvc.perform(RestDocumentationRequestBuilders.post("/api/studies")
                     .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
                     .content(toJson(request)))
                 .andExpect(status().isCreated())
                 .andDo(documentation())

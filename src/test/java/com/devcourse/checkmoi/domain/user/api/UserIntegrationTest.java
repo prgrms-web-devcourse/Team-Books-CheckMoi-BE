@@ -31,7 +31,7 @@ class UserIntegrationTest extends IntegrationTest {
 
         @Test
         void userPage() throws Exception {
-            TokenWithUserInfo givenUser = getTokenWithUserInfo("su");
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
             mockMvc.perform(get("/api/users/{userId}", givenUser.userInfo().id())
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
                 .andExpect(status().isOk());
@@ -44,7 +44,7 @@ class UserIntegrationTest extends IntegrationTest {
 
         @Test
         void deleteUser() throws Exception {
-            TokenWithUserInfo givenUser = getTokenWithUserInfo("su");
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
             mockMvc.perform(delete("/api/users/{userId}", givenUser.userInfo().id())
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
                 .andExpect(status().isNoContent())

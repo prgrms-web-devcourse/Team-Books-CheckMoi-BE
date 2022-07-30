@@ -6,8 +6,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.removeHeaders;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +36,7 @@ public abstract class ApiTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
             .addFilter(new CharacterEncodingFilter("UTF-8", true))
             .apply(documentationConfiguration(provider))
+            .apply(springSecurity())
             .alwaysDo(print())
             .build();
     }
@@ -56,4 +57,5 @@ public abstract class ApiTest {
     protected String toJson(Object object) throws JsonProcessingException {
         return objectMapper.writeValueAsString(object);
     }
+
 }

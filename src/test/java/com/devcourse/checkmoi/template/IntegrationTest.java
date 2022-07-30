@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.template;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -12,9 +13,13 @@ import com.devcourse.checkmoi.global.security.oauth.OAuthService;
 import com.devcourse.checkmoi.global.security.oauth.UserProfile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,6 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @SpringBootTest
+@ExtendWith(RestDocumentationExtension.class)
 public abstract class IntegrationTest {
 
     protected MockMvc mockMvc;
@@ -34,6 +40,7 @@ public abstract class IntegrationTest {
     @Autowired
     private OAuthService oAuthService;
 
+
     private static UserProfile createUserProfile(String name) {
         return UserProfile.builder()
             .oauthId(name)
@@ -45,20 +52,22 @@ public abstract class IntegrationTest {
     }
 
     @BeforeEach
-    private void setUp(WebApplicationContext context) {
+    protected void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
             .addFilter(new CharacterEncodingFilter("UTF-8", true))
+            .apply(documentationConfiguration(provider))
             .apply(springSecurity())
             .alwaysDo(print())
             .build();
     }
 
     @BeforeEach
-    private void setUpRestDocs(WebApplicationContext context) {
+    protected void setUpRestDocs(WebApplicationContext context) {
         this.restDocs = document(
             "{class-name}/{method-name}",
             preprocessRequest(prettyPrint()),
-            preprocessResponse(removeHeaders("Transfer-Encoding",
+            preprocessResponse(removeHeaders(
+                "Transfer-Encoding",
                 "Date",
                 "Keep-Alive",
                 "Connection"
@@ -66,12 +75,13 @@ public abstract class IntegrationTest {
         );
     }
 
+
     protected String toJson(Object object) throws JsonProcessingException {
         return objectMapper.writeValueAsString(object);
     }
 
-    protected TokenWithUserInfo getTokenWithUserInfo(String name) {
-        return oAuthService.register(createUserProfile(name));
+    protected TokenWithUserInfo getTokenWithUserInfo() {
+        return oAuthService.register(createUserProfile(UUID.randomUUID().toString().substring(19)));
     }
 
 }
