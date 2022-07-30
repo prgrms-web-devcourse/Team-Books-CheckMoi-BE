@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.user.model;
 
+import com.devcourse.checkmoi.domain.user.model.vo.Email;
 import com.devcourse.checkmoi.global.model.BaseEntity;
-import com.devcourse.checkmoi.global.vo.Email;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;

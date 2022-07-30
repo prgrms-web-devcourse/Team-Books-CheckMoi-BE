@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.user.service;
 
 import com.devcourse.checkmoi.domain.user.converter.UserConverter;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.Register;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
@@ -20,16 +21,10 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public UserInfo register(UserProfile userProfile) {
+    public Register register(UserProfile userProfile) {
         User user = userRepository.findByOauthId(String.valueOf(userProfile.getOauthId()))
-            .orElseGet(() -> userRepository.save(userProfile.toUser()));
-
-        return UserInfo.builder()
-            .id(user.getId())
-            .name(user.getName())
-            .email(user.getEmail().getValue())
-            .profileImageUrl(user.getProfileImgUrl())
-            .build();
+            .orElseGet(() -> userRepository.save(userConverter.profileToUser(userProfile)));
+        return userConverter.userToRegister(user);
     }
 
     public UserInfo findUserInfo(Long userId) {
