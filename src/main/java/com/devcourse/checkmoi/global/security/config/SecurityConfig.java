@@ -46,6 +46,7 @@ public class SecurityConfig {
             .and()
 
             // turnOff filter
+            .csrf().disable()
             .httpBasic().disable()
             .rememberMe().disable()
             .logout().disable()
