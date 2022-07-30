@@ -34,11 +34,9 @@ public class SecurityConfig {
             .cors().and()
 
             // permission
-            .authorizeHttpRequests()
-            .antMatchers("/h2-console/**").permitAll()
-            .antMatchers("/tokens").permitAll()
-            .antMatchers("**/docs/**").permitAll()
-            .antMatchers("/favicon.ico").permitAll()
+            .authorizeRequests()
+            .antMatchers("/docs/*").permitAll()
+            .antMatchers("/api/tokens").permitAll()
             .anyRequest().authenticated()
             .and()
 
@@ -48,7 +46,6 @@ public class SecurityConfig {
             .and()
 
             // turnOff filter
-            .csrf().disable()
             .httpBasic().disable()
             .rememberMe().disable()
             .logout().disable()
