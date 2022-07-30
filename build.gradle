@@ -16,7 +16,7 @@ plugins {
 }
 
 group = 'com.devcourse'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 sourceCompatibility = '17'
 
 configurations {
@@ -125,8 +125,8 @@ openapi3 {
     format = 'yaml'
     oauth2SecuritySchemeDefinition = {
         flows = ['authorizationCode']
-        tokenUrl = "$System.env.SERVER_NAME/token"
-        authorizationUrl = "$System.env.SERVER_NAME/authorize"
+        tokenUrl = "https://kauth.kakao.com/oauth/token"
+        authorizationUrl = "https://kauth.kakao.com/oauth/authorize"
     }
 }
 
@@ -142,9 +142,9 @@ sonarqube {
                 src/main/java/com/devcourse/checkmoi/global/exception/EntityNotFoundException.java,
                 src/main/java/com/devcourse/checkmoi/global/exception/ErrorMessage.java,
                 src/main/java/com/devcourse/checkmoi/global/model/BaseEntity.java
-                src/main/java/com/devcourse/checkmoi/global/security/*,
-                src/main/java/com/devcourse/checkmoi/domain/user/*,
-                src/main/java/com/devcourse/checkmoi/domain/token/*
+                src/main/java/com/devcourse/checkmoi/global/security/**,
+                src/main/java/com/devcourse/checkmoi/domain/user/**,
+                src/main/java/com/devcourse/checkmoi/domain/token/**
                 """
     }
 }
