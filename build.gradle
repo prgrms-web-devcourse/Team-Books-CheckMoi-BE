@@ -142,6 +142,7 @@ sonarqube {
                 src/main/java/com/devcourse/checkmoi/global/exception/EntityNotFoundException.java,
                 src/main/java/com/devcourse/checkmoi/global/exception/ErrorMessage.java,
                 src/main/java/com/devcourse/checkmoi/global/model/BaseEntity.java
+                src/main/java/com/devcourse/checkmoi/global/security/*,
                 src/main/java/com/devcourse/checkmoi/domain/user/*,
                 src/main/java/com/devcourse/checkmoi/domain/token/*
                 """
