@@ -11,6 +11,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -30,4 +32,11 @@ public class StudyMember {
     @ManyToOne(fetch = FetchType.LAZY)
     private Study study;
 
+	@Builder
+	public StudyMember(Long id, StudyMemberStatus status, User user, Study study) {
+		this.id = id;
+        this.status = status;
+        this.user = user;
+        this.study = study;
+	}
 }

@@ -7,5 +7,5 @@ public interface StudyCommandService {
 
     Long createStudy(Create request);
 
-    Long editStudyInfo(Long studyId, Edit request);
+    Long editStudyInfo(Long studyId, Long userId, Edit request);
 }
