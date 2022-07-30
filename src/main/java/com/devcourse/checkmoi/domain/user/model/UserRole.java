@@ -1,9 +1,7 @@
 package com.devcourse.checkmoi.domain.user.model;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
 public enum UserRole {
     GUEST("ROLE_GUEST"),
@@ -11,4 +9,7 @@ public enum UserRole {
 
     private final String grantedAuthority;
 
+    public String getGrantedAuthority() {
+        return grantedAuthority;
+    }
 }

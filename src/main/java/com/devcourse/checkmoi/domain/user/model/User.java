@@ -13,10 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -61,4 +59,31 @@ public class User extends BaseEntity {
         this.userRole = userRole;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getOauthId() {
+        return oauthId;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public String getProfileImgUrl() {
+        return profileImgUrl;
+    }
+
+    public UserRole getUserRole() {
+        return userRole;
+    }
 }
