@@ -12,6 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -43,5 +44,36 @@ public class Study extends BaseEntity {
     private LocalDate studyStartDate;
 
     private LocalDate studyEndDate;
+
+    public Study(String name, String thumbnailUrl, String description, Integer maxParticipant,
+        Book book, LocalDate gatherStartDate, LocalDate gatherEndDate,
+        LocalDate studyStartDate, LocalDate studyEndDate) {
+        this(null, name, thumbnailUrl, description, maxParticipant, book, gatherStartDate,
+            gatherEndDate, studyStartDate, studyEndDate);
+    }
+
+    @Builder
+    public Study(Long id, String name, String thumbnailUrl, String description,
+        Integer maxParticipant, Book book, LocalDate gatherStartDate, LocalDate gatherEndDate,
+        LocalDate studyStartDate, LocalDate studyEndDate) {
+        this.id = id;
+        this.name = name;
+        this.thumbnailUrl = thumbnailUrl;
+        this.description = description;
+        this.maxParticipant = maxParticipant;
+        this.book = book;
+        this.gatherStartDate = gatherStartDate;
+        this.gatherEndDate = gatherEndDate;
+        this.studyStartDate = studyStartDate;
+        this.studyEndDate = studyEndDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Book getBook() {
+        return book;
+    }
 
 }

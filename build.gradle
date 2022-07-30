@@ -119,6 +119,11 @@ openapi3 {
     description = 'Checkmoi API 페이지'
     version = project.version.toString().toUpperCase()
     format = 'yaml'
+    oauth2SecuritySchemeDefinition = {
+        flows = ['authorizationCode']
+        tokenUrl = "$System.env.SERVER_NAME/token"
+        authorizationUrl = "$System.env.SERVER_NAME/authorize"
+    }
 }
 
 sonarqube {
