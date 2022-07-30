@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,15 +22,16 @@ public class UserApi {
 
     private final UserService userService;
 
-    @GetMapping("/me")
+    @GetMapping("/users/{userId}")
     ResponseEntity<SuccessResponse<MyUserInfoResponse>> myPage(
-        @AuthenticationPrincipal JwtAuthentication user) {
-        return ResponseEntity.ok().body(new SuccessResponse<>(userService.findUserInfo(user.id())));
+        @PathVariable Long userId, @AuthenticationPrincipal JwtAuthentication user) {
+        return ResponseEntity.ok()
+            .body(new SuccessResponse<>(userService.findUserInfo(user.id())));
     }
 
-    @DeleteMapping("/me")
+    @DeleteMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteAccount(@AuthenticationPrincipal JwtAuthentication user) {
+    void deleteAccount(@PathVariable Long userId, @AuthenticationPrincipal JwtAuthentication user) {
         userService.deleteUserAccount(user.id());
     }
 
