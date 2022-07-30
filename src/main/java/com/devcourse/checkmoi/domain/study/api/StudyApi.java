@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.study.api;
 
 import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.CreateStudy;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,9 @@ public class StudyApi {
 
     private final StudyCommandService studyCommandService;
 
-    // C 스터디 개설 #5
     @PostMapping("/studies")
     public ResponseEntity<SuccessResponse<Long>> createStudy(
-        @RequestBody CreateStudy request) {
+        @RequestBody Create request) {
         Long studyId = studyCommandService.createStudy(request);
         return ResponseEntity
             .created(generatedUri(studyId))

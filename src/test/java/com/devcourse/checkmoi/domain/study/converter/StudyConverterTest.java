@@ -15,12 +15,12 @@ class StudyConverterTest {
 
     @Nested
     @DisplayName("스터디 등록 (개설) #5")
-    class CreateStudy {
+    class Create {
 
         @Test
         @DisplayName("S 스터디 등록 요청을 엔티티로 변환할 수 있다.")
         void createToEntityTest() {
-            StudyRequest.CreateStudy request = StudyRequest.CreateStudy.builder()
+            StudyRequest.Create request = StudyRequest.Create.builder()
                 .bookId(1L)
                 .name("스터디 이름")
                 .thumbnail("스터디 썸네일 URL")

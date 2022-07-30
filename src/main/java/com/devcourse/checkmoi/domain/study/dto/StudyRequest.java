@@ -1,12 +1,12 @@
 package com.devcourse.checkmoi.domain.study.dto;
 
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.CreateStudy;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import java.time.LocalDate;
 import lombok.Builder;
 
-public sealed interface StudyRequest permits CreateStudy {
+public sealed interface StudyRequest permits Create {
 
-    record CreateStudy(
+    record Create(
         Long bookId,
         String name,
         String thumbnail,
@@ -17,7 +17,7 @@ public sealed interface StudyRequest permits CreateStudy {
     ) implements StudyRequest {
 
         @Builder
-        public CreateStudy {
+        public Create {
         }
     }
 

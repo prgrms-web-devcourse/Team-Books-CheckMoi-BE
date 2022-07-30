@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.study.service.study;
 
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.CreateStudy;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +18,10 @@ public class StudyCommandServiceImpl implements
     private final StudyRepository studyRepository;
 
     @Override
-    public Long createStudy(CreateStudy request) {
-        return studyRepository.save(studyConverter.createToEntity(request)).getId();
+    public Long createStudy(Create request) {
+        return studyRepository
+            .save(studyConverter.createToEntity(request))
+            .getId();
     }
 
 }

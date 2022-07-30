@@ -39,13 +39,13 @@ class StudyApiTest extends ApiTest {
 
     @Nested
     @DisplayName("스터디 등록 (개설) #5")
-    class CreateStudy {
+    class Create {
 
         @Test
         @WithMockUser
         @DisplayName("S 스터디를 등록할 수 있다")
         void createStudy() throws Exception {
-            StudyRequest.CreateStudy request = StudyRequest.CreateStudy.builder()
+            StudyRequest.Create request = StudyRequest.Create.builder()
                 .bookId(1L)
                 .name("스터디 이름")
                 .thumbnail("스터디 썸네일 URL")
@@ -57,7 +57,7 @@ class StudyApiTest extends ApiTest {
             Long createdStudyId = 1L;
             SuccessResponse<Long> want = new SuccessResponse<>(1L);
 
-            when(studyCommandService.createStudy(any(StudyRequest.CreateStudy.class))).thenReturn(
+            when(studyCommandService.createStudy(any(StudyRequest.Create.class))).thenReturn(
                 createdStudyId);
             MvcResult result = mockMvc.perform(RestDocumentationRequestBuilders.post("/api/studies")
                     .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
@@ -72,7 +72,7 @@ class StudyApiTest extends ApiTest {
                 }
             );
             then(studyCommandService).should(times(1))
-                .createStudy(any(StudyRequest.CreateStudy.class));
+                .createStudy(any(StudyRequest.Create.class));
             assertThat(got.data()).isEqualTo(want.data());
         }
 

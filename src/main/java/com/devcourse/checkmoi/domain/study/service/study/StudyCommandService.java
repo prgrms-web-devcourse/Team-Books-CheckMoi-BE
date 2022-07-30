@@ -1,8 +1,8 @@
 package com.devcourse.checkmoi.domain.study.service.study;
 
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.CreateStudy;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 
 public interface StudyCommandService {
 
-    Long createStudy(CreateStudy request);
+    Long createStudy(Create request);
 }

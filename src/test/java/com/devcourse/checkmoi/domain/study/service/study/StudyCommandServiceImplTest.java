@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.CreateStudy;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
 import java.time.LocalDate;
@@ -32,12 +31,12 @@ class StudyCommandServiceImplTest {
 
     @Nested
     @DisplayName("스터디 등록 #5")
-    class CreateStudy {
+    class Create {
 
         @Test
         @DisplayName("S 스터디를 등록할 수 있다")
         void createStudy() {
-            StudyRequest.CreateStudy request = StudyRequest.CreateStudy.builder()
+            StudyRequest.Create request = StudyRequest.Create.builder()
                 .bookId(1L)
                 .name("스터디 이름")
                 .thumbnail("스터디 썸네일 URL")
@@ -62,7 +61,7 @@ class StudyCommandServiceImplTest {
                 .build();
             Long want = 1L;
 
-            when(studyConverter.createToEntity(any(StudyRequest.CreateStudy.class)))
+            when(studyConverter.createToEntity(any(StudyRequest.Create.class)))
                 .thenReturn(study);
             when(studyRepository.save(any(Study.class)))
                 .thenReturn(study);

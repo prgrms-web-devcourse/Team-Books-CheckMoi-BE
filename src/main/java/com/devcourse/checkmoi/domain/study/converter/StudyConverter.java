@@ -1,14 +1,14 @@
 package com.devcourse.checkmoi.domain.study.converter;
 
 import com.devcourse.checkmoi.domain.book.model.Book;
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.CreateStudy;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StudyConverter {
 
-    public Study createToEntity(CreateStudy request) {
+    public Study createToEntity(Create request) {
         return Study.builder()
             .book(
                 Book.builder()
