@@ -4,7 +4,6 @@ import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
-import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,8 @@ public class StudyApi {
 
     @PutMapping("/{studyId}")
     public ResponseEntity<SuccessResponse<Long>> editStudyInfo(
-        @PathVariable Long studyId, @RequestBody Edit request, @AuthenticationPrincipal JwtAuthentication user) {
+        @PathVariable Long studyId, @RequestBody Edit request,
+        @AuthenticationPrincipal JwtAuthentication user) {
         return ResponseEntity.ok(
             new SuccessResponse<>(studyCommandService.editStudyInfo(studyId, user.id(), request)));
     }

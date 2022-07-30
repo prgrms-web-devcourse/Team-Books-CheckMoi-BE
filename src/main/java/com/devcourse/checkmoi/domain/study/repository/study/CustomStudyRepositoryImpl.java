@@ -2,9 +2,7 @@ package com.devcourse.checkmoi.domain.study.repository.study;
 
 import static com.devcourse.checkmoi.domain.study.model.QStudy.study;
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
-import static com.devcourse.checkmoi.domain.user.model.QUser.user;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
