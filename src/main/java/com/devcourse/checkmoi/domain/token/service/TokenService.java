@@ -5,6 +5,7 @@ import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.token.model.Token;
 import com.devcourse.checkmoi.domain.token.repository.TokenRepository;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.Register;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.global.security.jwt.JwtTokenProvider;
@@ -24,14 +25,22 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public TokenWithUserInfo createToken(UserInfo user) {
-        String accessToken = jwtTokenProvider.createAccessToken(user.id());
+    public TokenWithUserInfo createToken(Register user) {
+        String accessToken = jwtTokenProvider.createAccessToken(user.id(), user.role());
         String refreshToken = jwtTokenProvider.createRefreshToken();
         Token token = tokenRepository.findTokenByUserId(user.id())
-            .orElse(new Token(refreshToken, user.id()));
+            .orElse(tokenRepository.save(new Token(refreshToken, user.id())));
 
         token.refresh(refreshToken);
-        return new TokenWithUserInfo(accessToken, refreshToken, user);
+
+        UserInfo userinfo = UserInfo.builder()
+            .id(user.id())
+            .name(user.name())
+            .email(user.email())
+            .profileImageUrl(user.profileImageUrl())
+            .build();
+
+        return new TokenWithUserInfo(accessToken, refreshToken, userinfo);
     }
 
     @Transactional
@@ -44,7 +53,9 @@ public class TokenService {
 
         Claims claims = jwtTokenProvider.getClaims(accessToken);
         Long userId = claims.get("userId", Long.class);
-        var findRefreshToken = tokenRepository.findTokenByUserId(userId)
+        String role = claims.get("role", String.class);
+
+        String findRefreshToken = tokenRepository.findTokenByUserId(userId)
             .map(Token::getRefreshToken)
             .orElseThrow(InvalidTokenException::new);
 
@@ -52,7 +63,7 @@ public class TokenService {
             throw new InvalidTokenException();
         }
 
-        var newAccessToken = jwtTokenProvider.createAccessToken(userId);
+        String newAccessToken = jwtTokenProvider.createAccessToken(userId, role);
         return new AccessToken(newAccessToken);
     }
 

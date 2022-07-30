@@ -23,25 +23,25 @@ public class JwtTokenProvider {
 
     private final String secretKey;
 
-    private final long accessTokenValidityInMilliseconds;
+    private final long accessTokenValidTime;
 
-    private final long refreshTokenValidityInMilliseconds;
+    private final long refreshTokenValidTime;
 
     public JwtTokenProvider(
         @Value("${jwt.issuer}") String issuer,
         @Value("${jwt.secret-key}") String secretKey,
-        @Value("${jwt.access-token.expire-length}") long accessTokenValidityInMilliseconds,
-        @Value("${jwt.refresh-token.expire-length}") long refreshTokenValidityInMilliseconds) {
+        @Value("${jwt.access-token.expire-length}") long accessTokenValidTime,
+        @Value("${jwt.refresh-token.expire-length}") long refreshTokenValidTime) {
         this.issuer = issuer;
         this.secretKey = secretKey;
-        this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
-        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
+        this.accessTokenValidTime = accessTokenValidTime;
+        this.refreshTokenValidTime = refreshTokenValidTime;
     }
 
-    public String createAccessToken(long payload) {
-        Map<String, Object> claims = Map.of("userId", payload);
+    public String createAccessToken(long payload, String role) {
+        Map<String, Object> claims = Map.of("userId", payload, "role", role);
         Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + accessTokenValidityInMilliseconds);
+        Date expiredDate = new Date(now.getTime() + accessTokenValidTime);
 
         return Jwts.builder()
             .setIssuer(issuer)
@@ -56,7 +56,7 @@ public class JwtTokenProvider {
         String payload = UUID.randomUUID().toString();
         Claims claims = Jwts.claims().setSubject(payload);
         Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
+        Date expiredDate = new Date(now.getTime() + refreshTokenValidTime);
 
         return Jwts.builder()
             .setIssuer(issuer)
