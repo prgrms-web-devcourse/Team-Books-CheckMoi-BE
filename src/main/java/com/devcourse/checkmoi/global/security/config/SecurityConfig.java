@@ -35,10 +35,8 @@ public class SecurityConfig {
 
             // permission
             .authorizeHttpRequests()
-            .antMatchers("/h2-console/**").permitAll()
-            .antMatchers("/tokens").permitAll()
-            .antMatchers("**/docs/**").permitAll()
-            .antMatchers("/favicon.ico").permitAll()
+            .antMatchers("/**/docs/**").permitAll()
+            .antMatchers("/api/tokens").permitAll()
             .anyRequest().authenticated()
             .and()
 
