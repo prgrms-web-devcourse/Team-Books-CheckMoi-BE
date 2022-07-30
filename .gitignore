@@ -40,3 +40,6 @@ out/
 .DS_Store
 .AppleDouble
 .LSOverride
+
+## OpenAPI SPEC Infomation
+src/main/resources/static/docs/openapi3.yaml
