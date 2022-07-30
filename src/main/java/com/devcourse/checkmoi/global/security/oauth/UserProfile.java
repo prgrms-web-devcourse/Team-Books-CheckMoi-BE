@@ -1,8 +1,6 @@
 package com.devcourse.checkmoi.global.security.oauth;
 
-import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.model.UserRole;
-import com.devcourse.checkmoi.domain.user.model.vo.Email;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import lombok.Builder;
@@ -22,7 +20,7 @@ public class UserProfile {
     private final String profileImgUrl;
 
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private UserRole userRole = UserRole.GUEST;
 
     @Builder
     public UserProfile(String oauthId, String provider, String name, String email,
@@ -32,17 +30,6 @@ public class UserProfile {
         this.name = name;
         this.email = email;
         this.profileImgUrl = profileImgUrl;
-        this.userRole = userRole;
     }
 
-    public User toUser() {
-        return User.builder()
-            .oauthId(oauthId)
-            .provider(provider)
-            .name(name)
-            .email(new Email(email))
-            .profileImgUrl(profileImgUrl)
-            .userRole(UserRole.GUEST)
-            .build();
-    }
 }
