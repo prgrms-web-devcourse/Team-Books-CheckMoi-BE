@@ -106,7 +106,11 @@ jacocoTestCoverageVerification {
             excludes = [
                     "com.devcourse.checkmoi.CheckmoiApplication",
                     "com.devcourse.checkmoi.global.*",
-                    "com.devcourse.checkmoi.domain.*.model.Q*"
+                    "com.devcourse.checkmoi.domain.*.model.Q*",
+                    "com.devcourse.checkmoi.domain.*.model.vo.Q*",
+                    "com.devcourse.checkmoi.domain.user.*",
+                    "com.devcourse.checkmoi.domain.token.*"
+
             ]
         }
     }
@@ -133,12 +137,14 @@ sonarqube {
                 src/main/java/com/devcourse/checkmoi/global/exception/EntityNotFoundException.java,
                 src/main/java/com/devcourse/checkmoi/global/exception/ErrorMessage.java,
                 src/main/java/com/devcourse/checkmoi/global/model/BaseEntity.java
+                src/main/java/com/devcourse/checkmoi/domain/user/*,
+                src/main/java/com/devcourse/checkmoi/domain/token/*
                 """
     }
 }
 
 task copyDocument(type: Copy) {
-    dependsOn ("openapi3")
+    dependsOn("openapi3")
     from file("$buildDir/api-spec/openapi3.yaml")
     into file("src/main/resources/static/docs/.")
 }
