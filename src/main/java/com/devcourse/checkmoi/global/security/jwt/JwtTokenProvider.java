@@ -11,9 +11,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class JwtTokenProvider {
 
@@ -90,6 +92,7 @@ public class JwtTokenProvider {
         try {
             validateToken(accessToken);
         } catch (ExpiredTokenException ignored) {
+            log.info("accessToken 유효기간이 지났습니다. Refresh 토큰을 재발급합니다.");
         }
     }
 
