@@ -1,27 +1,23 @@
 package com.devcourse.checkmoi.global.security.handler;
 
+import com.devcourse.checkmoi.global.exception.ErrorMessage;
+import com.devcourse.checkmoi.global.exception.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.devcourse.checkmoi.global.exception.ErrorResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private static final String ERROR_MESSAGE = "로그인이 필요합니다.";
     private static final String ERROR_LOG_MESSAGE = "[ERROR] {} : {}";
 
     private final ObjectMapper objectMapper;
@@ -29,11 +25,15 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
         AuthenticationException authException) throws IOException {
-        log.info(ERROR_LOG_MESSAGE, authException.getClass().getSimpleName(), ERROR_MESSAGE, authException);
+        log.info(ERROR_LOG_MESSAGE,
+            authException.getClass().getSimpleName(),
+            ErrorMessage.LOGIN_REQUIRED.getMessage(), authException);
+
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(new ErrorResponse(ERROR_MESSAGE)));
+        response.getWriter()
+            .write(objectMapper.writeValueAsString(ErrorResponse.of(ErrorMessage.LOGIN_REQUIRED)));
     }
 
 }
