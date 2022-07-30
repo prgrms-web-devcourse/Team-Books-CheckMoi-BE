@@ -21,8 +21,7 @@ class UserIntegrationTest extends IntegrationTest {
     @ValueSource(strings = "kakao")
     void loginDocument(String vendor) throws Exception {
         mockMvc.perform(post("/oauth2/authorization/" + vendor))
-            .andExpect(status().is3xxRedirection())
-            .andDo(print());
+            .andExpect(status().is3xxRedirection());
     }
 
     @Nested
