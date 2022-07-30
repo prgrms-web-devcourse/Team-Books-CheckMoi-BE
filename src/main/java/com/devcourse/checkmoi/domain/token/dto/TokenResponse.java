@@ -3,6 +3,7 @@ package com.devcourse.checkmoi.domain.token.dto;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.Tokens;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import lombok.Builder;
 
 public sealed interface TokenResponse permits Tokens, AccessToken, TokenWithUserInfo {
@@ -28,7 +29,8 @@ public sealed interface TokenResponse permits Tokens, AccessToken, TokenWithUser
 
     record TokenWithUserInfo(
         String accessToken,
-        String refreshToken
+        String refreshToken,
+        UserInfo userInfo
     ) implements TokenResponse {
 
         @Builder

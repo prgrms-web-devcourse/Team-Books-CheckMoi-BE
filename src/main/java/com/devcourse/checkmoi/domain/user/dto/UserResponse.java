@@ -1,12 +1,12 @@
 package com.devcourse.checkmoi.domain.user.dto;
 
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.Register;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import lombok.Builder;
 
-public sealed interface UserResponse permits UserInfo, Register {
+public sealed interface UserResponse permits UserInfo {
 
     record UserInfo(
+        Long id,
         String name,
         String email,
         String profileImageUrl
@@ -17,14 +17,4 @@ public sealed interface UserResponse permits UserInfo, Register {
         }
     }
 
-    record Register(
-        Long id,// TODO: name? id? Long? String?
-        String email,
-        String profileImageUrl
-    ) implements UserResponse {
-
-        @Builder
-        public Register {
-        }
-    }
 }

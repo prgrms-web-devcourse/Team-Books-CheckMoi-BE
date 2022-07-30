@@ -2,10 +2,10 @@ package com.devcourse.checkmoi.domain.token.service;
 
 import com.devcourse.checkmoi.domain.token.dto.TokenRequest;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
-import com.devcourse.checkmoi.domain.token.dto.TokenResponse.Tokens;
+import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.token.model.Token;
 import com.devcourse.checkmoi.domain.token.repository.TokenRepository;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.Register;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.global.security.jwt.JwtTokenProvider;
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
@@ -24,11 +24,11 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public Tokens createToken(Register user) {
+    public TokenWithUserInfo createToken(UserInfo user) {
         String accessToken = jwtTokenProvider.createAccessToken(user.id());
         String refreshToken = jwtTokenProvider.createRefreshToken();
         tokenRepository.save(new Token(refreshToken, user.id()));
-        return new Tokens(accessToken, refreshToken);
+        return new TokenWithUserInfo(accessToken, refreshToken, user);
     }
 
     @Transactional

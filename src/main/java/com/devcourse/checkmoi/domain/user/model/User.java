@@ -22,8 +22,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
-    private static final int NAME_MAX_LENGTH = 20;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,7 +32,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String provider;
 
-    @Column(length = NAME_MAX_LENGTH, nullable = false)
+    @Column(length = 20, nullable = false)
     private String name;
 
     @Embedded
