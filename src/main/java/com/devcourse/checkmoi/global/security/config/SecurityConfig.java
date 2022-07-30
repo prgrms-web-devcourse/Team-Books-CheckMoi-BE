@@ -17,51 +17,56 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final OAuthAuthenticationSuccessHandler oAuth2SuccessHandler;
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     private final ExceptionHandlerFilter exceptionHandlerFilter;
+
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
-                // cors
-                .cors()
-                .and()
+            // cors
+            .cors().and()
 
-                // permission
-                .authorizeHttpRequests()
-                .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/tokens").permitAll()
-                .antMatchers("**/docs/**").permitAll()
-                .antMatchers("/favicon.ico").permitAll()
-                .anyRequest().authenticated()
-                .and()
+            // permission
+            .authorizeHttpRequests()
+            .antMatchers("/h2-console/**").permitAll()
+            .antMatchers("/tokens").permitAll()
+            .antMatchers("**/docs/**").permitAll()
+            .antMatchers("/favicon.ico").permitAll()
+            .anyRequest().authenticated()
+            .and()
 
-                // oauth
-                .oauth2Login()
-                .successHandler(oAuth2SuccessHandler)
-                .and()
+            // oauth
+            .oauth2Login()
+            .successHandler(oAuth2SuccessHandler)
+            .and()
 
-                // turnOff filter
-                .httpBasic().disable()
-                .rememberMe().disable()
-                .csrf().disable()
-                .logout().disable()
-                .requestCache().disable()
-                .formLogin().disable()
-                .headers().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+            // turnOff filter
+            .csrf().disable()
+            .httpBasic().disable()
+            .rememberMe().disable()
+            .logout().disable()
+            .requestCache().disable()
+            .formLogin().disable()
+            .headers().disable()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
 
-                // jwt authentication entry point
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .and()
+            // jwt authentication entry point
+            .exceptionHandling()
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .and()
 
-                .addFilterBefore(jwtAuthenticationFilter, OAuth2AuthorizationRequestRedirectFilter.class)
-                .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter,
+                OAuth2AuthorizationRequestRedirectFilter.class)
+            .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
