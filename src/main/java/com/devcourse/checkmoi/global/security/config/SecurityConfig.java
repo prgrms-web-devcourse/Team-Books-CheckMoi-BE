@@ -6,6 +6,7 @@ import com.devcourse.checkmoi.global.security.handler.OAuthAuthenticationSuccess
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,6 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests()
             .antMatchers("/**/docs/**").permitAll()
             .antMatchers("/api/tokens").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/studies").permitAll()
             .anyRequest().authenticated()
             .and()
 

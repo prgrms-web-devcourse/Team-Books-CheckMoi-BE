@@ -4,8 +4,8 @@ import static com.devcourse.checkmoi.util.DocumentUtil.getDateFormat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
@@ -17,12 +17,17 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
-import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
+import com.devcourse.checkmoi.domain.study.service.study.StudyQueryService;
+import com.devcourse.checkmoi.domain.study.stub.StudyStub;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
+import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
@@ -34,6 +39,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -46,6 +53,9 @@ class StudyApiTest extends IntegrationTest {
 
     @MockBean
     private StudyCommandService studyCommandService;
+
+    @MockBean
+    private StudyQueryService studyQueryService;
 
     @Nested
     @DisplayName("스터디 등록")
@@ -218,6 +228,103 @@ class StudyApiTest extends IntegrationTest {
                 requestFields(
                     fieldWithPath("status").description("스터디 상태")
                 ));
+        }
+    }
+
+    @Nested
+    @DisplayName("특정 책에 대한 스터디 목록 조회 #43")
+    class GetStudies {
+
+        private final StudyConverter studyConverter = new StudyConverter();
+
+        @Test
+        @DisplayName("현재 모집중인 특정 책에 대한 스터디 목록을 조회한다.")
+        void getStudies() throws Exception {
+            Long bookId = 1L;
+            PageRequest pageRequest = new PageRequest();
+            Pageable pageable = pageRequest.of();
+            Studies response = new Studies(
+                new PageImpl<>(
+                    StudyStub.javaRecrutingStudyStub())
+                    .map(studyConverter::studyToStudyInfo)
+            );
+            given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
+                .willReturn(response);
+
+            ResultActions result = mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/api/studies")
+                    .param("bookId", String.valueOf(bookId))
+                    .param("size", "2")
+                    .param("page", "1")
+            );
+
+            result.andExpect(status().isOk())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            String dataPath = "data.studies.content[]";
+            String pagePath = "data.studies";
+            return MockMvcRestDocumentationWrapper.document("study-get-by-book",
+                ResourceSnippetParameters.builder()
+                    .tag("Study API")
+                    .summary("선택한 책의 모집중인 스터디 목록 확인")
+                    .description("선택한 책의 모집중인 스터디 목록 확인하는 API 입니다.")
+                    .responseSchema(Schema.schema("선택한 책의 모집중인 스터디 목록 응답")),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestParameters(
+                    parameterWithName("bookId").description("책 ID"),
+                    parameterWithName("size").description("가져올 스터디 수"),
+                    parameterWithName("page").description("가져올 페이지")
+                ),
+                responseFields(
+                    fieldWithPath(dataPath + ".id").type(JsonFieldType.NUMBER)
+                        .description("스터디 ID"),
+                    fieldWithPath(dataPath + ".name").type(JsonFieldType.STRING)
+                        .description("스터디 이름"),
+                    fieldWithPath(dataPath + ".thumbnailUrl").type(JsonFieldType.STRING)
+                        .description("스터디 썸네일"),
+                    fieldWithPath(dataPath + ".description").type(JsonFieldType.STRING)
+                        .description("스터디 설명"),
+                    fieldWithPath(dataPath + ".currentParticipant").type(
+                        JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
+                    fieldWithPath(dataPath + ".maxParticipant").type(JsonFieldType.NUMBER)
+                        .description("최대 스터디 참가 인원"),
+                    fieldWithPath(dataPath + ".gatherStartDate").type(JsonFieldType.STRING)
+                        .description("스터디 모집 시작 일자"),
+                    fieldWithPath(dataPath + ".gatherEndDate").type(JsonFieldType.STRING)
+                        .description("스터디 모집 종료 일자"),
+                    fieldWithPath(dataPath + ".studyStartDate").type(JsonFieldType.STRING)
+                        .description("스터디 진행 시작 일자"),
+                    fieldWithPath(dataPath + ".studyEndDate").type(JsonFieldType.STRING)
+                        .description("스터디 진행 종료 일자"),
+                    fieldWithPath(pagePath + ".pageable").type(JsonFieldType.STRING)
+                        .description("Pageable"),
+                    fieldWithPath(pagePath + ".last").type(JsonFieldType.BOOLEAN)
+                        .description("마지막 페이지"),
+                    fieldWithPath(pagePath + ".totalPages").type(JsonFieldType.NUMBER)
+                        .description("총 페이지"),
+                    fieldWithPath(pagePath + ".totalElements").type(JsonFieldType.NUMBER)
+                        .description("총 스터디 수"),
+                    fieldWithPath(pagePath + ".first").type(JsonFieldType.BOOLEAN)
+                        .description("첫 페이지"),
+                    fieldWithPath(pagePath + ".size").type(JsonFieldType.NUMBER)
+                        .description("현재 페이지의 스터디 수"),
+                    fieldWithPath(pagePath + ".number").type(JsonFieldType.NUMBER)
+                        .description("스터디 수"),
+                    fieldWithPath(pagePath + ".sort.empty").type(JsonFieldType.BOOLEAN)
+                        .description("정렬 기준 값 존재 여부"),
+                    fieldWithPath(pagePath + ".sort.sorted").type(JsonFieldType.BOOLEAN)
+                        .description("정렬되었는지 여부"),
+                    fieldWithPath(pagePath + ".sort.unsorted").type(JsonFieldType.BOOLEAN)
+                        .description("정렬되지 않았는지 여부"),
+                    fieldWithPath(pagePath + ".numberOfElements").type(JsonFieldType.NUMBER)
+                        .description("스터디 수"),
+                    fieldWithPath(pagePath + ".empty").type(JsonFieldType.BOOLEAN)
+                        .description("값이 비어있는지 여부")
+                )
+            );
         }
     }
 }

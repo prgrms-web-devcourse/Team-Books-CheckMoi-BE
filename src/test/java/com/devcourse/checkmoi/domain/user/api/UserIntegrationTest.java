@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.template.IntegrationTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
