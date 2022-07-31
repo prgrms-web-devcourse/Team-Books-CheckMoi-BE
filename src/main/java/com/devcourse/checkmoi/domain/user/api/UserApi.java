@@ -2,7 +2,8 @@ package com.devcourse.checkmoi.domain.user.api;
 
 import com.devcourse.checkmoi.domain.user.dto.UserRequest;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
-import com.devcourse.checkmoi.domain.user.service.UserService;
+import com.devcourse.checkmoi.domain.user.service.UserCommandService;
+import com.devcourse.checkmoi.domain.user.service.UserQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserApi {
 
-    private final UserService userService;
+    private final UserQueryService userQueryService;
+
+    private final UserCommandService userCommandService;
 
     @GetMapping("/users/{userId}")
     ResponseEntity<SuccessResponse<UserInfo>> userPage(
@@ -31,7 +34,7 @@ public class UserApi {
         @AuthenticationPrincipal JwtAuthentication user
     ) {
         return ResponseEntity.ok()
-            .body(new SuccessResponse<>(userService.findUserInfo(user.id())));
+            .body(new SuccessResponse<>(userQueryService.findUserInfo(user.id())));
     }
 
     @DeleteMapping("/users/{userId}")
@@ -39,7 +42,7 @@ public class UserApi {
         @PathVariable Long userId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
-        userService.deleteUserAccount(userId, user.id());
+        userCommandService.deleteUserAccount(userId, user.id());
         return ResponseEntity.noContent().build();
     }
 
@@ -49,7 +52,7 @@ public class UserApi {
         @AuthenticationPrincipal JwtAuthentication user,
         @RequestBody UserRequest.Edit request
     ) {
-        userService.editAccount(userId, user.id(), request);
+        userCommandService.editAccount(userId, user.id(), request);
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(userId));
     }

@@ -3,7 +3,6 @@ package com.devcourse.checkmoi.domain.user.service;
 import com.devcourse.checkmoi.domain.user.converter.UserConverter;
 import com.devcourse.checkmoi.domain.user.dto.UserRequest.Edit;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.Register;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.exception.UserNoPermissionException;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
@@ -14,35 +13,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class UserService {
+public class UserCommandServiceImpl implements UserCommandService {
 
     private final UserConverter userConverter;
 
     private final UserRepository userRepository;
 
-    public UserInfo findUserInfo(Long userId) {
-        User findUser = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
-        return userConverter.userToUserInfo(findUser);
-    }
-
-    @Transactional
-    public Register register(UserProfile userProfile) {
+    @Override
+    public Register registerAccount(UserProfile userProfile) {
         User user = userRepository.findByOauthId(String.valueOf(userProfile.getOauthId()))
             .orElseGet(() -> userRepository.save(userConverter.profileToUser(userProfile)));
         return userConverter.userToRegister(user);
     }
 
-    @Transactional
+    @Override
     public void deleteUserAccount(Long userId, Long authId) {
         validatePermission(userId, authId, "서비스 탈퇴");
 
         userRepository.deleteById(userId);
     }
 
-    @Transactional
+    @Override
     public void editAccount(Long userId, Long authId, Edit request) {
         validatePermission(userId, authId, "수정");
 
