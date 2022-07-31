@@ -1,11 +1,12 @@
 package com.devcourse.checkmoi.domain.study.dto;
 
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 import java.time.LocalDate;
 import lombok.Builder;
 
-public sealed interface StudyRequest permits Create, Edit {
+public sealed interface StudyRequest permits Create, Edit, Audit {
 
     record Create(
         Long bookId,
@@ -30,6 +31,16 @@ public sealed interface StudyRequest permits Create, Edit {
 
         @Builder
         public Edit {
+        }
+    }
+
+    record Audit(
+        String status
+    ) implements StudyRequest {
+
+        @Builder
+        public Audit {
+
         }
     }
 }

@@ -2,7 +2,6 @@ package com.devcourse.checkmoi.domain.study.model;
 
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
-
 import com.devcourse.checkmoi.domain.user.model.User;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,7 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -32,11 +30,23 @@ public class StudyMember {
     @ManyToOne(fetch = FetchType.LAZY)
     private Study study;
 
-	@Builder
-	public StudyMember(Long id, StudyMemberStatus status, User user, Study study) {
-		this.id = id;
+    @Builder
+    public StudyMember(Long id, StudyMemberStatus status, User user, Study study) {
+        this.id = id;
         this.status = status;
         this.user = user;
         this.study = study;
-	}
+    }
+
+    public void changeStatus(StudyMemberStatus status) {
+        this.status = status;
+    }
+
+    public StudyMemberStatus getStatus() {
+        return status;
+    }
+
+    public User getUser() {
+        return user;
+    }
 }

@@ -70,4 +70,36 @@ public class Book extends BaseEntity {
     public PublishedDate getPublishedAt() {
         return publishedAt;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }

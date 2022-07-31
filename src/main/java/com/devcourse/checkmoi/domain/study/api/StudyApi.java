@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.study.api;
 
 import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
@@ -40,5 +41,18 @@ public class StudyApi {
         @AuthenticationPrincipal JwtAuthentication user) {
         return ResponseEntity.ok(
             new SuccessResponse<>(studyCommandService.editStudyInfo(studyId, user.id(), request)));
+    }
+
+    @PutMapping("/{studyId}/member/{memberId}")
+    public ResponseEntity<Void> auditStudyParticipation(
+        @PathVariable Long studyId,
+        @PathVariable Long memberId,
+        @AuthenticationPrincipal JwtAuthentication user,
+        @RequestBody Audit request
+    ) {
+        studyCommandService.auditStudyParticipation(studyId, memberId, user.id(), request);
+        return ResponseEntity
+            .noContent()
+            .build();
     }
 }
