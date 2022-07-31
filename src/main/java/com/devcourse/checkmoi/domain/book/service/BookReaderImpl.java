@@ -33,7 +33,7 @@ public class BookReaderImpl implements BookReader {
             PageRequest.of(
                 pageRequest.getPage(),
                 pageRequest.getSize(),
-                Sort.by(Direction.DESC, "id"));
+                Sort.by(Direction.DESC, "createdAt"));
 
         return new LatestAllBooks(
             bookRepository.findAllTop(page).stream()
