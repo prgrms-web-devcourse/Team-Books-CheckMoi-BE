@@ -6,12 +6,11 @@ import com.devcourse.checkmoi.domain.book.dto.UpdateBookRequest.CreateBook;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public record PersistedDummyData(String author, String title, String thumbnail, Long bookId,
                                  String description, String isbn, String publisher,
-                                 String publishedAt, LocalDateTime createdAt) {
+                                 String publishedAt, LocalDate createdAt) {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
@@ -21,7 +20,7 @@ public record PersistedDummyData(String author, String title, String thumbnail, 
 
         this(author, title, thumbnail, bookId, description, isbn, publisher,
             publishedAt,
-            LocalDateTime.now());
+            LocalDate.now());
     }
 
     public SimpleBook simple() {
