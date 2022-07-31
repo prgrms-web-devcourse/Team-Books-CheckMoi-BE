@@ -15,6 +15,8 @@ import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
+import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
+import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,11 +32,21 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     private final StudyMemberRepository studyMemberRepository;
 
+    private final UserRepository userRepository;
+
     @Override
-    public Long createStudy(Create request) {
-        return studyRepository
-            .save(studyConverter.createToEntity(request))
-            .getId();
+    public Long createStudy(Create request, Long userId) {
+        Study study = studyRepository.save(studyConverter.createToEntity(request));
+        StudyMember studyMember = StudyMember.builder()
+            .user(
+                userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new)
+            )
+            .status(StudyMemberStatus.OWNED)
+            .study(study)
+        .build();
+        studyMemberRepository.save(studyMember);
+        return study.getId();
     }
 
     @Override

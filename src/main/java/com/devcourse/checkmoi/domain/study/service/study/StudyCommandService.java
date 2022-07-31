@@ -6,7 +6,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 
 public interface StudyCommandService {
 
-    Long createStudy(Create request);
+    Long createStudy(Create request, Long userId);
 
     Long editStudyInfo(Long studyId, Long userId, Edit request);
 

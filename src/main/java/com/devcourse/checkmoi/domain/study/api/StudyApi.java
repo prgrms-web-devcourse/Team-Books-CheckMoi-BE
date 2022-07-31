@@ -36,8 +36,9 @@ public class StudyApi {
 
     @PostMapping
     public ResponseEntity<SuccessResponse<Long>> createStudy(
-        @RequestBody Create request) {
-        Long studyId = studyCommandService.createStudy(request);
+        @RequestBody Create request,
+        @AuthenticationPrincipal JwtAuthentication user) {
+        Long studyId = studyCommandService.createStudy(request, user.id());
         return ResponseEntity
             .created(generatedUri(studyId))
             .body(new SuccessResponse<>(studyId));

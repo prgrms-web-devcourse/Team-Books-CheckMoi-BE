@@ -56,4 +56,16 @@ public class UserStub {
                 .build()
         );
     }
+
+    public static User user() {
+        return User.builder()
+            .id(1L)
+            .oauthId("ASDASDQWDAASDZFWEF1")
+            .provider("KAKAO")
+            .name("user1")
+            .email(new Email("user1@test.com"))
+            .profileImgUrl("https://example.com/java.png")
+            .userRole(UserRole.GUEST)
+            .build();
+    }
 }

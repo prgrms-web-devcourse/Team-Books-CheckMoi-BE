@@ -18,6 +18,10 @@ import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
+import com.devcourse.checkmoi.domain.study.stub.StudyMemberStub;
+import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.domain.user.repository.UserRepository;
+import com.devcourse.checkmoi.domain.user.stub.UserStub;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +47,9 @@ class StudyCommandServiceImplTest {
     @Mock
     StudyMemberRepository studyMemberRepository;
 
+    @Mock
+    UserRepository userRepository;
+
     @Nested
     @DisplayName("스터디 등록 #5")
     class Create {
@@ -59,6 +66,8 @@ class StudyCommandServiceImplTest {
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
                 .build();
+            Long userId = 1L;
+            User user = UserStub.user();
             Study study = Study.builder()
                 .book(
                     Book.builder().
@@ -73,13 +82,18 @@ class StudyCommandServiceImplTest {
                 .gatherStartDate(request.gatherStartDate())
                 .gatherEndDate(request.gatherEndDate())
                 .build();
+            StudyMember studyMember = StudyMemberStub.studyMember();
             Long want = 1L;
 
             when(studyConverter.createToEntity(any(StudyRequest.Create.class)))
                 .thenReturn(study);
             when(studyRepository.save(any(Study.class)))
                 .thenReturn(study);
-            Long got = studyCommandService.createStudy(request);
+            when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(user));
+            when(studyMemberRepository.save(any(StudyMember.class)))
+                .thenReturn(studyMember);
+            Long got = studyCommandService.createStudy(request, userId);
 
             assertThat(got).isEqualTo(want);
         }

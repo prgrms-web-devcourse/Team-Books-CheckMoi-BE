@@ -47,4 +47,12 @@ public class StudyMemberStub {
         );
     }
 
+    public static StudyMember studyMember() {
+        return StudyMember.builder()
+            .id(1L)
+            .status(StudyMemberStatus.OWNED)
+            .user(users.get(0))
+            .study(studies.get(0))
+            .build();
+    }
 }
