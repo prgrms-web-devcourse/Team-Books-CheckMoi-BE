@@ -32,7 +32,6 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("해당 스터디의 스터디장의 ID를 찾는다")
         void test() {
-            Long want = 1L;
             String name = "name";
             User user = userRepository.saveAndFlush(
                 User.builder().oauthId(name).provider("kakao").name(name)
@@ -44,7 +43,7 @@ class StudyRepositoryTest extends RepositoryTest {
                     .id(1L)
                     .build()
             );
-            studyMemberRepository.saveAndFlush(
+            StudyMember studyMember = studyMemberRepository.saveAndFlush(
                 StudyMember.builder()
                     .id(1L)
                     .status(StudyMemberStatus.OWNED)
@@ -54,9 +53,10 @@ class StudyRepositoryTest extends RepositoryTest {
                     )
                     .build()
             );
-            Long got = studyRepository.findStudyOwner(1L);
+            Long got = studyRepository.findStudyOwner(study.getId());
 
-            assertThat(got).isEqualTo(want);
+            assertThat(got)
+                .isEqualTo(studyMember.getUser().getId());
         }
     }
 }
