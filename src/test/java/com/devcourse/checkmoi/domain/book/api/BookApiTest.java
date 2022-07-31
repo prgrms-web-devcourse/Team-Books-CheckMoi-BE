@@ -131,14 +131,6 @@ class BookApiTest extends IntegrationTest {
                 .andExpect(status().isOk())
                 .andDo(documentation())
                 .andReturn();
-
-            SuccessResponse<LatestAllBooks> booksResponse = objectMapper.readValue(
-                mvcResult.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-
-            Assertions.assertThat(booksResponse.data().books().size())
-                .isEqualTo(2);
         }
 
         private RestDocumentationResultHandler documentation() {
@@ -190,14 +182,6 @@ class BookApiTest extends IntegrationTest {
                 .andExpect(status().isOk())
                 .andDo(documentation())
                 .andReturn();
-
-            SuccessResponse<BookSpecification> bookSpecificationResponse = objectMapper.readValue(
-                mvcResult.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
-
-            Assertions.assertThat(bookSpecificationResponse.data().id())
-                .isEqualTo(specification.id());
         }
 
         private RestDocumentationResultHandler documentation() {

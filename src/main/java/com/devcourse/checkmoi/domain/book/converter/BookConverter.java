@@ -19,7 +19,7 @@ public class BookConverter {
             .description(book.getDescription())
             .title(book.getTitle())
             .image(book.getThumbnail())
-            .createAt(book.getCreatedAt().toLocalDate())
+            .createAt(book.getCreatedAt())
             .pubDate(book.getPublishedAt().getPublishedAt())
             .build();
     }
@@ -43,7 +43,7 @@ public class BookConverter {
             .image(book.getThumbnail())
             .isbn(book.getIsbn())
             .id(book.getId())
-            .createAt(book.getCreatedAt().toLocalDate())
+            .createAt(book.getCreatedAt())
             .pubDate(book.getPublishedAt().getPublishedAt())
             .publisher(book.getPublisher())
             .title(book.getTitle())
