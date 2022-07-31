@@ -1,11 +1,9 @@
 package com.devcourse.checkmoi.template;
 
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.removeHeaders;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
@@ -20,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.headers.RequestHeadersSnippet;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -35,11 +33,8 @@ public abstract class IntegrationTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    protected RestDocumentationResultHandler restDocs;
-
     @Autowired
     private OAuthService oAuthService;
-
 
     private static UserProfile createUserProfile(String name) {
         return UserProfile.builder()
@@ -49,6 +44,12 @@ public abstract class IntegrationTest {
             .email(name + "@gmail.com")
             .profileImgUrl("url")
             .build();
+    }
+
+    protected RequestHeadersSnippet tokenRequestHeader() {
+        return requestHeaders(
+            headerWithName(AUTHORIZATION).description("JWT accessToken")
+        );
     }
 
     @BeforeEach
@@ -61,21 +62,6 @@ public abstract class IntegrationTest {
             .build();
     }
 
-    @BeforeEach
-    protected void setUpRestDocs(WebApplicationContext context) {
-        this.restDocs = document(
-            "{class-name}/{method-name}",
-            preprocessRequest(prettyPrint()),
-            preprocessResponse(removeHeaders(
-                "Transfer-Encoding",
-                "Date",
-                "Keep-Alive",
-                "Connection"
-            ), prettyPrint())
-        );
-    }
-
-
     protected String toJson(Object object) throws JsonProcessingException {
         return objectMapper.writeValueAsString(object);
     }
@@ -83,5 +69,4 @@ public abstract class IntegrationTest {
     protected TokenWithUserInfo getTokenWithUserInfo() {
         return oAuthService.register(createUserProfile(UUID.randomUUID().toString().substring(19)));
     }
-
 }
