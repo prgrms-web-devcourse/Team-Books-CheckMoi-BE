@@ -39,25 +39,39 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String profileImgUrl;
 
+    @Column(nullable = false)
+    private float temperature = 36.5f;
+
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
     private User(String oauthId, String provider, String name, Email email,
-        String profileImgUrl, UserRole userRole) {
-        this(null, oauthId, provider, name, email, profileImgUrl, userRole);
+        String profileImgUrl, float temperature, UserRole userRole) {
+        this(null, oauthId, provider, name, email, profileImgUrl, temperature, userRole);
     }
 
     @Builder
-    public User(Long id, String oauthId, String provider, String name, Email email,
-        String profileImgUrl, UserRole userRole) {
-        this.oauthId = oauthId;
-        this.name = name;
-        this.provider = provider;
-        this.profileImgUrl = profileImgUrl;
+    public User(Long id, String oauthId, String provider, String name,
+        Email email, String profileImgUrl, float temperature,
+        UserRole userRole) {
         this.id = id;
+        this.oauthId = oauthId;
+        this.provider = provider;
+        this.name = name;
         this.email = email;
+        this.profileImgUrl = profileImgUrl;
+        this.temperature = temperature;
         this.userRole = userRole;
     }
+
+    public void editName(String name) {
+        this.name = name;
+    }
+
+    public void editProfileImage(String profileImgUrl) {
+        this.profileImgUrl = profileImgUrl;
+    }
+
 
     public Long getId() {
         return id;
@@ -86,4 +100,5 @@ public class User extends BaseEntity {
     public UserRole getUserRole() {
         return userRole;
     }
+
 }
