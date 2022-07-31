@@ -14,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
 @Service
-public class BookReaderImpl implements BookReader {
+public class BookQueryServiceImpl implements BookQueryService {
 
     private final BookRepository bookRepository;
 
     private final BookConverter bookConverter;
 
-    public BookReaderImpl(BookRepository bookRepository,
+    public BookQueryServiceImpl(BookRepository bookRepository,
         BookConverter bookConverter) {
         this.bookRepository = bookRepository;
         this.bookConverter = bookConverter;

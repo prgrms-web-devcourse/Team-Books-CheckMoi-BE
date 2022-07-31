@@ -14,8 +14,8 @@ import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
-import com.devcourse.checkmoi.domain.book.service.BookReader;
-import com.devcourse.checkmoi.domain.book.service.BookStore;
+import com.devcourse.checkmoi.domain.book.service.BookCommandService;
+import com.devcourse.checkmoi.domain.book.service.BookQueryService;
 import com.devcourse.checkmoi.domain.book.stub.PersistedDummyData;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
@@ -42,10 +42,10 @@ import org.springframework.test.web.servlet.MvcResult;
 class BookApiTest extends IntegrationTest {
 
     @MockBean
-    BookStore bookStore;
+    BookCommandService bookCommandService;
 
     @MockBean
-    BookReader bookReader;
+    BookQueryService bookQueryService;
 
     private PersistedDummyData createDummyBigWhale() {
         return new PersistedDummyData("큰그림", "대왕고래", "abc/foo.png", 1L, "대왕고래와 아기고래가 함께 살았어요",
@@ -70,7 +70,7 @@ class BookApiTest extends IntegrationTest {
             CreateBook createRequest = bookInfo.create();
             SimpleBook simpleBook = bookInfo.simple();
 
-            given(bookStore.save(createRequest)).willReturn(simpleBook);
+            given(bookCommandService.save(createRequest)).willReturn(simpleBook);
 
             MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.put("/api/books")
                     .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
@@ -123,7 +123,7 @@ class BookApiTest extends IntegrationTest {
         void topBooks() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo(); // FIXME : 메인페이지 접속 권한에서 로그인을 필요로 하고 있다
 
-            given(bookReader.getAllTop(any()))
+            given(bookQueryService.getAllTop(any()))
                 .willReturn(books);
 
             MvcResult mvcResult = mockMvc.perform(get("/api/books")
@@ -175,7 +175,7 @@ class BookApiTest extends IntegrationTest {
 
             BookSpecification specification = bigWhaleBook.specification();
 
-            given(bookReader.getById(anyLong())).willReturn(specification);
+            given(bookQueryService.getById(anyLong())).willReturn(specification);
 
             MvcResult mvcResult = mockMvc.perform(get("/api/books/{bookId}", bigWhaleBook.bookId())
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))

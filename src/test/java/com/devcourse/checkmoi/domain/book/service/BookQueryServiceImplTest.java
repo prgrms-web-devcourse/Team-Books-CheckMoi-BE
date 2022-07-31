@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BookReaderImplTest {
+class BookQueryServiceImplTest {
 
     @Autowired
-    private BookReader bookReader;
+    private BookQueryService bookQueryService;
 
     @Autowired
     private BookRepository bookRepository;
@@ -49,7 +49,7 @@ class BookReaderImplTest {
         void getTopBooks() {
             SimplePage simplePage = SimplePage.defaultPage();
 
-            LatestAllBooks allTopBooks = bookReader.getAllTop(simplePage);
+            LatestAllBooks allTopBooks = bookQueryService.getAllTop(simplePage);
 
             Assertions.assertThat(allTopBooks.books().get(0).id())
                 .isEqualTo(lastCatBook.getId());
@@ -66,7 +66,7 @@ class BookReaderImplTest {
         void getByIdFail() {
             Long notExistingId = 0L;
 
-            Assertions.assertThatThrownBy(() -> bookReader.getById(notExistingId))
+            Assertions.assertThatThrownBy(() -> bookQueryService.getById(notExistingId))
                 .isInstanceOf(BookNotFoundException.class);
         }
     }

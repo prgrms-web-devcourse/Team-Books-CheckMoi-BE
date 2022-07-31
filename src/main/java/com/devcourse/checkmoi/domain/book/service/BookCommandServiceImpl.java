@@ -9,13 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class BookStoreImpl implements BookStore {
+public class BookCommandServiceImpl implements BookCommandService {
 
     private final BookRepository bookRepository;
 
     private final BookConverter bookConverter;
 
-    public BookStoreImpl(BookRepository bookRepository,
+    public BookCommandServiceImpl(BookRepository bookRepository,
         BookConverter bookConverter) {
         this.bookRepository = bookRepository;
         this.bookConverter = bookConverter;

@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BookStoreImplTest {
+class BookCommandServiceImplTest {
 
     @Autowired
-    private BookStore bookStore;
+    private BookCommandService bookCommandService;
 
     @Autowired
     private BookRepository bookRepository;
@@ -74,7 +74,7 @@ class BookStoreImplTest {
                 birdBook.getDescription()
             );
 
-            SimpleBook response = bookStore.save(createRequest);
+            SimpleBook response = bookCommandService.save(createRequest);
 
             Assertions.assertThat(response.id())
                 .isEqualTo(birdBook.getId());
@@ -93,7 +93,7 @@ class BookStoreImplTest {
                 "고양이의 귀여움을 설명한다"
             );
 
-            SimpleBook response = bookStore.save(createRequest);
+            SimpleBook response = bookCommandService.save(createRequest);
 
             Assertions.assertThat(response.id())
                 .isNotNull();

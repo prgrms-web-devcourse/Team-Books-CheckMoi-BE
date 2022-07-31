@@ -4,8 +4,8 @@ import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.SimplePage;
-import com.devcourse.checkmoi.domain.book.service.BookReader;
-import com.devcourse.checkmoi.domain.book.service.BookStore;
+import com.devcourse.checkmoi.domain.book.service.BookCommandService;
+import com.devcourse.checkmoi.domain.book.service.BookQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,20 +19,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/books")
 public class BookApi {
 
-    private final BookStore bookStore;
+    private final BookCommandService bookCommandService;
 
-    private final BookReader bookReader;
+    private final BookQueryService bookQueryService;
 
-    public BookApi(BookStore bookStore,
-        BookReader bookReader) {
-        this.bookStore = bookStore;
-        this.bookReader = bookReader;
+    public BookApi(BookCommandService bookCommandService,
+        BookQueryService bookQueryService) {
+        this.bookCommandService = bookCommandService;
+        this.bookQueryService = bookQueryService;
     }
 
     @PutMapping
     public ResponseEntity<SuccessResponse<Long>> register(
         @RequestBody CreateBook createRequest) {
-        Long bookId = bookStore.save(createRequest).id();
+        Long bookId = bookCommandService.save(createRequest).id();
 
         return ResponseEntity.ok(
             new SuccessResponse<>(bookId)
@@ -41,7 +41,7 @@ public class BookApi {
 
     @GetMapping
     public ResponseEntity<SuccessResponse<LatestAllBooks>> topBooks() {
-        LatestAllBooks topBooks = bookReader.getAllTop(SimplePage.defaultPage());
+        LatestAllBooks topBooks = bookQueryService.getAllTop(SimplePage.defaultPage());
 
         return ResponseEntity.ok(
             new SuccessResponse<>(topBooks)
@@ -51,7 +51,7 @@ public class BookApi {
     @GetMapping("/{bookId}")
     public ResponseEntity<SuccessResponse<BookSpecification>> getById(
         @PathVariable Long bookId) {
-        BookSpecification bookSpecification = bookReader.getById(bookId);
+        BookSpecification bookSpecification = bookQueryService.getById(bookId);
 
         return ResponseEntity.ok(
             new SuccessResponse<>(bookSpecification)

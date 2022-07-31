@@ -4,7 +4,7 @@ import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.SimplePage;
 
-public interface BookReader {
+public interface BookQueryService {
 
     LatestAllBooks getAllTop(SimplePage pageRequest);
 
