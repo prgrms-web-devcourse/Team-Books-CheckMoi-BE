@@ -88,9 +88,9 @@ class BookApiTest extends IntegrationTest {
         private RestDocumentationResultHandler documentation() {
             return MockMvcRestDocumentationWrapper.document("book-create",
                 ResourceSnippetParameters.builder().tag("Book API").summary("책 등록")
-                    .description("책 등록에 사용되는 API입니다.")
-                    .requestSchema(Schema.schema("UpdateBookRequest.CreateBook"))
-                    .responseSchema(Schema.schema("Book ID")),
+                    .description("책 등록에 사용되는 API 입니다.")
+                    .requestSchema(Schema.schema("책 생성 요청"))
+                    .responseSchema(Schema.schema("책 생성 응답")),
                 requestFields(fieldWithPath("title").type(JsonFieldType.STRING).description("책 제목"),
                     fieldWithPath("image").type(JsonFieldType.STRING).description("책 이미지"),
                     fieldWithPath("author").type(JsonFieldType.STRING).description("책 저자"),
@@ -137,7 +137,7 @@ class BookApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("book-top",
                 ResourceSnippetParameters.builder().tag("Book API").summary("메인 페이지 책 목록 받아오기")
                     .description("메인페이지에 책 목록을 가져오는 API 입니다")
-                    .responseSchema(Schema.schema("ReadBookResponse.LatestAllBooks")),
+                    .responseSchema(Schema.schema("책 목록 응답")),
                 responseFields(
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                     fieldWithPath("data.books").type(JsonFieldType.ARRAY).description("책 목록"),
@@ -153,7 +153,7 @@ class BookApiTest extends IntegrationTest {
                     fieldWithPath("data.books[].isbn").type(JsonFieldType.STRING)
                         .description("책 ISBN"),
                     fieldWithPath("data.books[].description").type(JsonFieldType.STRING)
-                        .description("책 설"),
+                        .description("책 설명"),
                     fieldWithPath("data.books[].createAt").type(JsonFieldType.STRING)
                         .description("책 등록날자"),
                     fieldWithPath("data.books[].pubDate").type(JsonFieldType.STRING)
@@ -188,7 +188,7 @@ class BookApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("book-getById",
                 ResourceSnippetParameters.builder().tag("Book API").summary("책 id 에 해당하는 책 가져오기")
                     .description("책 id 에 해당하는 책을 가져오는 API 입니다")
-                    .responseSchema(Schema.schema("ReadBookResponse.BookSpecification")),
+                    .responseSchema(Schema.schema("책 상세정보 응답")),
                 pathParameters(
                     parameterWithName("bookId").description("책 id")
                 ),
@@ -198,7 +198,7 @@ class BookApiTest extends IntegrationTest {
                     fieldWithPath("data.image").type(JsonFieldType.STRING).description("책 이미지"),
                     fieldWithPath("data.author").type(JsonFieldType.STRING).description("책 저자"),
                     fieldWithPath("data.publisher").type(JsonFieldType.STRING).description("책 출판사"),
-                    fieldWithPath("data.title").type(JsonFieldType.STRING).description("책 제"),
+                    fieldWithPath("data.title").type(JsonFieldType.STRING).description("책 제목"),
                     fieldWithPath("data.pubDate").type(JsonFieldType.STRING).description("책 발행날자"),
                     fieldWithPath("data.isbn").type(JsonFieldType.STRING).description("책 isbn13"),
                     fieldWithPath("data.description").type(JsonFieldType.STRING)

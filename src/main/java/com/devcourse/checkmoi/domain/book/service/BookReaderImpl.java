@@ -1,6 +1,5 @@
 package com.devcourse.checkmoi.domain.book.service;
 
-import static java.util.stream.Collectors.toList;
 import com.devcourse.checkmoi.domain.book.converter.BookConverter;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
@@ -38,7 +37,7 @@ public class BookReaderImpl implements BookReader {
         return new LatestAllBooks(
             bookRepository.findAllTop(page).stream()
                 .map(bookConverter::bookToSimple)
-                .collect(toList()));
+                .toList());
 
     }
 

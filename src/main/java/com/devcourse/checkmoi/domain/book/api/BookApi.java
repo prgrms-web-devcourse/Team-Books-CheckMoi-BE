@@ -30,7 +30,7 @@ public class BookApi {
     }
 
     @PutMapping
-    public ResponseEntity<SuccessResponse<Long>> updateBook(
+    public ResponseEntity<SuccessResponse<Long>> register(
         @RequestBody CreateBook createRequest) {
         Long bookId = bookStore.save(createRequest).id();
 
