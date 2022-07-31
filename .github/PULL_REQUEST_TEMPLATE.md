@@ -2,4 +2,4 @@
 
 ## 중점적으로 봐야할 부분
 
-resolves#
+- resolves #
