@@ -3,7 +3,6 @@ package com.devcourse.checkmoi.domain.book.service;
 import com.devcourse.checkmoi.domain.book.converter.BookConverter;
 import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.SimpleBook;
 import com.devcourse.checkmoi.domain.book.dto.UpdateBookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,10 +27,7 @@ public class BookStoreImpl implements BookStore {
         return bookRepository.findByIsbn(bookRequest.isbn())
             .map(bookConverter::bookToSimple)
             .orElseGet(() ->
-                bookConverter.bookToSimple(this.create(bookRequest)));
-    }
-
-    private Book create(CreateBook createRequest) {
-        return bookRepository.save(bookConverter.CreateToBook(createRequest));
+                bookConverter.bookToSimple(
+                    bookRepository.save(bookConverter.CreateToBook(bookRequest))));
     }
 }
