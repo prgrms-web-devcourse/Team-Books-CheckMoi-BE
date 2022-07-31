@@ -11,4 +11,5 @@ public interface StudyCommandService {
     Long editStudyInfo(Long studyId, Long userId, Edit request);
 
     void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request);
+
 }

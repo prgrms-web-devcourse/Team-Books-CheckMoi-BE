@@ -38,6 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests()
             .antMatchers("/**/docs/**").permitAll()
             .antMatchers("/api/tokens").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/studies").permitAll()
             .antMatchers(HttpMethod.GET, "/api/books/**").permitAll()
             .anyRequest().authenticated()
             .and()
