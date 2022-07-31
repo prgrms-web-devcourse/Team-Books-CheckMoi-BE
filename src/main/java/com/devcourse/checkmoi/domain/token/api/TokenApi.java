@@ -34,10 +34,11 @@ public class TokenApi {
             new SuccessResponse<>(tokenService.refreshAccessToken(accessToken, refreshToken)));
     }
 
-    @DeleteMapping("/tokens")
+    @DeleteMapping("/logout")
     public ResponseEntity<Void> deleteRefreshToken(
         @AuthenticationPrincipal JwtAuthentication user) {
         tokenService.deleteTokenByUserId(user.id());
         return ResponseEntity.noContent().build();
     }
+    
 }
