@@ -5,7 +5,6 @@ import static lombok.AccessLevel.PROTECTED;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.global.model.BaseEntity;
 import java.time.LocalDate;
-import java.util.StringJoiner;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -134,21 +133,4 @@ public class Study extends BaseEntity {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Study.class.getSimpleName() + "[", "]")
-            .add("id=" + id)
-            .add("name='" + name + "'")
-            .add("thumbnailUrl='" + thumbnailUrl + "'")
-            .add("description='" + description + "'")
-            .add("currentParticipant=" + currentParticipant)
-            .add("maxParticipant=" + maxParticipant)
-            .add("status=" + status)
-            .add("book=" + book)
-            .add("gatherStartDate=" + gatherStartDate)
-            .add("gatherEndDate=" + gatherEndDate)
-            .add("studyStartDate=" + studyStartDate)
-            .add("studyEndDate=" + studyEndDate)
-            .toString();
-    }
 }

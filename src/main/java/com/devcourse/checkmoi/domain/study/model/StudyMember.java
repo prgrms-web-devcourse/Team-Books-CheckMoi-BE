@@ -3,8 +3,6 @@ package com.devcourse.checkmoi.domain.study.model;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 import com.devcourse.checkmoi.domain.user.model.User;
-import java.util.StringJoiner;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -50,19 +48,5 @@ public class StudyMember {
 
     public User getUser() {
         return user;
-    }
-
-    public Study getStudy() {
-        return study;
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", StudyMember.class.getSimpleName() + "[", "]")
-            .add("id=" + id)
-            .add("status=" + status)
-            .add("user=" + user)
-            .add("study=" + study)
-            .toString();
     }
 }
