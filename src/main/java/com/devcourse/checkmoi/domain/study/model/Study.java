@@ -76,4 +76,15 @@ public class Study extends BaseEntity {
         return book;
     }
 
+    public void editName(String name) {
+        this.name = name;
+    }
+
+    public void editThumbnail(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public void editDescription(String description) {
+        this.description = description;
+    }
 }

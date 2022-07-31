@@ -1,14 +1,20 @@
 package com.devcourse.checkmoi.domain.study.service.study;
 
+import static com.devcourse.checkmoi.global.exception.ErrorMessage.ACCESS_DENIED;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
+import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
+import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -68,6 +74,80 @@ class StudyCommandServiceImplTest {
             Long got = studyCommandService.createStudy(request);
 
             assertThat(got).isEqualTo(want);
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 수정 #30")
+    class EditTest {
+
+        @Test
+        @DisplayName("S 스터디 정보 수정을 할 수 있다")
+        void editStudyInfo() {
+            StudyRequest.Edit request = StudyRequest.Edit.builder()
+                .name("스터디 이름")
+                .thumbnail("https://example.com")
+                .description("스터디 설명")
+                .build();
+            Long userId = 1L;
+            Long studyId = 1L;
+            Study study = Study.builder()
+                .id(1L)
+                .build();
+            when(studyRepository.findStudyOwner(anyLong()))
+                .thenReturn(userId);
+            when(studyRepository.findById(studyId))
+                .thenReturn(Optional.ofNullable(study));
+
+            Long got = studyCommandService.editStudyInfo(studyId, userId, request);
+
+            assertThat(got).isEqualTo(studyId);
+        }
+
+        @Test
+        @DisplayName("F 스터디 정보 수정 중 로그인 유저가 스터디 장이 아니라면 예외가 발생합니다")
+        void validateStudyOwner() {
+            StudyRequest.Edit request = StudyRequest.Edit.builder()
+                .name("스터디 이름")
+                .thumbnail("https://example.com")
+                .description("스터디 설명")
+                .build();
+            Long userId = 1L;
+            Long studyOwnerId = 2L;
+            Long studyId = 1L;
+            Study study = Study.builder()
+                .id(1L)
+                .build();
+
+            when(studyRepository.findStudyOwner(anyLong()))
+                .thenThrow(new NotStudyOwnerException(
+                    "스터디 정보 수정 권한이 없습니다. 유저 아이디 : " + userId + " 스터디장 Id : " + studyOwnerId, ACCESS_DENIED));
+
+            assertThatExceptionOfType(NotStudyOwnerException.class)
+                .isThrownBy(() -> studyCommandService.editStudyInfo(studyId, userId, request))
+                .withMessage("스터디 정보 수정 권한이 없습니다. 유저 아이디 : " + userId + " 스터디장 Id : " + studyOwnerId);
+        }
+
+        @Test
+        @DisplayName("F 스터디 정보 수정 중 해당 스터디 ID를 가진 스터디가 존재하지 않을 경우 예외가 발생합니다.")
+        void studyNotFound() {
+            StudyRequest.Edit request = StudyRequest.Edit.builder()
+                .name("스터디 이름")
+                .thumbnail("https://example.com")
+                .description("스터디 설명")
+                .build();
+            Long userId = 1L;
+            Long studyId = 1L;
+            Study study = Study.builder()
+                .id(1L)
+                .build();
+            when(studyRepository.findStudyOwner(anyLong()))
+                .thenReturn(userId);
+            when(studyRepository.findById(studyId))
+                .thenThrow(new StudyNotFoundException());
+
+            assertThatExceptionOfType(StudyNotFoundException.class)
+                .isThrownBy(() -> studyCommandService.editStudyInfo(studyId, userId, request));
         }
     }
 }
