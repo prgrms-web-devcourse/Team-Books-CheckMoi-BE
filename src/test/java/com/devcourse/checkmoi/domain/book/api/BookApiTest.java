@@ -10,10 +10,10 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.SimpleBook;
-import com.devcourse.checkmoi.domain.book.dto.UpdateBookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
 import com.devcourse.checkmoi.domain.book.service.BookReader;
 import com.devcourse.checkmoi.domain.book.service.BookStore;
 import com.devcourse.checkmoi.domain.book.stub.PersistedDummyData;

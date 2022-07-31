@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.book.service;
 
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.SimpleBook;
-import com.devcourse.checkmoi.domain.book.dto.UpdateBookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;

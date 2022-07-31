@@ -1,8 +1,8 @@
 package com.devcourse.checkmoi.domain.book.converter;
 
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.SimpleBook;
-import com.devcourse.checkmoi.domain.book.dto.UpdateBookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.stub.NewDummyData;
 import org.assertj.core.api.Assertions;

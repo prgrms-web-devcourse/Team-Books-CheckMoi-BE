@@ -1,9 +1,9 @@
 package com.devcourse.checkmoi.domain.book.api;
 
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.LatestAllBooks;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.SimplePage;
-import com.devcourse.checkmoi.domain.book.dto.UpdateBookRequest.CreateBook;
 import com.devcourse.checkmoi.domain.book.service.BookReader;
 import com.devcourse.checkmoi.domain.book.service.BookStore;
 import com.devcourse.checkmoi.global.model.SuccessResponse;

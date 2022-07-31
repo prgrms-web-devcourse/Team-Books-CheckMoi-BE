@@ -1,15 +1,15 @@
 package com.devcourse.checkmoi.domain.book.dto;
 
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
-public sealed interface ReadBookResponse permits SimpleBook, BookSpecification, LatestAllBooks {
+public sealed interface BookResponse permits SimpleBook, BookSpecification, LatestAllBooks {
 
     record SimpleBook(
         Long id,
@@ -23,7 +23,7 @@ public sealed interface ReadBookResponse permits SimpleBook, BookSpecification, 
         String description,
         @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDateTime createAt // TODO : 날짜 포맷
-    ) implements ReadBookResponse {
+    ) implements BookResponse {
 
         @Builder
         public SimpleBook {
@@ -42,7 +42,7 @@ public sealed interface ReadBookResponse permits SimpleBook, BookSpecification, 
         String description,
         @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDateTime createAt // TODO : 날짜 포맷
-    ) implements ReadBookResponse {
+    ) implements BookResponse {
 
         @Builder
         public BookSpecification {
@@ -51,7 +51,7 @@ public sealed interface ReadBookResponse permits SimpleBook, BookSpecification, 
 
     record LatestAllBooks(
         List<SimpleBook> books
-    ) implements ReadBookResponse {
+    ) implements BookResponse {
 
     }
 }

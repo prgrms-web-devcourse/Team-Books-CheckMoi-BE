@@ -1,8 +1,8 @@
 package com.devcourse.checkmoi.domain.book.service;
 
 import com.devcourse.checkmoi.domain.book.converter.BookConverter;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.SimpleBook;
-import com.devcourse.checkmoi.domain.book.dto.UpdateBookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,6 @@
 package com.devcourse.checkmoi.domain.book.service;
 
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.LatestAllBooks;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.SimplePage;
 import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
 import com.devcourse.checkmoi.domain.book.model.Book;

@@ -2,8 +2,8 @@ package com.devcourse.checkmoi.domain.book.service;
 
 import static java.util.stream.Collectors.toList;
 import com.devcourse.checkmoi.domain.book.converter.BookConverter;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.ReadBookResponse.LatestAllBooks;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.SimplePage;
 import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
