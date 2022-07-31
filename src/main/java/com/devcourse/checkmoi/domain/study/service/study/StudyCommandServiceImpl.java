@@ -38,7 +38,6 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public Long editStudyInfo(Long studyId, Long userId, Edit request) {
-        validateExistStudy(studyRepository.existsById(studyId));
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
         validateStudyOwner(userId, studyOwnerId,
             "스터디 정보 수정 권한이 없습니다. 유저 Id : " + userId + " 스터디장 Id : " + studyOwnerId);

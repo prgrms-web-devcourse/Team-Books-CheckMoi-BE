@@ -102,8 +102,6 @@ class StudyCommandServiceImplTest {
             Study study = Study.builder()
                 .id(1L)
                 .build();
-            when(studyRepository.existsById(anyLong()))
-                .thenReturn(true);
             when(studyRepository.findStudyOwner(anyLong()))
                 .thenReturn(userId);
             when(studyRepository.findById(studyId))
@@ -112,25 +110,6 @@ class StudyCommandServiceImplTest {
             Long got = studyCommandService.editStudyInfo(studyId, userId, request);
 
             assertThat(got).isEqualTo(studyId);
-        }
-
-        @Test
-        @DisplayName("F 존재하지 않는 스터디 ID일 경우 예외가 발생한다.")
-        void validateExistStudy() {
-            StudyRequest.Edit request = StudyRequest.Edit.builder()
-                .name("스터디 이름")
-                .thumbnail("https://example.com")
-                .description("스터디 설명")
-                .build();
-            Long userId = 1L;
-            Long studyId = 1L;
-
-            when(studyRepository.existsById(anyLong()))
-                .thenReturn(false);
-
-            assertThatExceptionOfType(StudyNotFoundException.class)
-                .isThrownBy(
-                    () -> studyCommandService.editStudyInfo(studyId, userId, request));
         }
 
         @Test
@@ -148,8 +127,6 @@ class StudyCommandServiceImplTest {
                 .id(1L)
                 .build();
 
-            when(studyRepository.existsById(anyLong()))
-                .thenReturn(true);
             when(studyRepository.findStudyOwner(anyLong()))
                 .thenThrow(new NotStudyOwnerException(
                     "스터디 정보 수정 권한이 없습니다. 유저 아이디 : " + userId + " 스터디장 Id : " + studyOwnerId,
@@ -174,8 +151,6 @@ class StudyCommandServiceImplTest {
             Study study = Study.builder()
                 .id(1L)
                 .build();
-            when(studyRepository.existsById(anyLong()))
-                .thenReturn(true);
             when(studyRepository.findStudyOwner(anyLong()))
                 .thenReturn(userId);
             when(studyRepository.findById(studyId))
