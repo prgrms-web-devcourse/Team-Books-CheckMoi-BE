@@ -4,6 +4,8 @@ import com.devcourse.checkmoi.global.model.BaseEntity;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,6 +31,7 @@ public class Book extends BaseEntity {
     private String publisher;
 
     @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @Column(nullable = false, length = 20, unique = true)
