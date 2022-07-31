@@ -18,8 +18,8 @@ public enum ErrorMessage {
 
     // not found error
     STUDY_NOT_FOUND("해당하는 스터디를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
-    BOOK_NOT_FOUND("해당하는 책을 찾을 수 없습니다", HttpStatus.NOT_FOUND);
-
+    BOOK_NOT_FOUND("해당하는 책을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
+    STUDY_JOIN_REQUEST_NOT_FOUND("해당하는 스터디 가입 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
     private final String message;
 

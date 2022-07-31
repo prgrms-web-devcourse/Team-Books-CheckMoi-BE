@@ -38,6 +38,14 @@ public class StudyMember {
         this.study = study;
     }
 
+    public void changeStatus(StudyMemberStatus status) {
+        this.status = status;
+    }
+
+    public StudyMemberStatus getStatus() {
+        return status;
+    }
+
     public User getUser() {
         return user;
     }
