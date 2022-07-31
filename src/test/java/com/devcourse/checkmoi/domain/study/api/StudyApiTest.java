@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
@@ -19,6 +20,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
+import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
@@ -138,7 +140,8 @@ class StudyApiTest extends IntegrationTest {
                 .build();
             Long requestId = 1L;
 
-            when(studyCommandService.editStudyInfo(anyLong(), anyLong(), any(StudyRequest.Edit.class)))
+            when(studyCommandService.editStudyInfo(anyLong(), anyLong(),
+                any(StudyRequest.Edit.class)))
                 .thenReturn(requestId);
 
             ResultActions result = mockMvc.perform(put("/api/studies/{id}", requestId)
@@ -173,6 +176,48 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath("data").type(JsonFieldType.NUMBER).description("스터디 ID")
                 )
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 가입 승낙 및 거절 #37")
+    class Audit {
+
+        @Test
+        void auditStudyParticipation() throws Exception {
+            Long studyId = 1L;
+            Long memberId = 1L;
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+            StudyRequest.Audit request = StudyRequest.Audit.builder()
+                .status("ACCEPTED")
+                .build();
+
+            ResultActions result = mockMvc.perform(
+                put("/api/studies/{studyId}/member/{memberId}", studyId, memberId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                    .content(toJson(request)));
+
+            result.andExpect(status().isNoContent())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("study-audit",
+                ResourceSnippetParameters.builder()
+                    .tag("Study API")
+                    .summary("스터디 가입 승낙 및 거절")
+                    .description("스터디 가입 승낙 및 거절에 사용되는 API입니다.")
+                    .requestSchema(Schema.schema("스터디 가입 승낙 및 거절 요청")),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("studyId").description("스터디 Id"),
+                    parameterWithName("memberId").description("멤버 Id")
+                ),
+                requestFields(
+                    fieldWithPath("status").description("스터디 상태")
+                ));
         }
     }
 }

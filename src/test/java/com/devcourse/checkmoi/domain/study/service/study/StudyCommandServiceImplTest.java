@@ -5,13 +5,18 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
+import com.devcourse.checkmoi.domain.study.exception.StudyJoinRequestNotFoundException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
+import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -34,6 +39,9 @@ class StudyCommandServiceImplTest {
 
     @Mock
     StudyRepository studyRepository;
+
+    @Mock
+    StudyMemberRepository studyMemberRepository;
 
     @Nested
     @DisplayName("스터디 등록 #5")
@@ -94,6 +102,8 @@ class StudyCommandServiceImplTest {
             Study study = Study.builder()
                 .id(1L)
                 .build();
+            when(studyRepository.existsById(anyLong()))
+                .thenReturn(true);
             when(studyRepository.findStudyOwner(anyLong()))
                 .thenReturn(userId);
             when(studyRepository.findById(studyId))
@@ -102,6 +112,25 @@ class StudyCommandServiceImplTest {
             Long got = studyCommandService.editStudyInfo(studyId, userId, request);
 
             assertThat(got).isEqualTo(studyId);
+        }
+
+        @Test
+        @DisplayName("F 존재하지 않는 스터디 ID일 경우 예외가 발생한다.")
+        void validateExistStudy() {
+            StudyRequest.Edit request = StudyRequest.Edit.builder()
+                .name("스터디 이름")
+                .thumbnail("https://example.com")
+                .description("스터디 설명")
+                .build();
+            Long userId = 1L;
+            Long studyId = 1L;
+
+            when(studyRepository.existsById(anyLong()))
+                .thenReturn(false);
+
+            assertThatExceptionOfType(StudyNotFoundException.class)
+                .isThrownBy(
+                    () -> studyCommandService.editStudyInfo(studyId, userId, request));
         }
 
         @Test
@@ -119,13 +148,17 @@ class StudyCommandServiceImplTest {
                 .id(1L)
                 .build();
 
+            when(studyRepository.existsById(anyLong()))
+                .thenReturn(true);
             when(studyRepository.findStudyOwner(anyLong()))
                 .thenThrow(new NotStudyOwnerException(
-                    "스터디 정보 수정 권한이 없습니다. 유저 아이디 : " + userId + " 스터디장 Id : " + studyOwnerId, ACCESS_DENIED));
+                    "스터디 정보 수정 권한이 없습니다. 유저 아이디 : " + userId + " 스터디장 Id : " + studyOwnerId,
+                    ACCESS_DENIED));
 
             assertThatExceptionOfType(NotStudyOwnerException.class)
                 .isThrownBy(() -> studyCommandService.editStudyInfo(studyId, userId, request))
-                .withMessage("스터디 정보 수정 권한이 없습니다. 유저 아이디 : " + userId + " 스터디장 Id : " + studyOwnerId);
+                .withMessage(
+                    "스터디 정보 수정 권한이 없습니다. 유저 아이디 : " + userId + " 스터디장 Id : " + studyOwnerId);
         }
 
         @Test
@@ -141,6 +174,8 @@ class StudyCommandServiceImplTest {
             Study study = Study.builder()
                 .id(1L)
                 .build();
+            when(studyRepository.existsById(anyLong()))
+                .thenReturn(true);
             when(studyRepository.findStudyOwner(anyLong()))
                 .thenReturn(userId);
             when(studyRepository.findById(studyId))
@@ -148,6 +183,106 @@ class StudyCommandServiceImplTest {
 
             assertThatExceptionOfType(StudyNotFoundException.class)
                 .isThrownBy(() -> studyCommandService.editStudyInfo(studyId, userId, request));
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 가입 승낙 및 거절 #37")
+    class Audit {
+
+        @Test
+        @DisplayName("S 스터디 가입 승낙 및 거절할 수 있다.")
+        void auditStudyParticipationTest() {
+            Long studyId = 1L;
+            Long memberId = 1L;
+            Long userId = 1L;
+            StudyRequest.Audit request = StudyRequest.Audit.builder()
+                .status("ACCEPTED")
+                .build();
+            Long studyOwnerId = 1L;
+            StudyMember studyMember = StudyMember.builder()
+                .id(1L)
+                .status(StudyMemberStatus.PENDING)
+                .build();
+            given(studyRepository.existsById(anyLong())).willReturn(true);
+            given(studyRepository.findStudyOwner(anyLong())).willReturn(studyOwnerId);
+            given(studyMemberRepository.findById(anyLong())).willReturn(
+                Optional.of(studyMember));
+
+            studyCommandService.auditStudyParticipation(studyId, memberId, userId, request);
+
+            assertThat(studyMember.getStatus()).isEqualTo(StudyMemberStatus.ACCEPTED);
+        }
+
+        @Test
+        @DisplayName("F 존재하지 않는 스터디 ID일 경우 예외가 발생한다.")
+        void validateExistStudy() {
+            Long studyId = 1L;
+            Long memberId = 1L;
+            Long userId = 1L;
+            StudyRequest.Audit request = StudyRequest.Audit.builder()
+                .status("ACCEPTED")
+                .build();
+            StudyMember studyMember = StudyMember.builder()
+                .id(1L)
+                .status(StudyMemberStatus.PENDING)
+                .build();
+            given(studyRepository.existsById(anyLong())).willReturn(false);
+
+            assertThatExceptionOfType(StudyNotFoundException.class)
+                .isThrownBy(
+                    () -> studyCommandService.auditStudyParticipation(studyId, memberId, userId,
+                        request));
+        }
+
+        @Test
+        @DisplayName("F 스터디장이 아닌 유저가 변경 시도시 예외가 발생한다.")
+        void validateStudyOwner() {
+            Long studyId = 1L;
+            Long memberId = 1L;
+            Long userId = 1L;
+            StudyRequest.Audit request = StudyRequest.Audit.builder()
+                .status("ACCEPTED")
+                .build();
+            Long studyOwnerId = 2L;
+
+            StudyMember studyMember = StudyMember.builder()
+                .id(1L)
+                .status(StudyMemberStatus.PENDING)
+                .build();
+            given(studyRepository.existsById(anyLong())).willReturn(true);
+            given(studyRepository.findStudyOwner(anyLong())).willReturn(studyOwnerId);
+
+            assertThatExceptionOfType(NotStudyOwnerException.class)
+                .isThrownBy(
+                    () -> studyCommandService.auditStudyParticipation(studyId, memberId, userId,
+                        request))
+                .withMessage("스터디 승인 권한이 없습니다. 유저 Id : " + userId + " 스터디 장 Id : " + studyOwnerId);
+        }
+
+        @Test
+        @DisplayName("F 해당 신청이 존재하지 않을 경우 예외가 발생한다.")
+        void studyJoinRequestNotFound() {
+            Long studyId = 1L;
+            Long memberId = 1L;
+            Long userId = 1L;
+            StudyRequest.Audit request = StudyRequest.Audit.builder()
+                .status("ACCEPTED")
+                .build();
+            Long studyOwnerId = 1L;
+            StudyMember studyMember = StudyMember.builder()
+                .id(1L)
+                .status(StudyMemberStatus.PENDING)
+                .build();
+            given(studyRepository.existsById(anyLong())).willReturn(true);
+            given(studyRepository.findStudyOwner(anyLong())).willReturn(studyOwnerId);
+            given(studyMemberRepository.findById(anyLong())).willReturn(
+                Optional.empty());
+
+            assertThatExceptionOfType(StudyJoinRequestNotFoundException.class)
+                .isThrownBy(
+                    () -> studyCommandService.auditStudyParticipation(studyId, memberId, userId,
+                        request));
         }
     }
 }
