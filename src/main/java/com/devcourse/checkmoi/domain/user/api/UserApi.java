@@ -39,7 +39,7 @@ public class UserApi {
         @PathVariable Long userId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
-        userService.deleteUserAccount(user.id());
+        userService.deleteUserAccount(userId, user.id());
         return ResponseEntity.noContent().build();
     }
 

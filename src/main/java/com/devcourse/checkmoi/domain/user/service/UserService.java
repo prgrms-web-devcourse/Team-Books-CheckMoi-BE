@@ -36,7 +36,9 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserAccount(Long userId) {
+    public void deleteUserAccount(Long userId, Long authId) {
+        validatePermission(userId, authId, "서비스 탈퇴");
+
         userRepository.deleteById(userId);
     }
 
