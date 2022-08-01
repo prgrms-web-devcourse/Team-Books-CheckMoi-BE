@@ -133,4 +133,7 @@ public class Study extends BaseEntity {
         this.description = description;
     }
 
+    public void changeStatus(StudyStatus status) {
+        this.status = status;
+    }
 }
