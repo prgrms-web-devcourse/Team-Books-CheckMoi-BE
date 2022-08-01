@@ -13,6 +13,8 @@ spring:
       hibernate:
         format_sql: true
         query.in_clause_parameter_padding: true
+    hibernate:
+      ddl-auto: update
   security:
     oauth2:
       client:
