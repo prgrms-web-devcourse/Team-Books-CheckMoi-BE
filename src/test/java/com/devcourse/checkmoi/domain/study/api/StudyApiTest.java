@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.study.StudyQueryService;
 import com.devcourse.checkmoi.domain.study.stub.StudyStub;
@@ -68,6 +69,8 @@ class StudyApiTest extends IntegrationTest {
                 .maxParticipant(5)
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
+                .studyStartDate(LocalDate.now())
+                .studyEndDate(LocalDate.now())
                 .build();
             Long createdStudyId = 1L;
             Long userId = 1L;
@@ -91,7 +94,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-create",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("스터디 등록 (개발중)")
+                    .summary("스터디 등록")
                     .description("스터디 등록에 사용되는 API입니다.")
                     .requestSchema(Schema.schema("스터디 생성 요청"))
                     .responseSchema(Schema.schema("스터디 생성 응답")),
@@ -114,7 +117,12 @@ class StudyApiTest extends IntegrationTest {
                         .description("모집 시작일자"),
                     fieldWithPath("gatherEndDate").type(JsonFieldType.STRING)
                         .attributes(getDateFormat())
-                        .description("모집 종료일자")
+                        .description("모집 종료일자"),
+                    fieldWithPath("studyStartDate").type(JsonFieldType.STRING)
+                        .attributes(getDateFormat())
+                        .description("스터디 시작 일자"),
+                    fieldWithPath("studyEndDate").type(JsonFieldType.STRING)
+                        .description("스터디 종료 일자")
                 ),
                 responseFields(
                     fieldWithPath("data").type(JsonFieldType.NUMBER)
@@ -122,6 +130,7 @@ class StudyApiTest extends IntegrationTest {
                 )
             );
         }
+
     }
 
     @Nested
@@ -136,6 +145,7 @@ class StudyApiTest extends IntegrationTest {
                 .name("스터디 이름")
                 .thumbnail("https://example.com")
                 .description("스터디 설명")
+                .status("IN_PROGRESS")
                 .build();
             Long requestId = 1L;
 
@@ -157,7 +167,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-edit",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("스터디 수정 (개발중)")
+                    .summary("스터디 수정")
                     .description("스터디 수정에 사용되는 API입니다.")
                     .requestSchema(Schema.schema("스터디 수정 요청"))
                     .responseSchema(Schema.schema("스터디 수정 응답")),
@@ -167,7 +177,8 @@ class StudyApiTest extends IntegrationTest {
                 requestFields(
                     fieldWithPath("name").type(JsonFieldType.STRING).description("스터디 이름"),
                     fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("스터디 대표 이미지"),
-                    fieldWithPath("description").type(JsonFieldType.STRING).description("스터디 설명")
+                    fieldWithPath("description").type(JsonFieldType.STRING).description("스터디 설명"),
+                    fieldWithPath("status").type(JsonFieldType.STRING).description("스터디 상태")
                 ),
                 pathParameters(
                     parameterWithName("id").description("스터디 ID")

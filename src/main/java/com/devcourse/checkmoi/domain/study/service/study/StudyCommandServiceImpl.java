@@ -14,6 +14,7 @@ import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
@@ -45,7 +46,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
                 .build()
             )
             .study(study)
-            .status(StudyMemberStatus.PENDING)
+            .status(StudyMemberStatus.OWNED)
             .build();
 
         studyMemberRepository.save(studyMember);
@@ -62,6 +63,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         study.editName(request.name());
         study.editThumbnail(request.thumbnail());
         study.editDescription(request.description());
+        study.changeStatus(StudyStatus.valueOf(request.status()));
         return study.getId();
     }
 

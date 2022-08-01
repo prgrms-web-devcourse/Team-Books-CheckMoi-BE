@@ -4,6 +4,7 @@ import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,6 +23,9 @@ public class StudyConverter {
             .maxParticipant(request.maxParticipant())
             .gatherStartDate(request.gatherStartDate())
             .gatherEndDate(request.gatherEndDate())
+            .studyStartDate(request.studyStartDate())
+            .studyEndDate(request.studyEndDate())
+            .status(StudyStatus.RECRUTING)
             .build();
     }
 

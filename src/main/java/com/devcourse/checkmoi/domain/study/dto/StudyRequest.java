@@ -15,7 +15,9 @@ public sealed interface StudyRequest permits Create, Edit, Audit {
         String description,
         Integer maxParticipant,
         LocalDate gatherStartDate,
-        LocalDate gatherEndDate
+        LocalDate gatherEndDate,
+        LocalDate studyStartDate,
+        LocalDate studyEndDate
     ) implements StudyRequest {
 
         @Builder
@@ -26,7 +28,8 @@ public sealed interface StudyRequest permits Create, Edit, Audit {
     record Edit(
         String name,
         String thumbnail,
-        String description
+        String description,
+        String status
     ) implements StudyRequest {
 
         @Builder

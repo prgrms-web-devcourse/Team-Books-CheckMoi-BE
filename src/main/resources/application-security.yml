@@ -8,7 +8,7 @@ spring:
             client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLIENT_SECRET}
             scope: profile_nickname, profile_image, account_email, birthday
-            redirect-uri: ${SERVER_NAME}/login/oauth2/code/{registrationId}
+            redirect-uri: http://localhost:3000
             client-authentication-method: POST
             authorization-grant-type: authorization_code
         provider:

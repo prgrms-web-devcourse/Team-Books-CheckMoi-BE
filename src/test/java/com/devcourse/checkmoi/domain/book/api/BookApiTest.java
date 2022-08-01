@@ -65,14 +65,17 @@ class BookApiTest extends IntegrationTest {
 
         @Test
         @WithMockUser
-        @DisplayName("책을 등록할 수 있다")
+        @DisplayName("S 로그인 사용자는 책을 등록할 수 있다")
         void save() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+
             CreateBook createRequest = bookInfo.create();
             SimpleBook simpleBook = bookInfo.simple();
 
             given(bookCommandService.save(createRequest)).willReturn(simpleBook);
 
             MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.put("/api/books")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
                     .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                     .content(toJson(createRequest))).andExpect(status().isOk()).andDo(documentation())
                 .andReturn();
@@ -91,6 +94,7 @@ class BookApiTest extends IntegrationTest {
                     .description("책 등록에 사용되는 API 입니다.")
                     .requestSchema(Schema.schema("책 생성 요청"))
                     .responseSchema(Schema.schema("책 생성 응답")),
+                tokenRequestHeader(),
                 requestFields(fieldWithPath("title").type(JsonFieldType.STRING).description("책 제목"),
                     fieldWithPath("image").type(JsonFieldType.STRING).description("책 이미지"),
                     fieldWithPath("author").type(JsonFieldType.STRING).description("책 저자"),
@@ -121,13 +125,10 @@ class BookApiTest extends IntegrationTest {
         @Test
         @DisplayName("페이지 네이션 없이 최대 8개의 책 목록을 가져온다")
         void topBooks() throws Exception {
-            TokenWithUserInfo givenUser = getTokenWithUserInfo(); // FIXME : 메인페이지 접속 권한에서 로그인을 필요로 하고 있다
-
             given(bookQueryService.getAllTop(any()))
                 .willReturn(books);
 
-            MvcResult mvcResult = mockMvc.perform(get("/api/books")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
+            MvcResult mvcResult = mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
                 .andDo(documentation())
                 .andReturn();
@@ -169,16 +170,13 @@ class BookApiTest extends IntegrationTest {
         @Test
         @DisplayName("id 를 통해 책을 조회한다")
         void getByIdSuccess() throws Exception {
-            TokenWithUserInfo givenUser = getTokenWithUserInfo(); // FIXME : 책  조회 권한에서 로그인을 필요로 하고 있다
-
             PersistedDummyData bigWhaleBook = createDummyBigWhale();
 
             BookSpecification specification = bigWhaleBook.specification();
 
             given(bookQueryService.getById(anyLong())).willReturn(specification);
 
-            MvcResult mvcResult = mockMvc.perform(get("/api/books/{bookId}", bigWhaleBook.bookId())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
+            MvcResult mvcResult = mockMvc.perform(get("/api/books/{bookId}", bigWhaleBook.bookId()))
                 .andExpect(status().isOk())
                 .andDo(documentation())
                 .andReturn();

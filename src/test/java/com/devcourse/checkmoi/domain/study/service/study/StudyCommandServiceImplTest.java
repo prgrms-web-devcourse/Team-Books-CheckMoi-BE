@@ -111,6 +111,7 @@ class StudyCommandServiceImplTest {
                 .name("스터디 이름")
                 .thumbnail("https://example.com")
                 .description("스터디 설명")
+                .status("IN_PROGRESS")
                 .build();
             Long userId = 1L;
             Long studyId = 1L;
