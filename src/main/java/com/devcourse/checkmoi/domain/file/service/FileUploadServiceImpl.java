@@ -39,8 +39,12 @@ public class FileUploadServiceImpl implements FileUploadService {
     @Override
     public void delete(String url) {
         repository.findByUrl(url)
-            .ifPresent(fileUploaded ->
-                s3Upload.delete(fileUploaded.getUrl()));
+            .ifPresent(this::remove);
+    }
+
+    private void remove(FileUploaded file) {
+        s3Upload.delete(file.getUrl());
+        repository.delete(file);
     }
 
     private void save(AttachedFile file, List<String> urls, Long userId) {
@@ -59,21 +63,4 @@ public class FileUploadServiceImpl implements FileUploadService {
         urls.add(url);
         repository.save(fileUploaded);
     }
-
-    //    private void save(AttachedFile file, List<String> urls) {
-//        String url = s3Upload.upload(file.getBytes(),
-//            file.randomName(null, "jpeg"),
-//            file.getContentType(),
-//            null);
-//
-//        FileUploaded fileUploaded = FileUploaded.builder()
-//            .extension(file.extension("jpeg"))
-//            .originalFileName(file.getOriginalFileName())
-////            .userId(userId)
-//            .url(url)
-//            .build();
-//
-//        urls.add(url);
-//        repository.save(fileUploaded);
-//    }
 }
