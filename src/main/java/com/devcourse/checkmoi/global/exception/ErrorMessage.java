@@ -19,7 +19,10 @@ public enum ErrorMessage {
     // not found error
     STUDY_NOT_FOUND("해당하는 스터디를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     BOOK_NOT_FOUND("해당하는 책을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
-    STUDY_JOIN_REQUEST_NOT_FOUND("해당하는 스터디 가입 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    STUDY_JOIN_REQUEST_NOT_FOUND("해당하는 스터디 가입 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+    // duplicate error
+    STUDY_JOIN_REQUEST_DUPLICATE("이미 스터디 가입 요청을 완료했습니다.", HttpStatus.CONFLICT);
 
     private final String message;
 

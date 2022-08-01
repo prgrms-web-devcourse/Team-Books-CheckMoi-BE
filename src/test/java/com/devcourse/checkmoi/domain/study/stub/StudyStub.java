@@ -117,4 +117,19 @@ public class StudyStub {
         );
     }
 
+    public static Study study() {
+        return Study.builder()
+            .id(1L)
+            .name("자바 스터디 1")
+            .thumbnailUrl("https://example.com/java.png")
+            .description("자바 스터디 1번입니다.")
+            .maxParticipant(3)
+            .status(StudyStatus.RECRUTING)
+            .book(book.get(0))
+            .gatherStartDate(LocalDate.now())
+            .gatherEndDate(LocalDate.now())
+            .studyStartDate(LocalDate.now())
+            .studyEndDate(LocalDate.now())
+            .build();
+    }
 }

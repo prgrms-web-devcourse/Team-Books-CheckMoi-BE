@@ -55,4 +55,22 @@ public class StudyMemberStub {
             .study(studies.get(0))
             .build();
     }
+
+    public static StudyMember deniedStudyMember() {
+        return StudyMember.builder()
+            .id(1L)
+            .status(StudyMemberStatus.DENIED)
+            .user(users.get(0))
+            .study(studies.get(0))
+            .build();
+    }
+
+    public static StudyMember pendingStudyMember() {
+        return StudyMember.builder()
+            .id(1L)
+            .status(StudyMemberStatus.DENIED)
+            .user(users.get(0))
+            .study(studies.get(0))
+            .build();
+    }
 }

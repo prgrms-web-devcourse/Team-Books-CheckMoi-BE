@@ -1,11 +1,13 @@
 package com.devcourse.checkmoi.domain.study.service.study;
 
 import static com.devcourse.checkmoi.global.exception.ErrorMessage.ACCESS_DENIED;
+import static com.devcourse.checkmoi.global.exception.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
 import static com.devcourse.checkmoi.global.exception.ErrorMessage.STUDY_JOIN_REQUEST_NOT_FOUND;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
+import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.exception.StudyJoinRequestNotFoundException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
@@ -14,6 +16,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
+import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import javax.transaction.Transactional;
@@ -41,9 +44,10 @@ public class StudyCommandServiceImpl implements StudyCommandService {
                 .id(userId)
                 .build()
             )
-            .status(StudyMemberStatus.OWNED)
             .study(study)
+            .status(StudyMemberStatus.PENDING)
             .build();
+
         studyMemberRepository.save(studyMember);
         return study.getId();
     }
@@ -73,6 +77,30 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         studyMember.changeStatus(StudyMemberStatus.valueOf(request.status()));
     }
 
+    @Override
+    public Long requestStudyJoin(Long studyId, Long userId) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(StudyNotFoundException::new);
+        User user = userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+        StudyMember request = studyMemberRepository.findByUser(user)
+            .map(studyMember -> {
+                validateDuplicateStudyMemberRequest(studyMember);
+                studyMember.changeStatus(StudyMemberStatus.PENDING);
+                return studyMember;
+            })
+            .orElseGet(() ->
+                StudyMember.builder()
+                    .study(study)
+                    .user(user)
+                    .status(StudyMemberStatus.PENDING)
+                    .build()
+            );
+
+        return studyMemberRepository.save(request)
+            .getId();
+    }
+
     private void validateExistStudy(boolean existStudy) {
         if (!existStudy) {
             throw new StudyNotFoundException();
@@ -85,4 +113,9 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         }
     }
 
+    private void validateDuplicateStudyMemberRequest(StudyMember studyMember) {
+        if (studyMember.getStatus() != StudyMemberStatus.DENIED) {
+            throw new DuplicateStudyJoinRequestException(STUDY_JOIN_REQUEST_DUPLICATE);
+        }
+    }
 }

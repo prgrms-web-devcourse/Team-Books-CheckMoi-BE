@@ -3,6 +3,7 @@ package com.devcourse.checkmoi.domain.study.model;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 import com.devcourse.checkmoi.domain.user.model.User;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -44,6 +45,10 @@ public class StudyMember {
 
     public StudyMemberStatus getStatus() {
         return status;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public User getUser() {
