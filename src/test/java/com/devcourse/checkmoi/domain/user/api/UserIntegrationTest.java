@@ -54,7 +54,7 @@ class UserIntegrationTest extends IntegrationTest {
         @DisplayName("S 회원 상세 페이지 조회")
         void userPage() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
-            mockMvc.perform(get("/api/users/{userId}", givenUser.userInfo().id())
+            mockMvc.perform(get("/api/me")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id")
@@ -76,9 +76,6 @@ class UserIntegrationTest extends IntegrationTest {
                     .description("회원 정보를 요청하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                pathParameters(
-                    parameterWithName("userId").description("회원 아이디")
-                ),
                 tokenRequestHeader()
             );
         }

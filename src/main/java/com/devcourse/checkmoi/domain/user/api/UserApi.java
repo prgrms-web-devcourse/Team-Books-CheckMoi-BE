@@ -28,9 +28,8 @@ public class UserApi {
 
     private final UserCommandService userCommandService;
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/me")
     ResponseEntity<SuccessResponse<UserInfoWithStudy>> userPage(
-        @PathVariable Long userId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
         return ResponseEntity.ok()
