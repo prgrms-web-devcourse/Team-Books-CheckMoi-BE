@@ -87,7 +87,7 @@ class BookApiTest extends IntegrationTest {
 
         private RestDocumentationResultHandler documentation() {
             return MockMvcRestDocumentationWrapper.document("book-create",
-                ResourceSnippetParameters.builder().tag("Book API").summary("책 등록")
+                ResourceSnippetParameters.builder().tag("Book API").summary("책 등록 (개발중)")
                     .description("책 등록에 사용되는 API 입니다.")
                     .requestSchema(Schema.schema("책 생성 요청"))
                     .responseSchema(Schema.schema("책 생성 응답")),
