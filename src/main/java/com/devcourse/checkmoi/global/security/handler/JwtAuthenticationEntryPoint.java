@@ -23,8 +23,11 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response,
-        AuthenticationException authException) throws IOException {
+    public void commence(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        AuthenticationException authException
+    ) throws IOException {
         log.info(ERROR_LOG_MESSAGE,
             authException.getClass().getSimpleName(),
             ErrorMessage.LOGIN_REQUIRED.getMessage());
