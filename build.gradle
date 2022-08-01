@@ -56,6 +56,12 @@ dependencies {
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
+    // aws s3
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.267'
+
+    // apache commons-io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+
     // lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
