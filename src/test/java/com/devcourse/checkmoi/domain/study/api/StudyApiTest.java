@@ -91,7 +91,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-create",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("스터디 등록")
+                    .summary("스터디 등록 (개발중)")
                     .description("스터디 등록에 사용되는 API입니다.")
                     .requestSchema(Schema.schema("스터디 생성 요청"))
                     .responseSchema(Schema.schema("스터디 생성 응답")),
@@ -157,7 +157,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-edit",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("스터디 수정")
+                    .summary("스터디 수정 (개발중)")
                     .description("스터디 수정에 사용되는 API입니다.")
                     .requestSchema(Schema.schema("스터디 수정 요청"))
                     .responseSchema(Schema.schema("스터디 수정 응답")),
@@ -206,7 +206,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-audit",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("스터디 가입 승낙 및 거절")
+                    .summary("스터디 가입 승낙 및 거절 (개발중)")
                     .description("스터디 가입 승낙 및 거절에 사용되는 API입니다.")
                     .requestSchema(Schema.schema("스터디 가입 승낙 및 거절 요청")),
                 preprocessRequest(prettyPrint()),
@@ -259,7 +259,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-get-by-book",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("선택한 책의 모집중인 스터디 목록 확인")
+                    .summary("선택한 책의 모집중인 스터디 목록 확인 (개발중)")
                     .description("선택한 책의 모집중인 스터디 목록 확인하는 API 입니다.")
                     .responseSchema(Schema.schema("선택한 책의 모집중인 스터디 목록 응답")),
                 preprocessRequest(prettyPrint()),
@@ -344,7 +344,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-join-request",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("스터디 가입 신청")
+                    .summary("스터디 가입 신청 (개발중)")
                     .description("스터디 가입 신청에 사용되는 API입니다.")
                     .responseSchema(Schema.schema("스터디 가입 요청 응답")),
                 preprocessRequest(prettyPrint()),
