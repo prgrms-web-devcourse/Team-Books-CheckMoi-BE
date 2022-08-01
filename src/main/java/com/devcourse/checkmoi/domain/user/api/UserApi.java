@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.user.api;
 
 import com.devcourse.checkmoi.domain.user.dto.UserRequest;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfoWithStudy;
 import com.devcourse.checkmoi.domain.user.service.UserCommandService;
 import com.devcourse.checkmoi.domain.user.service.UserQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
@@ -29,12 +29,12 @@ public class UserApi {
     private final UserCommandService userCommandService;
 
     @GetMapping("/users/{userId}")
-    ResponseEntity<SuccessResponse<UserInfo>> userPage(
+    ResponseEntity<SuccessResponse<UserInfoWithStudy>> userPage(
         @PathVariable Long userId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
         return ResponseEntity.ok()
-            .body(new SuccessResponse<>(userQueryService.findUserInfo(user.id())));
+            .body(new SuccessResponse<>(userQueryService.findUserInfoWithStudy(user.id())));
     }
 
     @DeleteMapping("/users/{userId}")
