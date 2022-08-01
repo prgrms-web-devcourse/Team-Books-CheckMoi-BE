@@ -8,7 +8,9 @@ import com.devcourse.checkmoi.domain.file.model.vo.AttachedFile;
 import com.devcourse.checkmoi.domain.file.model.vo.AttachedFile.FileType;
 import com.devcourse.checkmoi.domain.file.repository.FileUploadedRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,9 +30,10 @@ public class FileUploadServiceImpl implements FileUploadService {
     public AttachedFileResponse.Upload upload(AttachedFileRequest.Upload request, Long userId) {
         List<String> urls = new ArrayList<>();
 
-        request.files().stream()
+        Optional.ofNullable(request.files())
+            .orElse(Collections.emptyList()).stream()
             .map(multipartFile -> AttachedFile.toAttachedFile(multipartFile, FileType.IMAGE))
-            .forEach(file -> // TODO : AttachedFile 로직으로 인한 NPE 발생 가능성
+            .forEach(file -> // TODO : AttachedFile 로직으로 인한 NPE 발생 가능
                 save(file, urls, userId));
 
         return new Upload(urls);
