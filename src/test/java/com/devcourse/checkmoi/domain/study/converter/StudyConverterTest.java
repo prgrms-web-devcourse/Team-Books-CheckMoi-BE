@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -28,6 +29,8 @@ class StudyConverterTest {
                 .maxParticipant(5)
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
+                .studyStartDate(LocalDate.now())
+                .studyEndDate(LocalDate.now())
                 .build();
             Study want = Study.builder()
                 .book(
@@ -41,6 +44,9 @@ class StudyConverterTest {
                 .maxParticipant(request.maxParticipant())
                 .gatherStartDate(request.gatherStartDate())
                 .gatherEndDate(request.gatherEndDate())
+                .studyStartDate(request.studyStartDate())
+                .studyEndDate(request.studyEndDate())
+                .status(StudyStatus.RECRUTING)
                 .build();
 
             Study got = studyConverter.createToEntity(request);

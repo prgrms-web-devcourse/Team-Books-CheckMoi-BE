@@ -68,6 +68,8 @@ class StudyApiTest extends IntegrationTest {
                 .maxParticipant(5)
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
+                .studyStartDate(LocalDate.now())
+                .studyEndDate(LocalDate.now())
                 .build();
             Long createdStudyId = 1L;
             Long userId = 1L;
@@ -114,7 +116,12 @@ class StudyApiTest extends IntegrationTest {
                         .description("모집 시작일자"),
                     fieldWithPath("gatherEndDate").type(JsonFieldType.STRING)
                         .attributes(getDateFormat())
-                        .description("모집 종료일자")
+                        .description("모집 종료일자"),
+                    fieldWithPath("studyStartDate").type(JsonFieldType.STRING)
+                        .attributes(getDateFormat())
+                        .description("스터디 시작 일자"),
+                    fieldWithPath("studyEndDate").type(JsonFieldType.STRING)
+                        .description("스터디 종료 일자")
                 ),
                 responseFields(
                     fieldWithPath("data").type(JsonFieldType.NUMBER)
@@ -122,6 +129,7 @@ class StudyApiTest extends IntegrationTest {
                 )
             );
         }
+
     }
 
     @Nested
