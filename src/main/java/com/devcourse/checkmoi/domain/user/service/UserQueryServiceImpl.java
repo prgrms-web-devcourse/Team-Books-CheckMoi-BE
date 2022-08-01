@@ -2,6 +2,7 @@ package com.devcourse.checkmoi.domain.user.service;
 
 import com.devcourse.checkmoi.domain.user.converter.UserConverter;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfoWithStudy;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
@@ -22,6 +23,11 @@ public class UserQueryServiceImpl implements UserQueryService {
         User findUser = userRepository.findById(userId)
             .orElseThrow(UserNotFoundException::new);
         return userConverter.userToUserInfo(findUser);
+    }
+
+    @Override
+    public UserInfoWithStudy findUserInfoWithStudy(Long userId) {
+        return userRepository.findUserInfoWithStudy(userId);
     }
 
 }

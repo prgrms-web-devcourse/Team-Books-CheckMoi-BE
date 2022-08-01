@@ -20,7 +20,7 @@ public class UserProfile {
     private final String profileImgUrl;
 
     @Enumerated(EnumType.STRING)
-    private UserRole userRole = UserRole.GUEST;
+    private UserRole userRole = UserRole.LOGIN;
 
     @Builder
     public UserProfile(String oauthId, String provider, String name, String email,

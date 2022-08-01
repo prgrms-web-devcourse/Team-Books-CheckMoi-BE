@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum UserRole {
-    GUEST("ROLE_GUEST"),
-    HOST("ROLE_HOST");
+    LOGIN("ROLE_LOGIN");
 
     private final String grantedAuthority;
 

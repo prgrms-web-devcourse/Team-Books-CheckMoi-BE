@@ -27,7 +27,7 @@ public class UserConverter {
             .name(userProfile.getName())
             .email(new Email(userProfile.getEmail()))
             .profileImgUrl(userProfile.getProfileImgUrl())
-            .userRole(UserRole.GUEST)
+            .userRole(UserRole.LOGIN)
             .build();
     }
 
