@@ -1,6 +1,5 @@
 package com.devcourse.checkmoi.domain.study.repository.study;
 
-import static com.devcourse.checkmoi.domain.user.model.UserRole.GUEST;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
@@ -11,6 +10,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.stub.StudyMemberStub;
 import com.devcourse.checkmoi.domain.study.stub.StudyStub;
 import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.domain.user.model.UserRole;
 import com.devcourse.checkmoi.domain.user.model.vo.Email;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.domain.user.stub.UserStub;
@@ -51,7 +51,8 @@ class StudyRepositoryTest extends RepositoryTest {
             String name = "name";
             User user = userRepository.saveAndFlush(
                 User.builder().oauthId(name).provider("kakao").name(name)
-                    .email(new Email(name + "@gmail.com")).userRole(GUEST).profileImgUrl("url")
+                    .email(new Email(name + "@gmail.com")).userRole(UserRole.LOGIN)
+                    .profileImgUrl("url")
                     .build()
             );
             Study study = studyRepository.saveAndFlush(

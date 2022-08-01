@@ -16,7 +16,7 @@ public class UserStub {
                 .name("user1")
                 .email(new Email("user1@test.com"))
                 .profileImgUrl("https://example.com/java.png")
-                .userRole(UserRole.GUEST)
+                .userRole(UserRole.LOGIN)
                 .build(),
             User.builder()
                 .id(2L)
@@ -25,7 +25,7 @@ public class UserStub {
                 .name("user2")
                 .email(new Email("user2@test.com"))
                 .profileImgUrl("https://example.com/java2.png")
-                .userRole(UserRole.GUEST)
+                .userRole(UserRole.LOGIN)
                 .build(),
             User.builder()
                 .id(3L)
@@ -34,7 +34,7 @@ public class UserStub {
                 .name("user3")
                 .email(new Email("user3@test.com"))
                 .profileImgUrl("https://example.com/java.png")
-                .userRole(UserRole.HOST)
+                .userRole(UserRole.LOGIN)
                 .build(),
             User.builder()
                 .id(4L)
@@ -43,7 +43,7 @@ public class UserStub {
                 .name("user4")
                 .email(new Email("user4@test.com"))
                 .profileImgUrl("https://example.com/java.png")
-                .userRole(UserRole.GUEST)
+                .userRole(UserRole.LOGIN)
                 .build(),
             User.builder()
                 .id(5L)
@@ -52,7 +52,7 @@ public class UserStub {
                 .name("user5")
                 .email(new Email("user5@test.com"))
                 .profileImgUrl("https://example.com/java5.png")
-                .userRole(UserRole.HOST)
+                .userRole(UserRole.LOGIN)
                 .build()
         );
     }
@@ -65,7 +65,7 @@ public class UserStub {
             .name("user1")
             .email(new Email("user1@test.com"))
             .profileImgUrl("https://example.com/java.png")
-            .userRole(UserRole.GUEST)
+            .userRole(UserRole.LOGIN)
             .build();
     }
 }
