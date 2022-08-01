@@ -75,4 +75,11 @@ public class StudyApi {
         return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 
+    @PutMapping("/{studyId}/study-member")
+    public ResponseEntity<SuccessResponse<Long>> requestStudyJoin(@PathVariable Long studyId,
+        @AuthenticationPrincipal JwtAuthentication user) {
+        Long studyMemberId = studyCommandService.requestStudyJoin(studyId, user.id());
+        return ResponseEntity.ok()
+            .body(new SuccessResponse<>(studyMemberId));
+    }
 }

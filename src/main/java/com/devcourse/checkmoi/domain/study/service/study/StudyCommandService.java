@@ -12,4 +12,5 @@ public interface StudyCommandService {
 
     void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request);
 
+    Long requestStudyJoin(Long studyId, Long userId);
 }

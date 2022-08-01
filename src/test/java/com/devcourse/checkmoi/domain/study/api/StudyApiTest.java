@@ -318,4 +318,44 @@ class StudyApiTest extends IntegrationTest {
             );
         }
     }
+
+    @Nested
+    @DisplayName("스터디 가입 신청 #52")
+    class RequestStudyJoinTest {
+
+        @Test
+        void requestStudyJoin() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+            Long studyId = 1L;
+            Long studyMemberId = 1L;
+            given(studyCommandService.requestStudyJoin(studyId, givenUser.userInfo().id()))
+                .willReturn(studyMemberId);
+            ResultActions result = mockMvc.perform(
+                put("/api/studies/{studyId}/study-member", studyId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()));
+
+            result.andExpect(status().isOk())
+                .andDo(documentation())
+                .andExpect(jsonPath("$.data").value(studyMemberId));
+
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("study-join-request",
+                ResourceSnippetParameters.builder()
+                    .tag("Study API")
+                    .summary("스터디 가입 신청")
+                    .description("스터디 가입 신청에 사용되는 API입니다.")
+                    .responseSchema(Schema.schema("스터디 가입 요청 응답")),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
+                pathParameters(
+                    parameterWithName("studyId").description("스터디 Id")
+                ),
+                responseFields(
+                    fieldWithPath("data").description("스터디 멤버 Id")
+                ));
+        }
+    }
 }

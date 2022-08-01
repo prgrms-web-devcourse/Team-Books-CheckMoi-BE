@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
+import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.exception.StudyJoinRequestNotFoundException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
@@ -19,6 +20,8 @@ import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
 import com.devcourse.checkmoi.domain.study.stub.StudyMemberStub;
+import com.devcourse.checkmoi.domain.study.stub.StudyStub;
+import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.domain.user.stub.UserStub;
@@ -175,7 +178,7 @@ class StudyCommandServiceImplTest {
 
     @Nested
     @DisplayName("스터디 가입 승낙 및 거절 #37")
-    class Audit {
+    class AuditTest {
 
         @Test
         @DisplayName("S 스터디 가입 승낙 및 거절할 수 있다.")
@@ -271,5 +274,109 @@ class StudyCommandServiceImplTest {
                     () -> studyCommandService.auditStudyParticipation(studyId, memberId, userId,
                         request));
         }
+    }
+
+    @Nested
+    @DisplayName("스터디 가입 신청 #52")
+    class RequestStudyJoinTest {
+
+
+        @Test
+        @DisplayName("S 스터디 가입 신청을 할 수 있습니다.")
+        void requestStudyJoin() {
+            Long studyId = 1L;
+            Long userId = 1L;
+            Study study = StudyStub.study();
+            User user = UserStub.user();
+            StudyMember studyMember = StudyMemberStub.pendingStudyMember();
+            Long want = 1L;
+
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.of(study));
+            given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+            given(studyMemberRepository.findByUser(any(User.class)))
+                .willReturn(Optional.empty());
+            given(studyMemberRepository.save(any(StudyMember.class)))
+                .willReturn(studyMember);
+
+            Long got = studyCommandService.requestStudyJoin(studyId, userId);
+
+            assertThat(got).isEqualTo(want);
+        }
+
+        @Test
+        @DisplayName("S 만약 거절당했다면 스터디 가입 재신청을 할 수 있습니다.")
+        void reRequestStudyJoin() {
+            Long studyId = 1L;
+            Long userId = 1L;
+            Study study = StudyStub.study();
+            User user = UserStub.user();
+            StudyMember studyMember = StudyMemberStub.deniedStudyMember();
+            Long want = 1L;
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.of(study));
+            given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+            given(studyMemberRepository.findByUser(any(User.class)))
+                .willReturn(Optional.of(studyMember));
+            given(studyMemberRepository.save(any(StudyMember.class)))
+                .willReturn(studyMember);
+
+            Long got = studyCommandService.requestStudyJoin(studyId, userId);
+
+            assertThat(got).isEqualTo(want);
+        }
+
+
+        @Test
+        @DisplayName("F 해당 스터디가 존재하지 않는다면 예외 발생")
+        void studyNotFound() {
+            Long studyId = 1L;
+            Long userId = 1L;
+
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+            assertThatExceptionOfType(StudyNotFoundException.class)
+                .isThrownBy(() -> studyCommandService.requestStudyJoin(studyId, userId));
+        }
+
+        @Test
+        @DisplayName("F 유저가 존재하지 않는다면 예외 발생")
+        void userNotFound() {
+            Long studyId = 1L;
+            Long userId = 1L;
+            Study study = StudyStub.study();
+
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.of(study));
+            given(userRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+            assertThatExceptionOfType(UserNotFoundException.class)
+                .isThrownBy(() -> studyCommandService.requestStudyJoin(studyId, userId));
+        }
+
+        @Test
+        @DisplayName("F 유저가 이미 가입 요청을 했다면 예외 발생")
+        void duplicateStudyJoin() {
+            Long studyId = 1L;
+            Long userId = 1L;
+            Study study = StudyStub.study();
+            User user = UserStub.user();
+            StudyMember studyMember = StudyMemberStub.studyMember();
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.of(study));
+            given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+            given(studyMemberRepository.findByUser(any(User.class)))
+                .willReturn(Optional.of(studyMember));
+
+            assertThatExceptionOfType(DuplicateStudyJoinRequestException.class)
+                .isThrownBy(() -> studyCommandService.requestStudyJoin(studyId, userId));
+        }
+
+
     }
 }
