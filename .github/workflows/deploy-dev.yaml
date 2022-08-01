@@ -40,7 +40,7 @@ jobs:
           export KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
           export KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
           export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
-          ./gradlew jib
+          ./gradlew build jib
 
       - name: jenkins deploy
         uses: appleboy/jenkins-action@master

@@ -46,7 +46,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
                 .build()
             )
             .study(study)
-            .status(StudyMemberStatus.PENDING)
+            .status(StudyMemberStatus.OWNED)
             .build();
 
         studyMemberRepository.save(studyMember);
