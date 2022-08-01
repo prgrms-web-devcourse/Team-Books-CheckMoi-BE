@@ -44,3 +44,11 @@ jwt:
     expire-length: 3600000
   refresh-token:
     expire-length: 3600000
+cloud:
+  aws:
+    s3:
+      region: ap-northeast-2
+      accessKey: ${S3_ACCESS_KEY}
+      secretKey: ${S3_SECRET_KEY}
+      url: https://s3.ap-northeast-2.amazonaws.com
+      bucketName: devcourse-r-checkmoi-bucket
