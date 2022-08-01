@@ -193,7 +193,7 @@ class StudyApiTest extends IntegrationTest {
                 .build();
 
             ResultActions result = mockMvc.perform(
-                put("/api/studies/{studyId}/member/{memberId}", studyId, memberId)
+                put("/api/studies/{studyId}/members/{memberId}", studyId, memberId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
                     .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                     .content(toJson(request)));
@@ -331,7 +331,7 @@ class StudyApiTest extends IntegrationTest {
             given(studyCommandService.requestStudyJoin(studyId, givenUser.userInfo().id()))
                 .willReturn(studyMemberId);
             ResultActions result = mockMvc.perform(
-                put("/api/studies/{studyId}/study-member", studyId)
+                put("/api/studies/{studyId}/members", studyId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()));
 
             result.andExpect(status().isOk())

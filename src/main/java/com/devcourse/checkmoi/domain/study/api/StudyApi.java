@@ -52,7 +52,7 @@ public class StudyApi {
             new SuccessResponse<>(studyCommandService.editStudyInfo(studyId, user.id(), request)));
     }
 
-    @PutMapping("/{studyId}/member/{memberId}")
+    @PutMapping("/{studyId}/members/{memberId}")
     public ResponseEntity<Void> auditStudyParticipation(
         @PathVariable Long studyId,
         @PathVariable Long memberId,
@@ -75,7 +75,7 @@ public class StudyApi {
         return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 
-    @PutMapping("/{studyId}/study-member")
+    @PutMapping("/{studyId}/members")
     public ResponseEntity<SuccessResponse<Long>> requestStudyJoin(@PathVariable Long studyId,
         @AuthenticationPrincipal JwtAuthentication user) {
         Long studyMemberId = studyCommandService.requestStudyJoin(studyId, user.id());
