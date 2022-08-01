@@ -6,7 +6,6 @@ import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.exception.StudyJoinRequestNotFoundException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
@@ -15,6 +14,8 @@ import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
+import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,11 +31,21 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     private final StudyMemberRepository studyMemberRepository;
 
+    private final UserRepository userRepository;
+
     @Override
-    public Long createStudy(Create request) {
-        return studyRepository
-            .save(studyConverter.createToEntity(request))
-            .getId();
+    public Long createStudy(Create request, Long userId) {
+        Study study = studyRepository.save(studyConverter.createToEntity(request));
+        StudyMember studyMember = StudyMember.builder()
+            .user(User.builder()
+                .id(userId)
+                .build()
+            )
+            .status(StudyMemberStatus.OWNED)
+            .study(study)
+            .build();
+        studyMemberRepository.save(studyMember);
+        return study.getId();
     }
 
     @Override
