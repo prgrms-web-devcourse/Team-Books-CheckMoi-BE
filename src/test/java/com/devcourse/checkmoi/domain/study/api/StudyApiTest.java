@@ -97,6 +97,7 @@ class StudyApiTest extends IntegrationTest {
                     .responseSchema(Schema.schema("스터디 생성 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
                 requestFields(
                     fieldWithPath("bookId").type(JsonFieldType.NUMBER)
                         .description("책 아이디"),
@@ -162,6 +163,7 @@ class StudyApiTest extends IntegrationTest {
                     .responseSchema(Schema.schema("스터디 수정 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
                 requestFields(
                     fieldWithPath("name").type(JsonFieldType.STRING).description("스터디 이름"),
                     fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("스터디 대표 이미지"),
@@ -209,6 +211,7 @@ class StudyApiTest extends IntegrationTest {
                     .requestSchema(Schema.schema("스터디 가입 승낙 및 거절 요청")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("studyId").description("스터디 Id"),
                     parameterWithName("memberId").description("멤버 Id")

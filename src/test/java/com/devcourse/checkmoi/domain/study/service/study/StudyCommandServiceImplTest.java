@@ -89,8 +89,6 @@ class StudyCommandServiceImplTest {
                 .thenReturn(study);
             when(studyRepository.save(any(Study.class)))
                 .thenReturn(study);
-            when(userRepository.findById(anyLong()))
-                .thenReturn(Optional.of(user));
             when(studyMemberRepository.save(any(StudyMember.class)))
                 .thenReturn(studyMember);
             Long got = studyCommandService.createStudy(request, userId);
