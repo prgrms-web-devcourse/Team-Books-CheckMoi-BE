@@ -2,7 +2,6 @@ package com.devcourse.checkmoi.global.security.handler;
 
 import com.devcourse.checkmoi.global.security.oauth.OAuthProvider;
 import com.devcourse.checkmoi.global.security.oauth.OAuthService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,8 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final OAuthService oauthService;
-
-    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess(
