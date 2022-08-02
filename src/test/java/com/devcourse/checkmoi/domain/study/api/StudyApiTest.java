@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -20,17 +21,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.study.StudyQueryService;
 import com.devcourse.checkmoi.domain.study.stub.StudyStub;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -192,7 +198,7 @@ class StudyApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("스터디 가입 승낙 및 거절 #37")
-    class Audit {
+    class AuditTest {
 
         @Test
         void auditStudyParticipation() throws Exception {
@@ -235,7 +241,7 @@ class StudyApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("특정 책에 대한 스터디 목록 조회 #43")
-    class GetStudies {
+    class GetStudiesTest {
 
         private final StudyConverter studyConverter = new StudyConverter();
 
@@ -369,4 +375,114 @@ class StudyApiTest extends IntegrationTest {
                 ));
         }
     }
+
+    @Nested
+    @DisplayName("스터디 상세 조회 #56")
+    class StudyDetailInfoTest {
+
+        private static Long userId = 1L;
+
+        @Test
+        @DisplayName("S 스터디와 관련된 책과 스터디멤버 정보를 같이 조회할 수 있다")
+        void studyDetailInfoTest() throws Exception {
+
+            StudyDetailInfo givenStudyInfo = givenStudyDetailInfo(givenBookInfo());
+            List<UserInfo> givenMembers = List.of(givenUserInfo(), givenUserInfo());
+
+            StudyDetailWithMembers expected = StudyDetailWithMembers.builder()
+                .study(givenStudyInfo)
+                .members(givenMembers)
+                .build();
+
+            given(studyQueryService.getStudyInfoWithMembers(anyLong())).willReturn(expected);
+
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+            mockMvc.perform(get("/api/studies/{studyId}", givenUser.userInfo().id())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
+                .andExpect(status().isOk())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("study-join-request",
+                ResourceSnippetParameters.builder()
+                    .tag("Study API")
+                    .summary("스터디 상세 조회 API")
+                    .description("스터디와 관련된 책과 스터디멤버 정보를 같이 조회할 수 있는 API 입니다"),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
+                pathParameters(
+                    parameterWithName("studyId").description("스터디 아이디")
+                ),
+                responseFields(
+                    // study info
+                    fieldWithPath("data.study.id").description("스터디 아이디"),
+                    fieldWithPath("data.study.name").description("스터디 이름"),
+                    fieldWithPath("data.study.thumbnailUrl").description("스터디 썸네일"),
+                    fieldWithPath("data.study.description").description("스터디 설명"),
+                    fieldWithPath("data.study.currentParticipant").description("스터디 현재 참여 인원"),
+                    fieldWithPath("data.study.maxParticipant").description("스터디 최대 참여 인원"),
+                    fieldWithPath("data.study.gatherStartDate").description("스터디 모집 시작일"),
+                    fieldWithPath("data.study.gatherEndDate").description("스터디 모집 종료일"),
+                    fieldWithPath("data.study.studyStartDate").description("스터디 시작 일자"),
+                    fieldWithPath("data.study.studyEndDate").description("스터디 종료 일자"),
+
+                    // study book info
+                    fieldWithPath("data.study.book.bookId").description("스터디 책 아이디"),
+                    fieldWithPath("data.study.book.title").description("스터디 책 제목"),
+                    fieldWithPath("data.study.book.author").description("스터디 책 저자"),
+                    fieldWithPath("data.study.book.publisher").description("스터디 책 출판사"),
+                    fieldWithPath("data.study.book.thumbnail").description("스터디 책 썸네일"),
+
+                    // study member info
+                    fieldWithPath("data.members[].id").
+                        description("스터디 멤버 아이디"),
+                    fieldWithPath("data.members[].name")
+                        .description("스터디 멤버 이름"),
+                    fieldWithPath("data.members[].email")
+                        .description("스터디 멤버 이메일"),
+                    fieldWithPath("data.members[].profileImageUrl")
+                        .description("스터디 멤버 이미지 URL")
+
+                ));
+        }
+
+        private UserInfo givenUserInfo() {
+            return UserInfo.builder()
+                .id(userId++)
+                .name(UUID.randomUUID().toString().substring(10))
+                .email("asdf@asdf.com")
+                .profileImageUrl("url")
+                .build();
+        }
+
+        private StudyBookInfo givenBookInfo() {
+            return StudyBookInfo.builder()
+                .bookId(1L)
+                .title("책 제목")
+                .author("책 저자")
+                .publisher("출판사")
+                .thumbnail("책 썸네일")
+                .build();
+        }
+
+        private StudyDetailInfo givenStudyDetailInfo(StudyBookInfo bookInfo) {
+            return StudyDetailInfo.builder()
+                .id(1L)
+                .name("스터디 이름")
+                .thumbnailUrl("스터디 썸네일 URL")
+                .description("스터디 설명")
+                .currentParticipant(2)
+                .maxParticipant(5)
+                .gatherStartDate(LocalDate.now())
+                .gatherEndDate(LocalDate.now())
+                .studyStartDate(LocalDate.now())
+                .studyEndDate(LocalDate.now())
+                .book(bookInfo)
+                .build();
+        }
+
+    }
+
 }
