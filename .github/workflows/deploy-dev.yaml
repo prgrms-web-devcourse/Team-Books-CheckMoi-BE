@@ -40,6 +40,12 @@ jobs:
           export KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
           export KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
           export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+          export S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}
+          export S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
+          export S3_URL=${{ secrets.S3_URL }}
+          export S3_INTEGRATED_BUCKET_NAME=${{ secrets.S3_INTEGRATED_BUCKET_NAME }}
+
+
           ./gradlew build jib
 
       - name: jenkins deploy

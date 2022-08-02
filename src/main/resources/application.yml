@@ -1,4 +1,6 @@
 spring:
   profiles:
     active: local
-    include: security
+    include: >
+      security,
+      aws
