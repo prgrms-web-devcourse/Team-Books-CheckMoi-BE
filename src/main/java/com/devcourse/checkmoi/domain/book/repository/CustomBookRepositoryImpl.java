@@ -20,11 +20,10 @@ public class CustomBookRepositoryImpl implements
     public List<Book> findBooksByLatestStudy(Pageable page) {
         return jpaQueryFactory.select(book)
             .from(book)
-            .offset(page.getOffset())
-            .limit(page.getPageSize())
             .innerJoin(study)
             .on(book.id.eq(study.book.id))
             .orderBy(study.createdAt.desc())
+            .limit(page.getPageSize())
             .fetch();
     }
 }
