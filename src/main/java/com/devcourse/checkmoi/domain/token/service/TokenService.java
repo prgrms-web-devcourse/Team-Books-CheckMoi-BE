@@ -69,4 +69,8 @@ public class TokenService {
         }
         tokenRepository.deleteByUserId(userId);
     }
+
+    public String createTemporaryAccessToken(Long userId) {
+        return jwtTokenProvider.createAccessToken(userId, "ROLE_LOGIN");
+    }
 }

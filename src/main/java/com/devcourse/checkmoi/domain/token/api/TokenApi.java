@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +24,8 @@ public class TokenApi {
 
     @GetMapping("/tokens")
     public ResponseEntity<SuccessResponse<AccessToken>> refreshAccessToken(
-        HttpServletRequest httpServletRequest) {
+        HttpServletRequest httpServletRequest
+    ) {
         String accessToken = AuthorizationExtractor.extract(httpServletRequest);
 
         return ResponseEntity.ok(
@@ -38,9 +40,10 @@ public class TokenApi {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/login/success")
-    public String healthy() {
-        return "success";
+    // INFO: 편의메서드 입니다.
+    @GetMapping("/tokens/{userId}")
+    public String createTemporaryAccessToken(@PathVariable Long userId) {
+        return tokenService.createTemporaryAccessToken(userId);
     }
 
 }
