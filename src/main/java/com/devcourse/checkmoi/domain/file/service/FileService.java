@@ -3,7 +3,7 @@ package com.devcourse.checkmoi.domain.file.service;
 import com.devcourse.checkmoi.domain.file.dto.AttachedFileRequest;
 import com.devcourse.checkmoi.domain.file.dto.AttachedFileResponse;
 
-public interface FileUploadService {
+public interface FileService {
 
     AttachedFileResponse.Upload upload(AttachedFileRequest.Upload request, Long userId);
 

@@ -13,7 +13,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.file.dto.AttachedFileResponse;
 import com.devcourse.checkmoi.domain.file.dto.AttachedFileResponse.Upload;
-import com.devcourse.checkmoi.domain.file.service.FileUploadServiceImpl;
+import com.devcourse.checkmoi.domain.file.service.FileServiceImpl;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
@@ -31,10 +31,10 @@ import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
 
-class ImageUploadApiTest extends IntegrationTest {
+class ImageApiTest extends IntegrationTest {
 
     @MockBean
-    FileUploadServiceImpl fileUploadService;
+    FileServiceImpl fileUploadService;
 
     @Nested
     @DisplayName("이미지 업로드 테스트")

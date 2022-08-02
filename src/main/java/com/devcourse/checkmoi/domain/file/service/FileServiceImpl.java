@@ -14,13 +14,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FileUploadServiceImpl implements FileUploadService {
+public class FileServiceImpl implements FileService {
 
     private final S3Upload s3Upload;
 
     private final FileUploadedRepository repository;
 
-    public FileUploadServiceImpl(S3Upload s3Upload,
+    public FileServiceImpl(S3Upload s3Upload,
         FileUploadedRepository repository) {
         this.s3Upload = s3Upload;
         this.repository = repository;

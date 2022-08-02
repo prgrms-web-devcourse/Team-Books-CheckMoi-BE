@@ -2,8 +2,8 @@ package com.devcourse.checkmoi.domain.file.api;
 
 import com.devcourse.checkmoi.domain.file.dto.AttachedFileRequest;
 import com.devcourse.checkmoi.domain.file.dto.AttachedFileResponse;
-import com.devcourse.checkmoi.domain.file.service.FileUploadService;
-import com.devcourse.checkmoi.domain.file.service.FileUploadServiceImpl;
+import com.devcourse.checkmoi.domain.file.service.FileService;
+import com.devcourse.checkmoi.domain.file.service.FileServiceImpl;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class ImageUploadApi {
+public class ImageApi {
 
-    private final FileUploadService uploadService;
+    private final FileService uploadService;
 
-    public ImageUploadApi(FileUploadServiceImpl uploadService) {
+    public ImageApi(FileServiceImpl uploadService) {
         this.uploadService = uploadService;
     }
 
