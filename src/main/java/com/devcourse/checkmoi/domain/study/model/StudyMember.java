@@ -3,7 +3,7 @@ package com.devcourse.checkmoi.domain.study.model;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 import com.devcourse.checkmoi.domain.user.model.User;
-import javax.persistence.Column;
+import com.devcourse.checkmoi.global.model.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = PROTECTED)
-public class StudyMember {
+public class StudyMember extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -53,5 +53,9 @@ public class StudyMember {
 
     public User getUser() {
         return user;
+    }
+
+    public Study getStudy() {
+        return study;
     }
 }
