@@ -9,6 +9,7 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -99,10 +100,29 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             )
             .from(studyMember)
             .innerJoin(studyMember.user)
-            .where(studyMember.study.id.eq(studyId)
-                .and(studyMember.status.eq(requiredStatus))
-                .or(studyMember.status.eq(optionalStatus)))
+            .where(searchMemberContext(
+                studyId,
+                requiredStatus,
+                optionalStatus))
             .orderBy(studyMember.createdAt.asc())
             .fetch();
+    }
+
+    private BooleanBuilder searchMemberContext(Long studyId, StudyMemberStatus requiredStatus,
+        StudyMemberStatus optionalStatus) {
+
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        if (studyId != null) {
+            booleanBuilder.and(studyMember.study.id.eq(studyId));
+        }
+        if (requiredStatus != null) {
+            booleanBuilder.and(studyMember.status.eq(requiredStatus));
+        }
+        if (optionalStatus != null) {
+            booleanBuilder.or(studyMember.status.eq(optionalStatus));
+        }
+
+        return booleanBuilder;
     }
 }
