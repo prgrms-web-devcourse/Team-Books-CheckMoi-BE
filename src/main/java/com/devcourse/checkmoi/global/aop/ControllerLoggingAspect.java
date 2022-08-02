@@ -48,16 +48,12 @@ class ControllerLoggingAspect {
 
         Map<String, Object> params = new HashMap<>();
 
-        try {
-            params.put("controller", controllerName);
-            params.put("method", methodName);
-            params.put("params", getParams(request));
-            params.put("log_time", new Date());
-            params.put("request_uri", request.getRequestURI());
-            params.put("http_method", request.getMethod());
-        } catch (Exception e) {
-            log.error("LoggingAspect error", e);
-        }
+        params.put("controller", controllerName);
+        params.put("method", methodName);
+        params.put("params", getParams(request));
+        params.put("log_time", new Date());
+        params.put("request_uri", request.getRequestURI());
+        params.put("http_method", request.getMethod());
 
         log.info("params : {}", params);
         return result;
