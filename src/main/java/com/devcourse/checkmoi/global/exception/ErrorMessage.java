@@ -25,7 +25,7 @@ public enum ErrorMessage {
     STUDY_JOIN_REQUEST_DUPLICATE("이미 스터디 가입 요청을 완료했습니다.", HttpStatus.CONFLICT),
 
     // file error
-    NOT_ALLOWED_FILE("허용할 수 없는 파일입니다. 파일은 .jpeg,.png,.jpg 이어야합니다", HttpStatus.BAD_REQUEST);
+    NOT_ALLOWED_FILE("허용할 수 없는 파일입니다", HttpStatus.BAD_REQUEST);
 
     private final String message;
 

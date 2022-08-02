@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.file.model.vo;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
+import com.devcourse.checkmoi.domain.file.exception.FileException;
 import com.devcourse.checkmoi.domain.file.exception.NotAllowedFileException;
 import java.io.IOException;
 import java.util.UUID;
@@ -22,36 +23,35 @@ public class AttachedFile {
         this.bytes = bytes;
     }
 
-    private static boolean verify(MultipartFile multipartFile, FileType fileType) {
-        if (multipartFile != null && multipartFile.getSize() > 0
-            && multipartFile.getOriginalFilename() != null) {
-
-            String contentType = multipartFile.getContentType();
-
-            return !ObjectUtils.isEmpty(contentType) && contentType.toLowerCase()
-                .startsWith(fileType.getPrefix());
+    private static void checkMultipartFile(MultipartFile multipartFile) {
+        if (multipartFile == null || multipartFile.getSize() <= 0
+            || multipartFile.getOriginalFilename() == null) {
+            throw new NotAllowedFileException();
         }
-        return false;
     }
 
+    private static void checkContentType(MultipartFile multipartFile, FileType fileType) {
+        String contentType = multipartFile.getContentType();
+
+        if (ObjectUtils.isEmpty(contentType) || contentType.toLowerCase()
+            .startsWith(fileType.getPrefix())) {
+            throw new NotAllowedFileException();
+        }
+    }
 
     public static AttachedFile toAttachedFile(MultipartFile multipartFile,
         FileType fileType) {
-        // TODO : 리팩토링이 필요하다 - 이로 인해 NPE 에 대한 경고가 뜨고 있음
-        try {
-            if (verify(multipartFile, fileType)) {
-                return
-                    new AttachedFile(multipartFile.getOriginalFilename(),
-                        multipartFile.getContentType(),
-                        multipartFile.getBytes());
-            } else {
-                throw new NotAllowedFileException();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        return null;
+        try {
+            checkMultipartFile(multipartFile);
+            checkContentType(multipartFile, fileType);
+
+            return new AttachedFile(multipartFile.getOriginalFilename(),
+                multipartFile.getContentType(),
+                multipartFile.getBytes());
+        } catch (IOException e) {
+            throw new FileException(e);
+        }
     }
 
     public String getOriginalFileName() {
