@@ -28,6 +28,7 @@ public class UserConverter {
             .name(userProfile.getName())
             .email(new Email(userProfile.getEmail()))
             .profileImgUrl(userProfile.getProfileImgUrl())
+            .temperature(36.5f)
             .userRole(UserRole.LOGIN)
             .build();
     }
