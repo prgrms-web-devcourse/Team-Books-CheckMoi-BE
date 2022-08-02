@@ -47,6 +47,19 @@ class AttachedFileTest {
                     () -> AttachedFile.toAttachedFile(multipartFile, expectedMimeTye))
                 .isInstanceOf(NotAllowedFileException.class);
         }
+
+        @Test
+        @DisplayName("F 컨텐트가 비어있는 경우 AttachedFile 생성에 실패한다")
+        void createAttachedFileFailWithEmptyContent() {
+            FileType expectedMimeTye = FileType.IMAGE;
+
+            MultipartFile multipartFile = new MockMultipartFile(paramName,
+                notBlankFileName, "text/html", new byte[]{});
+
+            Assertions.assertThatThrownBy(
+                    () -> AttachedFile.toAttachedFile(multipartFile, expectedMimeTye))
+                .isInstanceOf(NotAllowedFileException.class);
+        }
     }
 
     @Nested
