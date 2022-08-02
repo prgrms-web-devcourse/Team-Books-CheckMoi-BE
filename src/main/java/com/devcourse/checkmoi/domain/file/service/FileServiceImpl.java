@@ -33,7 +33,7 @@ public class FileServiceImpl implements FileService {
         Optional.ofNullable(request.files())
             .orElse(Collections.emptyList()).stream()
             .map(multipartFile -> AttachedFile.toAttachedFile(multipartFile, FileType.IMAGE))
-            .forEach(file -> // TODO : AttachedFile 로직으로 인한 NPE 발생 가능
+            .forEach(file ->
                 save(file, urls, userId));
 
         return new Upload(urls);
