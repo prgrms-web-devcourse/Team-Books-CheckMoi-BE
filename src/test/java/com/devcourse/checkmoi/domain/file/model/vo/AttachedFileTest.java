@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 class AttachedFileTest {
 
-    private String notBlankPath = "fileName.jpeg";
+    private String paramName = "files";
 
     private String notBlankFileName = "fileName.jpeg";
 
@@ -25,7 +25,7 @@ class AttachedFileTest {
         @DisplayName("S 기대하는 컨텐트 타입을 가진 MultipartFile 로부터 AttachedFile 을 생성한다")
         void createAttachedFile() {
             FileType expectedMimeTye = FileType.IMAGE;
-            MultipartFile multipartFile = new MockMultipartFile(notBlankPath,
+            MultipartFile multipartFile = new MockMultipartFile(paramName,
                 notBlankFileName, "image/jpeg", notEmptyContents);
 
             AttachedFile file = AttachedFile.toAttachedFile(
@@ -40,7 +40,7 @@ class AttachedFileTest {
         void createAttachedFileFail() {
             FileType expectedMimeTye = FileType.IMAGE;
 
-            MultipartFile multipartFile = new MockMultipartFile(notBlankPath,
+            MultipartFile multipartFile = new MockMultipartFile(paramName,
                 notBlankFileName, "text/html", notEmptyContents);
 
             Assertions.assertThatThrownBy(
@@ -59,9 +59,9 @@ class AttachedFileTest {
         @DisplayName("S 전달된 basePath 에 유니크한 문자열을 더한 경로를 생성한다")
         void createPath() {
 
-            MultipartFile multipartFile1 = new MockMultipartFile(notBlankPath, notBlankPath,
+            MultipartFile multipartFile1 = new MockMultipartFile(paramName, paramName,
                 contentType, notEmptyContents);
-            MultipartFile multipartFile2 = new MockMultipartFile(notBlankPath, notBlankPath,
+            MultipartFile multipartFile2 = new MockMultipartFile(paramName, paramName,
                 contentType, notEmptyContents);
 
             String basePath = "foo";

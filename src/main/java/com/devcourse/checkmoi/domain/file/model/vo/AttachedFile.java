@@ -33,7 +33,7 @@ public class AttachedFile {
     private static void checkContentType(MultipartFile multipartFile, FileType fileType) {
         String contentType = multipartFile.getContentType();
 
-        if (ObjectUtils.isEmpty(contentType) || contentType.toLowerCase()
+        if (ObjectUtils.isEmpty(contentType) || !contentType.toLowerCase()
             .startsWith(fileType.getPrefix())) {
             throw new NotAllowedFileException();
         }
