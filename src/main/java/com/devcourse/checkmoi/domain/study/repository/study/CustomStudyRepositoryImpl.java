@@ -55,7 +55,8 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     @Override
     public StudyDetailWithMembers getStudyInfoWithMembers(Long studyId) {
         StudyDetailInfo studyInfo = getStudyInfo(studyId);
-        List<UserInfo> memberInfo = getStudyMembers(studyId);
+        List<UserInfo> memberInfo = getStudyMembers(studyId, StudyMemberStatus.ACCEPTED,
+            StudyMemberStatus.OWNED);
 
         return StudyDetailWithMembers.builder()
             .study(studyInfo)
@@ -84,7 +85,8 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .fetchOne();
     }
 
-    private List<UserInfo> getStudyMembers(Long studyId) {
+    private List<UserInfo> getStudyMembers(Long studyId, StudyMemberStatus requiredStatus,
+        StudyMemberStatus optionalStatus) {
         return jpaQueryFactory.select(
                 Projections.constructor(
                     UserInfo.class,
@@ -97,7 +99,9 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             )
             .from(studyMember)
             .innerJoin(studyMember.user)
-            .where(studyMember.study.id.eq(studyId))
+            .where(studyMember.study.id.eq(studyId)
+                .and(studyMember.status.eq(requiredStatus))
+                .or(studyMember.status.eq(optionalStatus)))
             .orderBy(studyMember.createdAt.asc())
             .fetch();
     }

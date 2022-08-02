@@ -1,8 +1,10 @@
 package com.devcourse.checkmoi.domain.study.repository.study;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeNotStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -20,6 +22,7 @@ import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.template.RepositoryTest;
 import java.util.ArrayList;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -123,9 +126,16 @@ class StudyRepositoryTest extends RepositoryTest {
         @BeforeEach
         private void setUpGiven() {
             User user = userRepository.save(makeUser());
+            User notStudyMemberUser = userRepository.save(makeNotStudyMemberUser());
+            User studyMemberUser = userRepository.save(makeStudyMemberUser());
             Book book = bookRepository.save(makeBook());
             study = studyRepository.save(makeStudy(book));
             studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+            studyMemberRepository.save(
+                makeStudyMember(study, notStudyMemberUser, StudyMemberStatus.DENIED));
+            studyMemberRepository.save(
+                makeStudyMember(study, studyMemberUser, StudyMemberStatus.ACCEPTED));
+
         }
 
         @Test
@@ -136,6 +146,9 @@ class StudyRepositoryTest extends RepositoryTest {
 
             validateStudyDetailInfo(response);
             validateMembers(response);
+
+            Assertions.assertThat(response.members().size())
+                .isEqualTo(2);
         }
 
         private void validateStudyDetailInfo(StudyDetailWithMembers response) {
