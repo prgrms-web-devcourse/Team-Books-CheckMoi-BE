@@ -5,6 +5,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.study.StudyQueryService;
 import com.devcourse.checkmoi.global.model.PageRequest;
@@ -33,6 +34,15 @@ public class StudyApi {
     private final StudyCommandService studyCommandService;
 
     private final StudyQueryService studyQueryService;
+
+    @GetMapping("/{studyId}")
+    public ResponseEntity<SuccessResponse<StudyDetailWithMembers>> getDetailInfo(
+        @PathVariable Long studyId
+    ) {
+        return ResponseEntity.ok()
+            .body(new SuccessResponse<>(studyQueryService.getStudyInfoWithMembers(studyId)));
+    }
+
 
     @PostMapping
     public ResponseEntity<SuccessResponse<Long>> createStudy(
