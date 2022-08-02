@@ -67,7 +67,8 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         return jpaQueryFactory.select(
                 Projections.constructor(
                     StudyDetailInfo.class,
-                    study.id, study.name, study.thumbnailUrl, study.description,
+                    study.id, study.name, study.status.stringValue(),
+                    study.thumbnailUrl, study.description,
                     study.currentParticipant, study.maxParticipant,
                     study.gatherStartDate, study.gatherEndDate,
                     study.studyStartDate, study.studyEndDate,

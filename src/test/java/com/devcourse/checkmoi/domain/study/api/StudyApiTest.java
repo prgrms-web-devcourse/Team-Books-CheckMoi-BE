@@ -419,6 +419,7 @@ class StudyApiTest extends IntegrationTest {
                     // study info
                     fieldWithPath("data.study.id").description("스터디 아이디"),
                     fieldWithPath("data.study.name").description("스터디 이름"),
+                    fieldWithPath("data.study.status").description("스터디 진행 상태"),
                     fieldWithPath("data.study.thumbnailUrl").description("스터디 썸네일"),
                     fieldWithPath("data.study.description").description("스터디 설명"),
                     fieldWithPath("data.study.currentParticipant").description("스터디 현재 참여 인원"),
