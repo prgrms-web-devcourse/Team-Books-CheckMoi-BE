@@ -6,6 +6,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
@@ -21,9 +22,13 @@ public sealed interface StudyResponse permits
         String description,
         int currentParticipant,
         Integer maxParticipant,
+        @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate gatherStartDate,
+        @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate gatherEndDate,
+        @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate studyStartDate,
+        @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate studyEndDate
     ) implements StudyResponse {
 
@@ -41,11 +46,13 @@ public sealed interface StudyResponse permits
 
         Integer currentParticipant,
         Integer maxParticipant,
-
+        @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate gatherStartDate,
+        @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate gatherEndDate,
-
+        @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate studyStartDate,
+        @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate studyEndDate,
 
         StudyBookInfo book
