@@ -33,10 +33,20 @@ jobs:
       - name: OpenAPI Spec Create
         run: |
           export SERVER_NAME=${{ secrets.PROD_SERVER_NAME }}
+          export S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}
+          export S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
+          export S3_URL=${{ secrets.S3_URL }}
+          export S3_INTEGRATED_BUCKET_NAME=${{ secrets.S3_INTEGRATED_BUCKET_NAME }}
           ./gradlew test copyDocument
 
       - name: Execute Gradle build and analyze
-        run: ./gradlew build jib
+        run: |
+          export S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}
+          export S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
+          export S3_URL=${{ secrets.S3_URL }}
+          export S3_INTEGRATED_BUCKET_NAME=${{ secrets.S3_INTEGRATED_BUCKET_NAME }}
+          ./gradlew build jib
+
 
       - name: jenkins deploy
         uses: appleboy/jenkins-action@master
