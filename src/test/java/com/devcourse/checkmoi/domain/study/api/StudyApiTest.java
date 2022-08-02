@@ -411,7 +411,6 @@ class StudyApiTest extends IntegrationTest {
                     .description("스터디와 관련된 책과 스터디멤버 정보를 같이 조회할 수 있는 API 입니다"),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("studyId").description("스터디 아이디")
                 ),
