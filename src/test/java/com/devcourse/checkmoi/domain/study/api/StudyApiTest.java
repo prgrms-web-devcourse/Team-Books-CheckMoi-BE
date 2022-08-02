@@ -419,6 +419,7 @@ class StudyApiTest extends IntegrationTest {
                     // study info
                     fieldWithPath("data.study.id").description("스터디 아이디"),
                     fieldWithPath("data.study.name").description("스터디 이름"),
+                    fieldWithPath("data.study.status").description("스터디 진행 상태"),
                     fieldWithPath("data.study.thumbnailUrl").description("스터디 썸네일"),
                     fieldWithPath("data.study.description").description("스터디 설명"),
                     fieldWithPath("data.study.currentParticipant").description("스터디 현재 참여 인원"),
@@ -442,9 +443,10 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 멤버 이름"),
                     fieldWithPath("data.members[].email")
                         .description("스터디 멤버 이메일"),
+                    fieldWithPath("data.members[].temperature")
+                        .description("스터디 멤버 온도"),
                     fieldWithPath("data.members[].profileImageUrl")
                         .description("스터디 멤버 이미지 URL")
-
                 ));
         }
 
@@ -453,6 +455,7 @@ class StudyApiTest extends IntegrationTest {
                 .id(userId++)
                 .name(UUID.randomUUID().toString().substring(10))
                 .email("asdf@asdf.com")
+                .temperature(36.5f)
                 .profileImageUrl("url")
                 .build();
         }

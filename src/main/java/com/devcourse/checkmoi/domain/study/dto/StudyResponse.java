@@ -41,9 +41,9 @@ public sealed interface StudyResponse permits
     record StudyDetailInfo(
         Long id,
         String name,
+        String status,
         String thumbnailUrl,
         String description,
-
         Integer currentParticipant,
         Integer maxParticipant,
         @JsonFormat(pattern = "yyyy/MM/dd")

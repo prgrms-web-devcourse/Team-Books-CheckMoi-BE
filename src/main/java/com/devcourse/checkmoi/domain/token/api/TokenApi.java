@@ -1,6 +1,5 @@
 package com.devcourse.checkmoi.domain.token.api;
 
-import com.devcourse.checkmoi.domain.token.dto.TokenRequest;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
 import com.devcourse.checkmoi.domain.token.service.TokenService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
@@ -10,11 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,14 +21,13 @@ public class TokenApi {
 
     private final TokenService tokenService;
 
-    @PostMapping("/tokens")
+    @GetMapping("/tokens")
     public ResponseEntity<SuccessResponse<AccessToken>> refreshAccessToken(
-        HttpServletRequest httpServletRequest,
-        @Validated @RequestBody TokenRequest.RefreshToken refreshToken
-    ) {
+        HttpServletRequest httpServletRequest) {
         String accessToken = AuthorizationExtractor.extract(httpServletRequest);
+
         return ResponseEntity.ok(
-            new SuccessResponse<>(tokenService.refreshAccessToken(accessToken, refreshToken)));
+            new SuccessResponse<>(tokenService.refreshAccessToken(accessToken)));
     }
 
     @DeleteMapping("/logout")

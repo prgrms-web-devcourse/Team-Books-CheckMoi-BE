@@ -1,6 +1,5 @@
 package com.devcourse.checkmoi.domain.token.service;
 
-import com.devcourse.checkmoi.domain.token.dto.TokenRequest;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.token.model.Token;
@@ -37,6 +36,7 @@ public class TokenService {
             .id(user.id())
             .name(user.name())
             .email(user.email())
+            .temperature(36.5f)
             .profileImageUrl(user.profileImageUrl())
             .build();
 
@@ -44,12 +44,9 @@ public class TokenService {
     }
 
     @Transactional
-    public AccessToken refreshAccessToken(String accessToken,
-        TokenRequest.RefreshToken refreshTokenRequest) {
-        jwtTokenProvider.validateAccessToken(accessToken);
+    public AccessToken refreshAccessToken(String accessToken) {
 
-        String refreshToken = refreshTokenRequest.refreshToken();
-        jwtTokenProvider.validateToken(refreshToken);
+        jwtTokenProvider.validateAccessToken(accessToken);
 
         Claims claims = jwtTokenProvider.getClaims(accessToken);
         Long userId = claims.get("userId", Long.class);
@@ -59,9 +56,7 @@ public class TokenService {
             .map(Token::getRefreshToken)
             .orElseThrow(InvalidTokenException::new);
 
-        if (!refreshToken.equals(findRefreshToken)) {
-            throw new InvalidTokenException();
-        }
+        jwtTokenProvider.validateToken(findRefreshToken);
 
         String newAccessToken = jwtTokenProvider.createAccessToken(userId, role);
         return new AccessToken(newAccessToken);

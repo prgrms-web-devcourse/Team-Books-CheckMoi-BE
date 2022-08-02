@@ -101,4 +101,7 @@ public class User extends BaseEntity {
         return userRole;
     }
 
+    public float getTemperature() {
+        return temperature;
+    }
 }

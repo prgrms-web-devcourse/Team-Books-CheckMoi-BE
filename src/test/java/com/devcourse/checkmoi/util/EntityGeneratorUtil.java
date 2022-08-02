@@ -44,6 +44,7 @@ public abstract class EntityGeneratorUtil {
             .oauthId("ASDASDQWDAASDZFWEF1")
             .provider("KAKAO")
             .name(name)
+            .temperature(36.5f)
             .email(new Email(name + "@test.com"))
             .profileImgUrl("https://example.com/java.png")
             .userRole(UserRole.LOGIN)
