@@ -260,7 +260,7 @@ class StudyApiTest extends IntegrationTest {
                 .willReturn(response);
 
             ResultActions result = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/studies")
+                get("/api/studies")
                     .param("bookId", String.valueOf(bookId))
                     .param("size", "2")
                     .param("page", "1")
@@ -276,7 +276,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-get-by-book",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("선택한 책의 모집중인 스터디 목록 확인 (개발중)")
+                    .summary("선택한 책의 모집중인 스터디 목록 확인")
                     .description("선택한 책의 모집중인 스터디 목록 확인하는 API 입니다.")
                     .responseSchema(Schema.schema("선택한 책의 모집중인 스터디 목록 응답")),
                 preprocessRequest(prettyPrint()),
@@ -404,7 +404,7 @@ class StudyApiTest extends IntegrationTest {
         }
 
         private RestDocumentationResultHandler documentation() {
-            return MockMvcRestDocumentationWrapper.document("study-join-request",
+            return MockMvcRestDocumentationWrapper.document("study-detail-info",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
                     .summary("스터디 상세 조회 API")
