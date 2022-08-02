@@ -29,8 +29,8 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-            .antMatchers("/static/**", "/favicon.ico");
+        return web -> web.ignoring()
+            .antMatchers("/static/**", "/favicon.ico", "/api/tokens/**");
     }
 
     @Bean

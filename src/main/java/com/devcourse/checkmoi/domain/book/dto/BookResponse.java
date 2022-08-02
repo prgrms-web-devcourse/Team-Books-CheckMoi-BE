@@ -14,12 +14,12 @@ public sealed interface BookResponse permits SimpleBook, BookSpecification, Late
     record SimpleBook(
         Long id,
         String title,
-        String image,
         String author,
         String publisher,
         @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate pubDate, // TODO : 날짜 포맷 결정
         String isbn,
+        String image,
         String description,
         @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDateTime createAt // TODO : 날짜 포맷
@@ -50,7 +50,9 @@ public sealed interface BookResponse permits SimpleBook, BookSpecification, Late
     }
 
     record LatestAllBooks(
-        List<SimpleBook> books
+        List<SimpleBook> latestBooks,
+        List<SimpleBook> studyLatestBooks
+
     ) implements BookResponse {
 
     }

@@ -32,7 +32,6 @@ public record PersistedDummyData(String author, String title, String thumbnail, 
             .image(this.thumbnail)
             .description(this.description)
             .id(this.bookId)
-            .description(this.description)
             .isbn(this.isbn)
             .publisher(this.publisher)
             .pubDate(LocalDate.parse(this.publishedAt, formatter))

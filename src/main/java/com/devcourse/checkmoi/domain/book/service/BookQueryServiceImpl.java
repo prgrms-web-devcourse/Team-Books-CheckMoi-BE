@@ -6,6 +6,7 @@ import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.SimplePage;
 import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
+import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -28,16 +29,24 @@ public class BookQueryServiceImpl implements BookQueryService {
 
     @Override
     public LatestAllBooks getAllTop(SimplePage pageRequest) {
-        PageRequest page =
+        PageRequest registerLatest =
             PageRequest.of(
                 pageRequest.getPage(),
                 pageRequest.getSize(),
                 Sort.by(Direction.DESC, "createdAt"));
-
+        PageRequest studyLatest =
+            PageRequest.of(
+                pageRequest.getPage(),
+                pageRequest.getSize()
+            );
         return new LatestAllBooks(
-            bookRepository.findAllTop(page).stream()
+            bookRepository.findAllTop(registerLatest).stream()
                 .map(bookConverter::bookToSimple)
-                .toList());
+                .toList(),
+            bookRepository.findBooksByLatestStudy(studyLatest).stream()
+                .map(bookConverter::bookToSimple)
+                .toList()
+        );
 
     }
 
