@@ -1,31 +1,31 @@
 package com.devcourse.checkmoi.domain.study.repository.study;
 
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
-import com.devcourse.checkmoi.domain.book.stub.BookStub;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
-import com.devcourse.checkmoi.domain.study.stub.StudyMemberStub;
-import com.devcourse.checkmoi.domain.study.stub.StudyStub;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.model.UserRole;
 import com.devcourse.checkmoi.domain.user.model.vo.Email;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
-import com.devcourse.checkmoi.domain.user.stub.UserStub;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.template.RepositoryTest;
+import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 class StudyRepositoryTest extends RepositoryTest {
 
@@ -43,7 +43,7 @@ class StudyRepositoryTest extends RepositoryTest {
 
     @Nested
     @DisplayName("스터디 수정 #30")
-    class findStudyOwnerTest {
+    class FindStudyOwnerTest {
 
         @Test
         @DisplayName("해당 스터디의 스터디장의 ID를 찾는다")
@@ -79,37 +79,90 @@ class StudyRepositoryTest extends RepositoryTest {
 
     @Nested
     @DisplayName("특정 책에 대한 스터디 목록 조회 #43")
-    class getStudies {
+    class GetStudies {
 
-        @PersistenceContext
-        private EntityManager entityManager;
+        List<Study> studies = new ArrayList<>();
 
+        Book givenBook;
 
         @BeforeEach
         void init() {
-            entityManager.createNativeQuery("ALTER TABLE book ALTER COLUMN `id` RESTART WITH 1")
-                .executeUpdate();
-            List<Book> books = BookStub.StubBook();
-            List<Study> studies = StudyStub.studiesStub();
+            User user = userRepository.save(makeUser());
+            givenBook = bookRepository.save(makeBook());
 
-            userRepository.saveAll(UserStub.usersStub());
-            bookRepository.saveAll(books);
-            studyRepository.saveAll(studies);
-            studyMemberRepository.saveAll(StudyMemberStub.studyMembers());
+            int generatedStudyNumber = 4;
+            for (int i = 0; i < generatedStudyNumber; i++) {
+                Study study = studyRepository.save(makeStudy(givenBook));
+                studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+                studies.add(study);
+            }
         }
 
         @Test
         @DisplayName("책 아이디를 기준으로 모집중인 스터디 정보를 조회한다.")
         void findRecruitingStudyByBookId() {
             PageRequest pageRequest = new PageRequest();
-            Pageable pageable = pageRequest.of();
-            Page<Study> got = studyRepository.findRecruitingStudyByBookId(1L, pageable);
-            List<String> want = StudyStub.javaRecrutingStudyNameStub();
 
-            assertThat(got).hasSize(want.size());
-            for (int i = 0; i < got.getSize(); i++) {
-                assertThat(got.getContent().get(i).getName()).isEqualTo(want.get(i));
-            }
+            Page<Study> pageResult =
+                studyRepository.findRecruitingStudyByBookId(givenBook.getId(), pageRequest.of());
+
+            List<Study> result = pageResult.getContent();
+
+            assertThat(result)
+                .usingRecursiveFieldByFieldElementComparator()
+                .hasSameElementsAs(studies);
         }
     }
+
+    @Nested
+    @DisplayName("스터디 상세 조회 #56")
+    class GetDetail {
+
+        Study study;
+
+        @BeforeEach
+        private void setUpGiven() {
+            User user = userRepository.save(makeUser());
+            Book book = bookRepository.save(makeBook());
+            study = studyRepository.save(makeStudy(book));
+            studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+        }
+
+        @Test
+        @DisplayName("S 스터디와 관련된 책과 스터디멤버 정보를 같이 조회할 수 있다")
+        void getStudyInfoWithBookAndMembers() {
+            StudyDetailWithMembers response =
+                studyRepository.getStudyInfoWithMembers(study.getId());
+
+            validateStudyDetailInfo(response);
+            validateMembers(response);
+        }
+
+        private void validateStudyDetailInfo(StudyDetailWithMembers response) {
+            assertAll(
+                () -> assertThat(response.study()).hasFieldOrProperty("id"),
+                () -> assertThat(response.study()).hasFieldOrProperty("name"),
+                () -> assertThat(response.study()).hasFieldOrProperty("thumbnailUrl"),
+                () -> assertThat(response.study()).hasFieldOrProperty("description"),
+                () -> assertThat(response.study()).hasFieldOrProperty("currentParticipant"),
+                () -> assertThat(response.study()).hasFieldOrProperty("maxParticipant"),
+                () -> assertThat(response.study()).hasFieldOrProperty("currentParticipant"),
+                () -> assertThat(response.study()).hasFieldOrProperty("gatherStartDate"),
+                () -> assertThat(response.study()).hasFieldOrProperty("gatherEndDate"),
+                () -> assertThat(response.study()).hasFieldOrProperty("studyStartDate"),
+                () -> assertThat(response.study()).hasFieldOrProperty("studyEndDate")
+            );
+        }
+
+        private void validateMembers(StudyDetailWithMembers response) {
+            assertAll(
+                () -> assertThat(response.members().get(0)).hasFieldOrProperty("id"),
+                () -> assertThat(response.members().get(0)).hasFieldOrProperty("name"),
+                () -> assertThat(response.members().get(0)).hasFieldOrProperty("email"),
+                () -> assertThat(response.members().get(0)).hasFieldOrProperty("profileImageUrl")
+            );
+        }
+    }
+
 }
+
