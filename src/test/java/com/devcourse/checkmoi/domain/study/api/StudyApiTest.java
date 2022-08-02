@@ -443,9 +443,10 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 멤버 이름"),
                     fieldWithPath("data.members[].email")
                         .description("스터디 멤버 이메일"),
+                    fieldWithPath("data.members[].temperature")
+                        .description("스터디 멤버 온도"),
                     fieldWithPath("data.members[].profileImageUrl")
                         .description("스터디 멤버 이미지 URL")
-
                 ));
         }
 
@@ -454,6 +455,7 @@ class StudyApiTest extends IntegrationTest {
                 .id(userId++)
                 .name(UUID.randomUUID().toString().substring(10))
                 .email("asdf@asdf.com")
+                .temperature(36.5f)
                 .profileImageUrl("url")
                 .build();
         }

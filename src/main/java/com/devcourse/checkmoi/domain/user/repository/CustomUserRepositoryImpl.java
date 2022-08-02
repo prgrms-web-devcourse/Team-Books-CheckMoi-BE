@@ -27,6 +27,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             .id(user.id())
             .name(user.name())
             .email(user.email())
+            .temperature(user.temperature())
             .profileImageUrl(user.profileImageUrl())
             .studies(studyInfos)
             .build();
@@ -49,7 +50,8 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
         return jpaQueryFactory.select(
                 Projections.constructor(
                     UserInfo.class,
-                    user.id, user.name, user.email.value.as("email"), user.profileImgUrl
+                    user.id, user.name, user.email.value.as("email"),
+                    user.temperature, user.profileImgUrl
                 )
             )
             .from(user)

@@ -13,6 +13,7 @@ public sealed interface UserResponse permits UserInfo, UserInfoWithStudy, Regist
         Long id,
         String name,
         String email,
+        Float temperature,
         String profileImageUrl
     ) implements UserResponse {
 
@@ -25,6 +26,7 @@ public sealed interface UserResponse permits UserInfo, UserInfoWithStudy, Regist
         Long id,
         String name,
         String email,
+        Float temperature,
         String profileImageUrl,
         List<StudyInfo> studies
     ) implements UserResponse {

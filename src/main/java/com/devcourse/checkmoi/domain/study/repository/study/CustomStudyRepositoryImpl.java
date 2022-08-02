@@ -91,6 +91,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                     studyMember.user.id,
                     studyMember.user.name,
                     studyMember.user.email.value.as("email"),
+                    studyMember.user.temperature,
                     studyMember.user.profileImgUrl
                 )
             )
