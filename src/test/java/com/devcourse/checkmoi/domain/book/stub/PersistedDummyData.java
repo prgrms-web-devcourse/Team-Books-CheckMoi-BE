@@ -10,16 +10,18 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public record PersistedDummyData(String author, String title, String thumbnail, Long bookId,
+                                 String category,
                                  String description, String isbn, String publisher,
                                  String publishedAt, LocalDateTime createdAt) {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     public PersistedDummyData(String author, String title, String thumbnail, Long bookId,
+        String category,
         String description,
         String isbn, String publisher, String publishedAt) {
 
-        this(author, title, thumbnail, bookId, description, isbn, publisher,
+        this(author, title, thumbnail, bookId, category, description, isbn, publisher,
             publishedAt,
             LocalDateTime.now());
     }
@@ -30,9 +32,9 @@ public record PersistedDummyData(String author, String title, String thumbnail, 
             .createAt(this.createdAt)
             .title(this.title)
             .image(this.thumbnail)
+            .category(this.category)
             .description(this.description)
             .id(this.bookId)
-            .description(this.description)
             .isbn(this.isbn)
             .publisher(this.publisher)
             .pubDate(LocalDate.parse(this.publishedAt, formatter))

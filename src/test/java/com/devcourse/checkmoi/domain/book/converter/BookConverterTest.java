@@ -63,6 +63,7 @@ class BookConverterTest {
             "대왕고래",
             "abc/foo.png",
             null,
+            "UNDEFINED",
             "대왕고래와 아기고래가 함께 살았어요",
             "1231231231231",
             "Hanbit",

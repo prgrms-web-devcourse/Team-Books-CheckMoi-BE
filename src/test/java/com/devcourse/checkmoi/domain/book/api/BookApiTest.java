@@ -48,12 +48,13 @@ class BookApiTest extends IntegrationTest {
     BookQueryService bookQueryService;
 
     private PersistedDummyData createDummyBigWhale() {
-        return new PersistedDummyData("큰그림", "대왕고래", "abc/foo.png", 1L, "대왕고래와 아기고래가 함께 살았어요",
+        return new PersistedDummyData("큰그림", "대왕고래", "abc/foo.png", 1L, "UNDEFINED",
+            "대왕고래와 아기고래가 함께 살았어요",
             "1231231231231", "Hanbit", "20021010");
     }
 
     private PersistedDummyData createDummyWhaleTwo() {
-        return new PersistedDummyData("큰그림", "향고래", "abc/foo.png", 2L, "향고래를 닮았네요",
+        return new PersistedDummyData("큰그림", "향고래", "abc/foo.png", 2L, "UNDEFINED", "향고래를 닮았네요",
             "1231231231232", "Hanbit", "20021010");
     }
 
@@ -119,7 +120,9 @@ class BookApiTest extends IntegrationTest {
             PersistedDummyData whaleTwo = createDummyWhaleTwo();
 
             books = new LatestAllBooks(
-                List.of(bigWhale.simple(), whaleTwo.simple()));
+                List.of(bigWhale.simple(), whaleTwo.simple()),
+                List.of(whaleTwo.simple())
+            );
         }
 
         @Test
@@ -135,29 +138,57 @@ class BookApiTest extends IntegrationTest {
         }
 
         private RestDocumentationResultHandler documentation() {
+            String latestPath = "data.latestBooks[]";
+            String studyLatestPath = "data.studyLatestBooks[]";
             return MockMvcRestDocumentationWrapper.document("book-top",
                 ResourceSnippetParameters.builder().tag("Book API").summary("메인 페이지 책 목록 받아오기")
                     .description("메인페이지에 책 목록을 가져오는 API 입니다")
                     .responseSchema(Schema.schema("책 목록 응답")),
                 responseFields(
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                    fieldWithPath("data.books").type(JsonFieldType.ARRAY).description("책 목록"),
-                    fieldWithPath("data.books[].id").type(JsonFieldType.NUMBER).description("책 ID"),
-                    fieldWithPath("data.books[].title").type(JsonFieldType.STRING)
+                    fieldWithPath("data.latestBooks").type(JsonFieldType.ARRAY)
+                        .description("최근에 생성된 책 목록"),
+                    fieldWithPath(latestPath + ".id").type(JsonFieldType.NUMBER)
+                        .description("책 ID"),
+                    fieldWithPath(latestPath + ".title").type(JsonFieldType.STRING)
                         .description("책 제목"),
-                    fieldWithPath("data.books[].image").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".image").type(JsonFieldType.STRING)
                         .description("책 이미지"),
-                    fieldWithPath("data.books[].author").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".author").type(JsonFieldType.STRING)
                         .description("책 저자"),
-                    fieldWithPath("data.books[].publisher").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".publisher").type(JsonFieldType.STRING)
                         .description("책 출판사"),
-                    fieldWithPath("data.books[].isbn").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".category").type(JsonFieldType.STRING)
+                        .description("책 카테고리"),
+                    fieldWithPath(latestPath + ".isbn").type(JsonFieldType.STRING)
                         .description("책 ISBN"),
-                    fieldWithPath("data.books[].description").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".description").type(JsonFieldType.STRING)
                         .description("책 설명"),
-                    fieldWithPath("data.books[].createAt").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".createAt").type(JsonFieldType.STRING)
                         .description("책 등록날자"),
-                    fieldWithPath("data.books[].pubDate").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".pubDate").type(JsonFieldType.STRING)
+                        .description("책 발행날자"),
+                    fieldWithPath("data.studyLatestBooks").type(JsonFieldType.ARRAY)
+                        .description("최근에 스터디가 개설된 책 목록"),
+                    fieldWithPath(studyLatestPath + ".id").type(JsonFieldType.NUMBER)
+                        .description("책 ID"),
+                    fieldWithPath(studyLatestPath + ".title").type(JsonFieldType.STRING)
+                        .description("책 제목"),
+                    fieldWithPath(studyLatestPath + ".image").type(JsonFieldType.STRING)
+                        .description("책 이미지"),
+                    fieldWithPath(studyLatestPath + ".author").type(JsonFieldType.STRING)
+                        .description("책 저자"),
+                    fieldWithPath(studyLatestPath + ".publisher").type(JsonFieldType.STRING)
+                        .description("책 출판사"),
+                    fieldWithPath(studyLatestPath + ".category").type(JsonFieldType.STRING)
+                        .description("책 카테고리"),
+                    fieldWithPath(studyLatestPath + ".isbn").type(JsonFieldType.STRING)
+                        .description("책 ISBN"),
+                    fieldWithPath(studyLatestPath + ".description").type(JsonFieldType.STRING)
+                        .description("책 설명"),
+                    fieldWithPath(studyLatestPath + ".createAt").type(JsonFieldType.STRING)
+                        .description("책 등록날자"),
+                    fieldWithPath(studyLatestPath + ".pubDate").type(JsonFieldType.STRING)
                         .description("책 발행날자")
                 ));
         }

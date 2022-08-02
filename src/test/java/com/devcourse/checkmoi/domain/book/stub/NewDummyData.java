@@ -8,7 +8,7 @@ import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public record NewDummyData(String author, String title, String thumbnail, Long bookId,
+public record NewDummyData(String author, String title, String thumbnail, Long bookId, String category,
                            String description, String isbn, String publisher,
                            String publishedAt) {
 
@@ -26,6 +26,7 @@ public record NewDummyData(String author, String title, String thumbnail, Long b
             .publisher(this.publisher)
             .pubDate(LocalDate.parse(this.publishedAt,
                 formatter))
+            .category(this.category)
             .build();
     }
 
