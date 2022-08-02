@@ -536,9 +536,7 @@ class StudyApiTest extends IntegrationTest {
 
         private List<UserInfo> userInfoList() {
 
-            return LongStream.of(3)
-                .mapToObj(this::createUserInfo)
-                .toList();
+            return LongStream.range(1, 3).mapToObj(this::createUserInfo).toList();
         }
 
         private UserInfo createUserInfo(Long id) {
