@@ -543,6 +543,7 @@ class StudyApiTest extends IntegrationTest {
 
         private UserInfo createUserInfo(Long id) {
             return UserInfo.builder()
+                .id(id)
                 .temperature(36.5f)
                 .email("abc" + id + "@naver.com")
                 .name("abc" + id)
