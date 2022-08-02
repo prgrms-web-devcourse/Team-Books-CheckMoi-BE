@@ -10,6 +10,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
@@ -174,6 +175,38 @@ class StudyRepositoryTest extends RepositoryTest {
                 () -> assertThat(response.members().get(0)).hasFieldOrProperty("email"),
                 () -> assertThat(response.members().get(0)).hasFieldOrProperty("profileImageUrl")
             );
+        }
+    }
+    
+    @Nested
+    @DisplayName("스터디 신청 목록 가져오기")
+    public class GetStudyAppliersTest {
+
+        private Study study;
+
+        @BeforeEach
+        void setUp() {
+            User user = userRepository.save(makeUser());
+            User notStudyMemberUser = userRepository.save(makeNotStudyMemberUser());
+            User studyMemberUser = userRepository.save(makeStudyMemberUser());
+            Book book = bookRepository.save(makeBook());
+
+            study = studyRepository.save(makeStudy(book));
+
+            studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+            studyMemberRepository.save(
+                makeStudyMember(study, notStudyMemberUser, StudyMemberStatus.PENDING));
+            studyMemberRepository.save(
+                makeStudyMember(study, studyMemberUser, StudyMemberStatus.ACCEPTED));
+        }
+
+        @Test
+        @DisplayName("S 아직 수락, 거절 되지 않은 스터디 신청자 목록을 가져온다")
+        void getAllAppliersSuccess() {
+            StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
+
+            Assertions.assertThat(studyAppliers.appliers().size())
+                .isEqualTo(1);
         }
     }
 

@@ -2,6 +2,7 @@ package com.devcourse.checkmoi.domain.study.repository.study;
 
 import static com.devcourse.checkmoi.domain.study.model.QStudy.study;
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
@@ -62,6 +63,15 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         return StudyDetailWithMembers.builder()
             .study(studyInfo)
             .members(memberInfo)
+            .build();
+    }
+
+    @Override
+    public StudyAppliers getStudyAppliers(Long studyId) {
+        List<UserInfo> appliers = getStudyMembers(studyId, StudyMemberStatus.PENDING, null);
+
+        return StudyAppliers.builder()
+            .appliers(appliers)
             .build();
     }
 
