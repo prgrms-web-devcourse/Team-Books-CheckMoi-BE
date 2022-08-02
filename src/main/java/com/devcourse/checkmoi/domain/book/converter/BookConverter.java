@@ -16,7 +16,6 @@ public class BookConverter {
             .title(book.getTitle())
             .author(book.getAuthor())
             .publisher(book.getPublisher())
-            .category(book.getCategory().name())
             .isbn(book.getIsbn())
             .description(book.getDescription())
             .image(book.getThumbnail())

@@ -16,7 +16,6 @@ public sealed interface BookResponse permits SimpleBook, BookSpecification, Late
         String title,
         String author,
         String publisher,
-        String category,
         @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate pubDate, // TODO : 날짜 포맷 결정
         String isbn,

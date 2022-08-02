@@ -26,7 +26,6 @@ public record NewDummyData(String author, String title, String thumbnail, Long b
             .publisher(this.publisher)
             .pubDate(LocalDate.parse(this.publishedAt,
                 formatter))
-            .category(this.category)
             .build();
     }
 

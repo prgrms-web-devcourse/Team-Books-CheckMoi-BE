@@ -48,13 +48,13 @@ class BookApiTest extends IntegrationTest {
     BookQueryService bookQueryService;
 
     private PersistedDummyData createDummyBigWhale() {
-        return new PersistedDummyData("큰그림", "대왕고래", "abc/foo.png", 1L, "UNDEFINED",
+        return new PersistedDummyData("큰그림", "대왕고래", "abc/foo.png", 1L,
             "대왕고래와 아기고래가 함께 살았어요",
             "1231231231231", "Hanbit", "20021010");
     }
 
     private PersistedDummyData createDummyWhaleTwo() {
-        return new PersistedDummyData("큰그림", "향고래", "abc/foo.png", 2L, "UNDEFINED", "향고래를 닮았네요",
+        return new PersistedDummyData("큰그림", "향고래", "abc/foo.png", 2L, "향고래를 닮았네요",
             "1231231231232", "Hanbit", "20021010");
     }
 
@@ -158,8 +158,6 @@ class BookApiTest extends IntegrationTest {
                         .description("책 저자"),
                     fieldWithPath(latestPath + ".publisher").type(JsonFieldType.STRING)
                         .description("책 출판사"),
-                    fieldWithPath(latestPath + ".category").type(JsonFieldType.STRING)
-                        .description("책 카테고리"),
                     fieldWithPath(latestPath + ".isbn").type(JsonFieldType.STRING)
                         .description("책 ISBN"),
                     fieldWithPath(latestPath + ".description").type(JsonFieldType.STRING)
@@ -180,8 +178,6 @@ class BookApiTest extends IntegrationTest {
                         .description("책 저자"),
                     fieldWithPath(studyLatestPath + ".publisher").type(JsonFieldType.STRING)
                         .description("책 출판사"),
-                    fieldWithPath(studyLatestPath + ".category").type(JsonFieldType.STRING)
-                        .description("책 카테고리"),
                     fieldWithPath(studyLatestPath + ".isbn").type(JsonFieldType.STRING)
                         .description("책 ISBN"),
                     fieldWithPath(studyLatestPath + ".description").type(JsonFieldType.STRING)
