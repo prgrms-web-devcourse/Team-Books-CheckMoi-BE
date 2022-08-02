@@ -1,7 +1,8 @@
 package com.devcourse.checkmoi.domain.study.repository.study;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeNotStudyMemberUser;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeNonStudyMemberUser;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeSecondNonStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMemberUser;
@@ -15,6 +16,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMemb
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.model.UserRole;
 import com.devcourse.checkmoi.domain.user.model.vo.Email;
@@ -127,7 +129,7 @@ class StudyRepositoryTest extends RepositoryTest {
         @BeforeEach
         private void setUpGiven() {
             User user = userRepository.save(makeUser());
-            User notStudyMemberUser = userRepository.save(makeNotStudyMemberUser());
+            User notStudyMemberUser = userRepository.save(makeNonStudyMemberUser());
             User studyMemberUser = userRepository.save(makeStudyMemberUser());
             Book book = bookRepository.save(makeBook());
             study = studyRepository.save(makeStudy(book));
@@ -177,25 +179,37 @@ class StudyRepositoryTest extends RepositoryTest {
             );
         }
     }
-    
+
     @Nested
     @DisplayName("스터디 신청 목록 가져오기")
     public class GetStudyAppliersTest {
 
         private Study study;
 
+        private User user;
+
+        private User firstAppliedUser;
+
+        private User secondAppliedUser;
+
+        private User studyMemberUser;
+
         @BeforeEach
         void setUp() {
-            User user = userRepository.save(makeUser());
-            User notStudyMemberUser = userRepository.save(makeNotStudyMemberUser());
-            User studyMemberUser = userRepository.save(makeStudyMemberUser());
+            user = userRepository.save(makeUser());
+            firstAppliedUser = userRepository.save(makeNonStudyMemberUser());
+            secondAppliedUser = userRepository.save(makeSecondNonStudyMemberUser());
+            studyMemberUser = userRepository.save(makeStudyMemberUser());
             Book book = bookRepository.save(makeBook());
 
             study = studyRepository.save(makeStudy(book));
 
-            studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
             studyMemberRepository.save(
-                makeStudyMember(study, notStudyMemberUser, StudyMemberStatus.PENDING));
+                makeStudyMember(study, user, StudyMemberStatus.OWNED));
+            studyMemberRepository.save(
+                makeStudyMember(study, firstAppliedUser, StudyMemberStatus.PENDING));
+            studyMemberRepository.save(
+                makeStudyMember(study, secondAppliedUser, StudyMemberStatus.PENDING));
             studyMemberRepository.save(
                 makeStudyMember(study, studyMemberUser, StudyMemberStatus.ACCEPTED));
         }
@@ -206,7 +220,18 @@ class StudyRepositoryTest extends RepositoryTest {
             StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
 
             Assertions.assertThat(studyAppliers.appliers().size())
-                .isEqualTo(1);
+                .isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("S 아직 수락, 거절 되지 않은 스터디 신청자 목록을 오래된순으로 가져온다")
+        void getAllAppliersAscSuccess() {
+            StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
+
+            UserInfo firstUserInfo = studyAppliers.appliers().get(0);
+
+            Assertions.assertThat(firstUserInfo.id())
+                .isEqualTo(firstAppliedUser.getId());
         }
     }
 

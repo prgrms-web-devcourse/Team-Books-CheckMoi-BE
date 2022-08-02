@@ -101,7 +101,6 @@ public sealed interface StudyResponse permits
     }
 
     record StudyAppliers(
-        int count,
         List<UserInfo> appliers
     ) implements StudyResponse {
 

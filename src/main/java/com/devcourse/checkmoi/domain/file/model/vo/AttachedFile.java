@@ -68,6 +68,7 @@ public class AttachedFile {
     public String randomName(String basePath, String defaultExtension) {
         String name = ObjectUtils.isEmpty(basePath) ? UUID.randomUUID().toString()
             : basePath + "/" + UUID.randomUUID();
+
         return name + "." + extension(defaultExtension);
     }
 

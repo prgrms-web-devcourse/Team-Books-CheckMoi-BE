@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
@@ -37,6 +38,7 @@ import com.epages.restdocs.apispec.Schema;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.LongStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -485,6 +487,68 @@ class StudyApiTest extends IntegrationTest {
                 .build();
         }
 
+    }
+
+    @Nested
+    @DisplayName("스터디 신청목록 조회")
+    class StudyApplierApiTest {
+
+        @Test
+        void getAppliersApiSuccess() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+
+            Long studyId = 1L;
+
+            given(studyQueryService.getStudyAppliers(anyLong(), anyLong()))
+                .willReturn(
+                    new StudyAppliers(userInfoList()));
+
+            mockMvc.perform(get("/api/studies/{studyId}/members", studyId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
+                .andExpect(status().isOk())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("study-join-request-list",
+                ResourceSnippetParameters.builder()
+                    .tag("Study API")
+                    .summary("스터디 신청자 목록 조회 API")
+                    .description("해당하는 스터디에 대해 아직 처리되지 않은 신청자 목록을 가져옵니다"),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("studyId").description("스터디 아이디")
+                ),
+                responseFields(
+                    fieldWithPath("data.appliers[].id").
+                        description("스터디 신청 멤버 아이디"),
+                    fieldWithPath("data.appliers[].name")
+                        .description("스터디 신청 멤버 이름"),
+                    fieldWithPath("data.appliers[].email")
+                        .description("스터디 신청 멤버 이메일"),
+                    fieldWithPath("data.appliers[].temperature")
+                        .description("스터디 신청 멤버 온도"),
+                    fieldWithPath("data.appliers[].profileImageUrl")
+                        .description("스터디 신청 멤버 이미지 URL")
+                ));
+        }
+
+        private List<UserInfo> userInfoList() {
+
+            return LongStream.of(3)
+                .mapToObj(this::createUserInfo)
+                .toList();
+        }
+
+        private UserInfo createUserInfo(Long id) {
+            return UserInfo.builder()
+                .temperature(36.5f)
+                .email("abc" + id + "@naver.com")
+                .name("abc" + id)
+                .profileImageUrl("https://north/foo.png")
+                .build();
+        }
     }
 
 }
