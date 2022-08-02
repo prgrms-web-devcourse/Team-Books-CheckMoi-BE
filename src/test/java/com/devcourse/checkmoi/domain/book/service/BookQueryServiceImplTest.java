@@ -51,7 +51,7 @@ class BookQueryServiceImplTest {
 
             LatestAllBooks allTopBooks = bookQueryService.getAllTop(simplePage);
 
-            Assertions.assertThat(allTopBooks.books().get(0).id())
+            Assertions.assertThat(allTopBooks.latestBooks().get(0).id())
                 .isEqualTo(lastCatBook.getId());
         }
 

@@ -9,7 +9,7 @@ public class SimplePage {
 
     private static final int DEFAULT_PAGE = 0;
 
-    private static final int DEFAULT_PAGE_SIZE = 8;
+    private static final int DEFAULT_PAGE_SIZE = 4;
 
     private final Integer page;
 

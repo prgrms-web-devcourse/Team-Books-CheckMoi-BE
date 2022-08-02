@@ -132,4 +132,20 @@ public class StudyStub {
             .studyEndDate(LocalDate.now())
             .build();
     }
+
+    public static Study study(Book b) {
+        return Study.builder()
+            .id(1L)
+            .name("자바 스터디 1")
+            .thumbnailUrl("https://example.com/java.png")
+            .description("자바 스터디 1번입니다.")
+            .maxParticipant(3)
+            .status(StudyStatus.RECRUTING)
+            .book(b)
+            .gatherStartDate(LocalDate.now())
+            .gatherEndDate(LocalDate.now())
+            .studyStartDate(LocalDate.now())
+            .studyEndDate(LocalDate.now())
+            .build();
+    }
 }
