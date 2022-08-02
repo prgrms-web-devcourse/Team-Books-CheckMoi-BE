@@ -1,7 +1,6 @@
 package com.devcourse.checkmoi.domain.file.model.vo;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
-import com.devcourse.checkmoi.domain.file.exception.FileException;
 import com.devcourse.checkmoi.domain.file.exception.NotAllowedFileException;
 import java.io.IOException;
 import java.util.UUID;
@@ -50,7 +49,7 @@ public class AttachedFile {
                 multipartFile.getContentType(),
                 multipartFile.getBytes());
         } catch (IOException e) {
-            throw new FileException(e);
+            throw new RuntimeException(e);
         }
     }
 
