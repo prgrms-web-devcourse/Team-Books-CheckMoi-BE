@@ -1,16 +1,13 @@
 package com.devcourse.checkmoi.domain.token.api;
 
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import com.devcourse.checkmoi.domain.token.dto.TokenRequest;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
@@ -32,38 +29,16 @@ class TokenApiTest extends IntegrationTest {
     class RefreshAccessToken {
 
         @Test
-        @DisplayName("S refreshToken 을 사용해 새로운 accessToken 을 발급받는다")
+        @DisplayName("S 새로운 accessToken 을 발급받는다")
         void refreshAccessToken() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
 
-            TokenRequest.RefreshToken request = TokenRequest.RefreshToken.builder()
-                .refreshToken(givenUser.refreshToken())
-                .build();
-
-            mockMvc.perform(post("/api/tokens")
+            mockMvc.perform(get("/api/tokens")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
-                    .content(toJson(request)))
+                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.accessToken").exists())
                 .andDo(documentation());
-        }
-
-        @Test
-        @DisplayName("F refreshToken 이 비어있으면 accessToken 을 재발급 받지 못한다")
-        void emptyRefreshTokenRequest() throws Exception {
-            TokenWithUserInfo givenUser = getTokenWithUserInfo();
-
-            TokenRequest.RefreshToken request = TokenRequest.RefreshToken.builder().build();
-
-            mockMvc.perform(post("/api/tokens")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
-                    .content(toJson(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].message")
-                    .value("refreshToken은 비어있을 수 없습니다."))
-                .andDo(print());
         }
 
         private RestDocumentationResultHandler documentation() {
@@ -72,15 +47,9 @@ class TokenApiTest extends IntegrationTest {
                     .tag("Token API")
                     .summary("로그인 유지 API")
                     .description("토큰방식 인증을 통해 로그인을 유지하는 API 입니다.")
-                    .requestSchema(Schema.schema("로그인 유지 요청"))
                     .responseSchema(Schema.schema("로그인 유지 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-
-                requestFields(
-                    fieldWithPath("refreshToken").type(JsonFieldType.STRING)
-                        .description("리프레쉬 토큰")
-                ),
                 tokenRequestHeader(),
                 responseFields(
                     fieldWithPath("data.accessToken").type(JsonFieldType.STRING)
