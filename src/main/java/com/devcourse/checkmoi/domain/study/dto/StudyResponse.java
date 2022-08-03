@@ -70,7 +70,13 @@ public sealed interface StudyResponse permits
         String title,
         String author,
         String publisher,
-        String thumbnail
+        String thumbnail,
+
+        String isbn,
+        @JsonFormat(pattern = "yyyy/MM/dd")
+        LocalDate publishedAt,
+        String description
+
     ) implements StudyResponse {
 
         @Builder

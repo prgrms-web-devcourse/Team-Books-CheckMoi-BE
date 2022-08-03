@@ -437,6 +437,10 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath("data.study.book.publisher").description("스터디 책 출판사"),
                     fieldWithPath("data.study.book.thumbnail").description("스터디 책 썸네일"),
 
+                    fieldWithPath("data.study.book.isbn").description("스터디 책 ISBN"),
+                    fieldWithPath("data.study.book.publishedAt").description("스터디 책 출판일"),
+                    fieldWithPath("data.study.book.description").description("스터디 책 설명"),
+
                     // study member info
                     fieldWithPath("data.members[].id").
                         description("스터디 멤버 아이디"),
