@@ -22,7 +22,7 @@ public class ImageApi {
         this.uploadService = uploadService;
     }
 
-    @PostMapping("/image")
+    @PostMapping("/images")
     public ResponseEntity<SuccessResponse<AttachedFileResponse.Upload>> uploadImage(
         @AuthenticationPrincipal JwtAuthentication user,
         AttachedFileRequest.Upload uploadRequest

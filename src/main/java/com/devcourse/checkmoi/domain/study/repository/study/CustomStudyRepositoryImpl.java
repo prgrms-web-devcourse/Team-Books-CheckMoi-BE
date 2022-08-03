@@ -10,8 +10,8 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,8 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     @Override
-    public StudyAppliers getStudyAppliers(Long studyId) {
+    public StudyAppliers getStudyAppliers(
+        Long studyId) {
         List<UserInfo> appliers = getStudyMembers(studyId, StudyMemberStatus.PENDING, null);
 
         return StudyAppliers.builder()
@@ -110,29 +111,25 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             )
             .from(studyMember)
             .innerJoin(studyMember.user)
-            .where(searchMemberContext(
-                studyId,
-                requiredStatus,
-                optionalStatus))
+            .where(
+                eqStudyId(studyId),
+                eqStatus(requiredStatus)
+                    .or(eqStatus(optionalStatus)))
             .orderBy(studyMember.createdAt.asc())
             .fetch();
     }
 
-    private BooleanBuilder searchMemberContext(Long studyId, StudyMemberStatus requiredStatus,
-        StudyMemberStatus optionalStatus) {
-
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
-
-        if (studyId != null) {
-            booleanBuilder.and(studyMember.study.id.eq(studyId));
+    private BooleanExpression eqStatus(StudyMemberStatus status) {
+        if (status == null) {
+            return null;
         }
-        if (requiredStatus != null) {
-            booleanBuilder.and(studyMember.status.eq(requiredStatus));
-        }
-        if (optionalStatus != null) {
-            booleanBuilder.or(studyMember.status.eq(optionalStatus));
-        }
+        return studyMember.status.eq(status);
+    }
 
-        return booleanBuilder;
+    private BooleanExpression eqStudyId(Long studyId) {
+        if (studyId == null) {
+            return null;
+        }
+        return studyMember.study.id.eq(studyId);
     }
 }

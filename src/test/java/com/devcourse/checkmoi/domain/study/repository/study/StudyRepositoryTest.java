@@ -32,6 +32,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 class StudyRepositoryTest extends RepositoryTest {
 
@@ -182,7 +184,7 @@ class StudyRepositoryTest extends RepositoryTest {
 
     @Nested
     @DisplayName("스터디 신청 목록 가져오기")
-    public class GetStudyAppliersTest {
+    class GetStudyAppliersTest {
 
         private Study study;
 
@@ -212,6 +214,11 @@ class StudyRepositoryTest extends RepositoryTest {
                 makeStudyMember(study, secondAppliedUser, StudyMemberStatus.PENDING));
             studyMemberRepository.save(
                 makeStudyMember(study, studyMemberUser, StudyMemberStatus.ACCEPTED));
+
+            userRepository.flush();
+            studyMemberRepository.flush();
+            studyRepository.flush();
+
         }
 
         @Test
@@ -232,6 +239,16 @@ class StudyRepositoryTest extends RepositoryTest {
 
             Assertions.assertThat(firstUserInfo.id())
                 .isEqualTo(firstAppliedUser.getId());
+        }
+
+        @Test
+        @DisplayName("S 스터디의 스터디원 수를 가져온다")
+        @Transactional(propagation = Propagation.NEVER)
+        void countSuccess() {
+            Study foundStudy = studyRepository.findById(this.study.getId()).get();
+
+            Assertions.assertThat(foundStudy.getCurrentParticipant())
+                .isEqualTo(2);
         }
     }
 

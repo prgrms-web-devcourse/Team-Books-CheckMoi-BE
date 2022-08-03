@@ -30,7 +30,7 @@ public class Study extends BaseEntity {
 
     private String description;
 
-    @Formula("(select count(1) from study_member sm where sm.study_id = id)")
+    @Formula("(select count(1) from study_member sm where sm.study_id = id and ( sm.status = 'OWNED' or sm.status = 'ACCEPTED') )")
     private int currentParticipant;
 
     private Integer maxParticipant;
