@@ -57,7 +57,7 @@ class ImageApiTest extends IntegrationTest {
             given(fileUploadService.upload(any(), any()))
                 .willReturn(uploadResponse);
 
-            ResultActions resultActions = mockMvc.perform(multipart("/api/image")
+            ResultActions resultActions = mockMvc.perform(multipart("/api/images")
                 .file(new MockMultipartFile("files", notBlankPath,
                     "image/jpeg", notEmptyContents))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
