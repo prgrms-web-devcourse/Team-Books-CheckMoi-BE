@@ -36,16 +36,16 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
 
             var tokenResponse = oauthService.register(userProfile);
 
-            String uri = UriComponentsBuilder.fromUriString("http://localhost:3000/login")
+            String uri = UriComponentsBuilder.fromUriString("https://checkmoi.vercel.app/login")
                 .queryParam("token", tokenResponse.accessToken())
                 .build()
                 .toUriString();
+
+            response.setHeader("Authorization", "Bearer " + tokenResponse.accessToken());
             response.sendRedirect(uri);
 
             log.info("user : " + tokenResponse.userInfo());
             log.info("a token : " + tokenResponse.accessToken());
-            log.info("r token : " + tokenResponse.refreshToken());
-
         }
     }
 
