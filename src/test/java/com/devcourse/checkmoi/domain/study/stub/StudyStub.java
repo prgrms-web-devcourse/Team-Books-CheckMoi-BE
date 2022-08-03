@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class StudyStub {
+
     private static final List<Book> book = BookStub.StubBook();
 
     public static List<String> javaRecrutingStudyNameStub() {
@@ -25,7 +26,7 @@ public class StudyStub {
                 .thumbnailUrl("https://example.com/java.png")
                 .description("자바 스터디 1번입니다.")
                 .maxParticipant(3)
-                .status(StudyStatus.RECRUTING)
+                .status(StudyStatus.RECRUITING)
                 .book(book.get(0))
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
@@ -38,7 +39,7 @@ public class StudyStub {
                 .thumbnailUrl("https://example.com/java3.png")
                 .description("자바 스터디 3번입니다.")
                 .maxParticipant(3)
-                .status(StudyStatus.RECRUTING)
+                .status(StudyStatus.RECRUITING)
                 .book(book.get(0))
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
@@ -47,6 +48,7 @@ public class StudyStub {
                 .build()
         );
     }
+
     public static List<Study> studiesStub() {
         return List.of(
             Study.builder()
@@ -55,7 +57,7 @@ public class StudyStub {
                 .thumbnailUrl("https://example.com/java.png")
                 .description("자바 스터디 1번입니다.")
                 .maxParticipant(3)
-                .status(StudyStatus.RECRUTING)
+                .status(StudyStatus.RECRUITING)
                 .book(book.get(0))
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
@@ -81,7 +83,7 @@ public class StudyStub {
                 .thumbnailUrl("https://example.com/java3.png")
                 .description("자바 스터디 3번입니다.")
                 .maxParticipant(3)
-                .status(StudyStatus.RECRUTING)
+                .status(StudyStatus.RECRUITING)
                 .book(book.get(0))
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
@@ -94,7 +96,7 @@ public class StudyStub {
                 .thumbnailUrl("https://example.com/java.png")
                 .description("자바스크립트 스터디 1번입니다.")
                 .maxParticipant(3)
-                .status(StudyStatus.RECRUTING)
+                .status(StudyStatus.RECRUITING)
                 .book(book.get(1))
                 .gatherStartDate(LocalDate.now())
                 .gatherEndDate(LocalDate.now())
@@ -124,7 +126,7 @@ public class StudyStub {
             .thumbnailUrl("https://example.com/java.png")
             .description("자바 스터디 1번입니다.")
             .maxParticipant(3)
-            .status(StudyStatus.RECRUTING)
+            .status(StudyStatus.RECRUITING)
             .book(book.get(0))
             .gatherStartDate(LocalDate.now())
             .gatherEndDate(LocalDate.now())
@@ -140,7 +142,7 @@ public class StudyStub {
             .thumbnailUrl("https://example.com/java.png")
             .description("자바 스터디 1번입니다.")
             .maxParticipant(3)
-            .status(StudyStatus.RECRUTING)
+            .status(StudyStatus.RECRUITING)
             .book(b)
             .gatherStartDate(LocalDate.now())
             .gatherEndDate(LocalDate.now())

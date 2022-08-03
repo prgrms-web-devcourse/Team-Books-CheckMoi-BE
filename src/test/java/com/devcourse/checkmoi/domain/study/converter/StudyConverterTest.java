@@ -46,7 +46,7 @@ class StudyConverterTest {
                 .gatherEndDate(request.gatherEndDate())
                 .studyStartDate(request.studyStartDate())
                 .studyEndDate(request.studyEndDate())
-                .status(StudyStatus.RECRUTING)
+                .status(StudyStatus.RECRUITING)
                 .build();
 
             Study got = studyConverter.createToEntity(request);
