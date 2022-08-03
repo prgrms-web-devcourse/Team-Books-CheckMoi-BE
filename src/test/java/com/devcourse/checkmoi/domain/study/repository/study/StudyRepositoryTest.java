@@ -1,17 +1,22 @@
 package com.devcourse.checkmoi.domain.study.repository.study;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeNonStudyMemberUser;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeSecondNonStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.model.UserRole;
 import com.devcourse.checkmoi.domain.user.model.vo.Email;
@@ -20,12 +25,15 @@ import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.template.RepositoryTest;
 import java.util.ArrayList;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 class StudyRepositoryTest extends RepositoryTest {
 
@@ -123,9 +131,16 @@ class StudyRepositoryTest extends RepositoryTest {
         @BeforeEach
         private void setUpGiven() {
             User user = userRepository.save(makeUser());
+            User notStudyMemberUser = userRepository.save(makeNonStudyMemberUser());
+            User studyMemberUser = userRepository.save(makeStudyMemberUser());
             Book book = bookRepository.save(makeBook());
             study = studyRepository.save(makeStudy(book));
             studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+            studyMemberRepository.save(
+                makeStudyMember(study, notStudyMemberUser, StudyMemberStatus.DENIED));
+            studyMemberRepository.save(
+                makeStudyMember(study, studyMemberUser, StudyMemberStatus.ACCEPTED));
+
         }
 
         @Test
@@ -136,6 +151,9 @@ class StudyRepositoryTest extends RepositoryTest {
 
             validateStudyDetailInfo(response);
             validateMembers(response);
+
+            Assertions.assertThat(response.members().size())
+                .isEqualTo(2);
         }
 
         private void validateStudyDetailInfo(StudyDetailWithMembers response) {
@@ -161,6 +179,76 @@ class StudyRepositoryTest extends RepositoryTest {
                 () -> assertThat(response.members().get(0)).hasFieldOrProperty("email"),
                 () -> assertThat(response.members().get(0)).hasFieldOrProperty("profileImageUrl")
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 신청 목록 가져오기")
+    class GetStudyAppliersTest {
+
+        private Study study;
+
+        private User user;
+
+        private User firstAppliedUser;
+
+        private User secondAppliedUser;
+
+        private User studyMemberUser;
+
+        @BeforeEach
+        void setUp() {
+            user = userRepository.save(makeUser());
+            firstAppliedUser = userRepository.save(makeNonStudyMemberUser());
+            secondAppliedUser = userRepository.save(makeSecondNonStudyMemberUser());
+            studyMemberUser = userRepository.save(makeStudyMemberUser());
+            Book book = bookRepository.save(makeBook());
+
+            study = studyRepository.save(makeStudy(book));
+
+            studyMemberRepository.save(
+                makeStudyMember(study, user, StudyMemberStatus.OWNED));
+            studyMemberRepository.save(
+                makeStudyMember(study, firstAppliedUser, StudyMemberStatus.PENDING));
+            studyMemberRepository.save(
+                makeStudyMember(study, secondAppliedUser, StudyMemberStatus.PENDING));
+            studyMemberRepository.save(
+                makeStudyMember(study, studyMemberUser, StudyMemberStatus.ACCEPTED));
+
+            userRepository.flush();
+            studyMemberRepository.flush();
+            studyRepository.flush();
+
+        }
+
+        @Test
+        @DisplayName("S 아직 수락, 거절 되지 않은 스터디 신청자 목록을 가져온다")
+        void getAllAppliersSuccess() {
+            StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
+
+            Assertions.assertThat(studyAppliers.appliers().size())
+                .isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("S 아직 수락, 거절 되지 않은 스터디 신청자 목록을 오래된순으로 가져온다")
+        void getAllAppliersAscSuccess() {
+            StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
+
+            UserInfo firstUserInfo = studyAppliers.appliers().get(0);
+
+            Assertions.assertThat(firstUserInfo.id())
+                .isEqualTo(firstAppliedUser.getId());
+        }
+
+        @Test
+        @DisplayName("S 스터디의 스터디원 수를 가져온다")
+        @Transactional(propagation = Propagation.NEVER)
+        void countSuccess() {
+            Study foundStudy = studyRepository.findById(this.study.getId()).get();
+
+            Assertions.assertThat(foundStudy.getCurrentParticipant())
+                .isEqualTo(2);
         }
     }
 

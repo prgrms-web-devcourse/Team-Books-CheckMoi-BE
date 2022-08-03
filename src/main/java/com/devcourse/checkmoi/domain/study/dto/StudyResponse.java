@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.study.dto;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
@@ -13,7 +14,7 @@ import lombok.Builder;
 import org.springframework.data.domain.Page;
 
 public sealed interface StudyResponse permits
-    StudyInfo, StudyDetailWithMembers, Studies, StudyDetailInfo, StudyBookInfo {
+    StudyInfo, StudyDetailWithMembers, Studies, StudyDetailInfo, StudyBookInfo, StudyAppliers {
 
     record StudyInfo(
         Long id,
@@ -99,5 +100,12 @@ public sealed interface StudyResponse permits
         }
     }
 
+    record StudyAppliers(
+        List<UserInfo> appliers
+    ) implements StudyResponse {
 
+        @Builder
+        public StudyAppliers {
+        }
+    }
 }

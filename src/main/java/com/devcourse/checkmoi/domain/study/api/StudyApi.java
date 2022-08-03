@@ -5,6 +5,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.study.StudyQueryService;
@@ -91,5 +92,14 @@ public class StudyApi {
         Long studyMemberId = studyCommandService.requestStudyJoin(studyId, user.id());
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(studyMemberId));
+    }
+
+    @GetMapping("/{studyId}/members")
+    public ResponseEntity<SuccessResponse<StudyAppliers>> getStudyAppliers(
+        @PathVariable Long studyId,
+        @AuthenticationPrincipal JwtAuthentication user) {
+
+        return ResponseEntity.ok()
+            .body(new SuccessResponse<>(studyQueryService.getStudyAppliers(user.id(), studyId)));
     }
 }

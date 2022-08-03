@@ -51,6 +51,47 @@ public abstract class EntityGeneratorUtil {
             .build();
     }
 
+    public static User makeSecondNonStudyMemberUser() {
+        String name = UUID.randomUUID().toString().substring(26);
+
+        return User.builder()
+            .oauthId("ASDASDQWDAASDZFWEF4")
+            .provider("KAKAO")
+            .name(name)
+            .temperature(36.5f)
+            .email(new Email(name + "@test.com"))
+            .profileImgUrl("https://example.com/java.png")
+            .userRole(UserRole.LOGIN)
+            .build();
+    }
+
+    public static User makeNonStudyMemberUser() {
+        String name = UUID.randomUUID().toString().substring(26);
+
+        return User.builder()
+            .oauthId("ASDASDQWDAASDZFWEF2")
+            .provider("KAKAO")
+            .name(name)
+            .temperature(36.5f)
+            .email(new Email(name + "@test.com"))
+            .profileImgUrl("https://example.com/java.png")
+            .userRole(UserRole.LOGIN)
+            .build();
+    }
+
+    public static User makeStudyMemberUser() {
+        String name = UUID.randomUUID().toString().substring(26);
+        return User.builder()
+            .oauthId("ASDASDQWDAASDZFWEF3")
+            .provider("KAKAO")
+            .name(name)
+            .temperature(36.5f)
+            .email(new Email(name + "@test.com"))
+            .profileImgUrl("https://example.com/java.png")
+            .userRole(UserRole.LOGIN)
+            .build();
+    }
+
     public static Book makeBook() {
         String title = UUID.randomUUID().toString().substring(10);
         String isbn = UUID.randomUUID().toString().substring(20);

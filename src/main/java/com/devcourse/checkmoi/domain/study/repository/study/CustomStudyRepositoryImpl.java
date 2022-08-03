@@ -2,6 +2,7 @@ package com.devcourse.checkmoi.domain.study.repository.study;
 
 import static com.devcourse.checkmoi.domain.study.model.QStudy.study;
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
@@ -10,6 +11,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -55,11 +57,22 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     @Override
     public StudyDetailWithMembers getStudyInfoWithMembers(Long studyId) {
         StudyDetailInfo studyInfo = getStudyInfo(studyId);
-        List<UserInfo> memberInfo = getStudyMembers(studyId);
+        List<UserInfo> memberInfo = getStudyMembers(studyId, StudyMemberStatus.ACCEPTED,
+            StudyMemberStatus.OWNED);
 
         return StudyDetailWithMembers.builder()
             .study(studyInfo)
             .members(memberInfo)
+            .build();
+    }
+
+    @Override
+    public StudyAppliers getStudyAppliers(
+        Long studyId) {
+        List<UserInfo> appliers = getStudyMembers(studyId, StudyMemberStatus.PENDING, null);
+
+        return StudyAppliers.builder()
+            .appliers(appliers)
             .build();
     }
 
@@ -84,7 +97,8 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .fetchOne();
     }
 
-    private List<UserInfo> getStudyMembers(Long studyId) {
+    private List<UserInfo> getStudyMembers(Long studyId, StudyMemberStatus requiredStatus,
+        StudyMemberStatus optionalStatus) {
         return jpaQueryFactory.select(
                 Projections.constructor(
                     UserInfo.class,
@@ -97,8 +111,25 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             )
             .from(studyMember)
             .innerJoin(studyMember.user)
-            .where(studyMember.study.id.eq(studyId))
+            .where(
+                eqStudyId(studyId),
+                eqStatus(requiredStatus)
+                    .or(eqStatus(optionalStatus)))
             .orderBy(studyMember.createdAt.asc())
             .fetch();
+    }
+
+    private BooleanExpression eqStatus(StudyMemberStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return studyMember.status.eq(status);
+    }
+
+    private BooleanExpression eqStudyId(Long studyId) {
+        if (studyId == null) {
+            return null;
+        }
+        return studyMember.study.id.eq(studyId);
     }
 }

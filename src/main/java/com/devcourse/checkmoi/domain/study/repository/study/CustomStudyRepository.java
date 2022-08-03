@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.domain.study.repository.study;
 
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import org.springframework.data.domain.Page;
@@ -12,4 +13,6 @@ public interface CustomStudyRepository {
     Page<Study> findRecruitingStudyByBookId(Long bookId, Pageable pageable);
 
     StudyDetailWithMembers getStudyInfoWithMembers(Long studyId);
+
+    StudyAppliers getStudyAppliers(Long studyId);
 }
