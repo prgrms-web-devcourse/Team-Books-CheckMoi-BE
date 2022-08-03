@@ -35,8 +35,11 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
                 .toUserProfile(oauth);
 
             var tokenResponse = oauthService.register(userProfile);
+            var frontUrl = request.getScheme() + "://" +
+                request.getServerName() + ":" + request.getServerPort();
 
-            String uri = UriComponentsBuilder.fromUriString("https://checkmoi.vercel.app/login")
+            log.info("oauth token request occurred! frontUrl : " + frontUrl);
+            String uri = UriComponentsBuilder.fromUriString(frontUrl + "/login")
                 .queryParam("token", tokenResponse.accessToken())
                 .build()
                 .toUriString();
