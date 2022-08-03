@@ -24,7 +24,6 @@ public class CustomBookRepositoryImpl implements
             .on(book.id.eq(study.book.id))
             .orderBy(study.createdAt.desc())
             .limit(page.getPageSize())
-            .distinct()
             .fetch();
     }
 }
