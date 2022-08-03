@@ -36,7 +36,10 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
 
             var tokenResponse = oauthService.register(userProfile);
 
-            String uri = UriComponentsBuilder.fromUriString("http://localhost:3000/login")
+            var frontUrl = request.getHeader("Origin");
+            log.info("oauth token request occurred! front url : " + frontUrl);
+
+            String uri = UriComponentsBuilder.fromUriString(frontUrl + "/login")
                 .queryParam("token", tokenResponse.accessToken())
                 .build()
                 .toUriString();
@@ -44,8 +47,6 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
 
             log.info("user : " + tokenResponse.userInfo());
             log.info("a token : " + tokenResponse.accessToken());
-            log.info("r token : " + tokenResponse.refreshToken());
-
         }
     }
 
