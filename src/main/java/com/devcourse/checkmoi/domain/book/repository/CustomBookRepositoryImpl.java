@@ -22,7 +22,8 @@ public class CustomBookRepositoryImpl implements
             .from(book)
             .innerJoin(study)
             .on(book.id.eq(study.book.id))
-            .orderBy(study.createdAt.desc())
+            .groupBy(book.id)
+            .orderBy(study.createdAt.max().desc())
             .limit(page.getPageSize())
             .fetch();
     }
