@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
@@ -35,19 +34,13 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
                 .toUserProfile(oauth);
 
             var tokenResponse = oauthService.register(userProfile);
+
             var frontUrl = request.getScheme() + "://" +
                 request.getServerName() + ":" + request.getServerPort();
 
             log.info("oauth token request occurred! frontUrl : " + frontUrl);
-            String uri = UriComponentsBuilder.fromUriString("https://checkmoi.vercel.app/login")
-                .queryParam("token", tokenResponse.accessToken())
-                .build()
-                .toUriString();
 
             response.setHeader("Authorization", "Bearer " + tokenResponse.accessToken());
-            response.setHeader("hello", "Bearer " + tokenResponse.accessToken());
-            response.setHeader("su", "Bearer " + tokenResponse.accessToken());
-            response.sendRedirect(uri);
 
             log.info("user : " + tokenResponse.userInfo());
             log.info("a token : " + tokenResponse.accessToken());
