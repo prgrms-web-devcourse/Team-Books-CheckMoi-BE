@@ -3,6 +3,7 @@ package com.devcourse.checkmoi.domain.study.model;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 import com.devcourse.checkmoi.domain.book.model.Book;
+import com.devcourse.checkmoi.domain.study.exception.NotAllowedStudyStatusException;
 import com.devcourse.checkmoi.global.model.BaseEntity;
 import java.time.LocalDate;
 import javax.persistence.Entity;
@@ -134,6 +135,10 @@ public class Study extends BaseEntity {
     }
 
     public void changeStatus(StudyStatus status) {
+        if (!this.status.isAllowedNextStatus(status)) {
+            throw new NotAllowedStudyStatusException();
+        }
+
         this.status = status;
     }
 }
