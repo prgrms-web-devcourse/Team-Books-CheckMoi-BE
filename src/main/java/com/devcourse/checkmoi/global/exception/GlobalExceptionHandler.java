@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
-        log.error(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage());
+        log.error(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage(), e);
 
         ErrorMessage errorMessage = e.getErrorMessage();
         ErrorResponse response = ErrorResponse.of(errorMessage);
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception e) {
-        log.error(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage());
+        log.error(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage(), e);
 
         ErrorResponse response = ErrorResponse.of(ErrorMessage.INTERNAL_SERVER_ERROR);
 
@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException.class)
     protected ResponseEntity<ErrorResponse> handleBindException(BindException e) {
-        log.warn(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage());
+        log.warn(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage(), e);
 
         ErrorResponse response = ErrorResponse.of(e);
 

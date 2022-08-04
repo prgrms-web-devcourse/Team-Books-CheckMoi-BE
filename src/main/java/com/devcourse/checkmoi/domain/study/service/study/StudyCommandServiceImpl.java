@@ -55,23 +55,34 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public Long editStudyInfo(Long studyId, Long userId, Edit request) {
-        Long studyOwnerId = studyRepository.findStudyOwner(studyId);
-        validateStudyOwner(userId, studyOwnerId,
-            "스터디 정보 수정 권한이 없습니다. 유저 Id : " + userId + " 스터디장 Id : " + studyOwnerId);
+        validateStudyOwner(userId, studyId);
+
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
+        StudyStatus beforeStatus = study.getStatus();
+
         study.editName(request.name());
         study.editThumbnail(request.thumbnail());
         study.editDescription(request.description());
         study.changeStatus(StudyStatus.valueOf(request.status()));
+
+        if (isNecessaryToDeny(beforeStatus, study.getStatus())) {
+            studyRepository.updateAllAppliersAsDenied(studyId);
+        }
+
         return study.getId();
+    }
+
+    private boolean isNecessaryToDeny(StudyStatus beforeStatus, StudyStatus afterStatus) {
+        return beforeStatus == StudyStatus.RECRUITING &&
+            afterStatus == StudyStatus.IN_PROGRESS;
     }
 
     @Override
     public void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request) {
         validateExistStudy(studyRepository.existsById(studyId));
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
-        validateStudyOwner(userId, studyOwnerId,
+        checkStudyOwner(userId, studyOwnerId,
             "스터디 승인 권한이 없습니다. 유저 Id : " + userId + " 스터디 장 Id : " + studyOwnerId
         );
         StudyMember studyMember = studyMemberRepository.findById(memberId)
@@ -109,7 +120,14 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         }
     }
 
-    private void validateStudyOwner(Long userId, Long studyOwnerId, String message) {
+    private void validateStudyOwner(Long userId, Long studyId) {
+        Long studyOwnerId = studyRepository.findStudyOwner(studyId);
+
+        checkStudyOwner(userId, studyOwnerId,
+            "스터디 정보 수정 권한이 없습니다. 유저 Id : " + userId + " 스터디장 Id : " + studyOwnerId);
+    }
+
+    private void checkStudyOwner(Long userId, Long studyOwnerId, String message) {
         if (!studyOwnerId.equals(userId)) {
             throw new NotStudyOwnerException(message, ACCESS_DENIED);
         }

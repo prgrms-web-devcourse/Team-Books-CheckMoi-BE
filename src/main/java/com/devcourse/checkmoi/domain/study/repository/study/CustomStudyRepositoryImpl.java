@@ -74,6 +74,15 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .build();
     }
 
+    @Override
+    public void updateAllAppliersAsDenied(Long studyId) {
+        jpaQueryFactory.update(studyMember)
+            .where(studyMember.study.id.eq(studyId),
+                studyMember.status.eq(StudyMemberStatus.PENDING))
+            .set(studyMember.status, StudyMemberStatus.DENIED)
+            .execute();
+    }
+
     private StudyDetailInfo getStudyInfo(Long studyId) {
         return jpaQueryFactory.select(
                 Projections.constructor(
