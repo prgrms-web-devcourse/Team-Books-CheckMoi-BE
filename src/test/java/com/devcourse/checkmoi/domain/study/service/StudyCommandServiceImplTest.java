@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.study.service;
 
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
-import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUTING;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.global.exception.ErrorMessage.ACCESS_DENIED;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
@@ -103,7 +103,7 @@ class StudyCommandServiceImplTest {
                 .id(1L)
                 .status(OWNED)
                 .user(makeUserWithId(1L))
-                .study(makeStudyWithId(makeBookWithId(1L), RECRUTING, 1L))
+                .study(makeStudyWithId(makeBookWithId(1L), RECRUITING, 1L))
                 .build();
             Long want = 1L;
 
@@ -136,6 +136,7 @@ class StudyCommandServiceImplTest {
             Long studyId = 1L;
             Study study = Study.builder()
                 .id(1L)
+                .status(RECRUITING)
                 .build();
             when(studyRepository.findStudyOwner(anyLong()))
                 .thenReturn(userId);
@@ -312,7 +313,7 @@ class StudyCommandServiceImplTest {
         void requestStudyJoin() {
 
             User user = makeUserWithId(1L);
-            Study study = makeStudyWithId(makeBook(), RECRUTING, 1L);
+            Study study = makeStudyWithId(makeBook(), RECRUITING, 1L);
             StudyMember studyMember = makeStudyMember(study, user, StudyMemberStatus.PENDING);
 
             given(studyRepository.findById(anyLong()))
@@ -333,7 +334,7 @@ class StudyCommandServiceImplTest {
         @Test
         @DisplayName("S 만약 거절당했다면 스터디 가입 재신청을 할 수 있습니다.")
         void reRequestStudyJoin() {
-            Study study = makeStudyWithId(makeBook(), RECRUTING, 1L);
+            Study study = makeStudyWithId(makeBook(), RECRUITING, 1L);
             User user = makeUserWithId(1L);
             StudyMember studyMember =
                 makeStudyMemberWithId(study, user, StudyMemberStatus.DENIED, 1L);
@@ -375,7 +376,7 @@ class StudyCommandServiceImplTest {
         @DisplayName("F 유저가 존재하지 않는다면 예외 발생")
         void userNotFound() {
             User user = makeUserWithId(1L);
-            Study study = makeStudyWithId(makeBook(), RECRUTING, 1L);
+            Study study = makeStudyWithId(makeBook(), RECRUITING, 1L);
 
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(study));
@@ -390,7 +391,7 @@ class StudyCommandServiceImplTest {
         @Test
         @DisplayName("F 유저가 이미 가입 요청을 했다면 예외 발생")
         void duplicateStudyJoin() {
-            Study study = makeStudyWithId(makeBookWithId(1L), RECRUTING, 1L);
+            Study study = makeStudyWithId(makeBookWithId(1L), RECRUITING, 1L);
             User user = makeUserWithId(1L);
 
             StudyMember studyMember =

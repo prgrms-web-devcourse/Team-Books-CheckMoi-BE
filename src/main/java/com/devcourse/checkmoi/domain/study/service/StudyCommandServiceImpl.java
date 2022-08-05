@@ -59,11 +59,23 @@ public class StudyCommandServiceImpl implements StudyCommandService {
             "스터디 정보 수정 권한이 없습니다. 유저 Id : " + userId + " 스터디장 Id : " + studyOwnerId);
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
+        StudyStatus beforeStatus = study.getStatus();
+
         study.editName(request.name());
         study.editThumbnail(request.thumbnail());
         study.editDescription(request.description());
         study.changeStatus(StudyStatus.valueOf(request.status()));
+
+        if (isNecessaryToDeny(beforeStatus, study.getStatus())) {
+            studyRepository.updateAllAppliersAsDenied(studyId);
+        }
+
         return study.getId();
+    }
+
+    private boolean isNecessaryToDeny(StudyStatus beforeStatus, StudyStatus afterStatus) {
+        return beforeStatus == StudyStatus.RECRUITING &&
+            afterStatus == StudyStatus.IN_PROGRESS;
     }
 
     @Override
@@ -100,5 +112,4 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
         return studyMemberRepository.save(request).getId();
     }
-
 }

@@ -61,7 +61,7 @@ class BookRepositoryTest extends RepositoryTest {
         @BeforeEach
         void setUp() {
             userRepository.save(makeUser());
-            studyRepository.save(makeStudy(birdBook, StudyStatus.RECRUTING));
+            studyRepository.save(makeStudy(birdBook, StudyStatus.RECRUITING));
         }
 
         @Test

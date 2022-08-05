@@ -1,5 +1,9 @@
 package com.devcourse.checkmoi.domain.study.repository;
 
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.PENDING;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
@@ -11,19 +15,17 @@ import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.model.Study;
-import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
-import com.devcourse.checkmoi.domain.user.model.UserRole;
-import com.devcourse.checkmoi.domain.user.model.vo.Email;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.template.RepositoryTest;
 import java.util.ArrayList;
 import java.util.List;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -54,32 +56,42 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("해당 스터디의 스터디장의 ID를 찾는다")
         void test() {
-            String name = "name";
-            User user = userRepository.saveAndFlush(
-                User.builder().oauthId(name).provider("kakao").name(name)
-                    .email(new Email(name + "@gmail.com")).userRole(UserRole.LOGIN)
-                    .profileImgUrl("url")
-                    .build()
-            );
-            Study study = studyRepository.saveAndFlush(
-                Study.builder()
-                    .id(1L)
-                    .build()
-            );
-            StudyMember studyMember = studyMemberRepository.saveAndFlush(
-                StudyMember.builder()
-                    .id(1L)
-                    .status(StudyMemberStatus.OWNED)
-                    .study(study)
-                    .user(
-                        user
-                    )
-                    .build()
-            );
+            User ownedUser = userRepository.saveAndFlush(makeUser());
+            User memberUser = userRepository.saveAndFlush(makeUser());
+            Book book = bookRepository.saveAndFlush(makeBook());
+            Study study = studyRepository.saveAndFlush(makeStudy(book, IN_PROGRESS));
+
+            studyMemberRepository.saveAndFlush(makeStudyMember(study, ownedUser, OWNED));
+            studyMemberRepository.saveAndFlush(makeStudyMember(study, memberUser, ACCEPTED));
+
             Long got = studyRepository.findStudyOwner(study.getId());
 
             assertThat(got)
-                .isEqualTo(studyMember.getUser().getId());
+                .isEqualTo(ownedUser.getId());
+        }
+
+        @Test
+        @DisplayName("S 해당 스터디에 대한 스터디 신청 중 PENDING 상태인 스터디 신청들을 모두 DENIED 상태로 변경한다")
+        void denySuccess() {
+            User owner = userRepository.save(makeUser());
+            User pendingUser = userRepository.save(makeUser());
+            User acceptedUser = userRepository.save(makeUser());
+
+            Book book = bookRepository.save(makeBook());
+            Study study = studyRepository.save(makeStudy(book, IN_PROGRESS));
+
+            studyMemberRepository.save(makeStudyMember(study, owner, OWNED));
+            studyMemberRepository.save(makeStudyMember(study, pendingUser, PENDING));
+            studyMemberRepository.save(makeStudyMember(study, acceptedUser, ACCEPTED));
+
+            studyRepository.updateAllAppliersAsDenied(study.getId());
+
+            List<UserInfo> appliers = studyRepository
+                .getStudyAppliers(study.getId())
+                .appliers();
+
+            Assertions.assertThat(appliers)
+                .isEmpty();
         }
     }
 
@@ -98,8 +110,8 @@ class StudyRepositoryTest extends RepositoryTest {
 
             int generatedStudyNumber = 4;
             for (int i = 0; i < generatedStudyNumber; i++) {
-                Study study = studyRepository.save(makeStudy(givenBook, StudyStatus.RECRUTING));
-                studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+                Study study = studyRepository.save(makeStudy(givenBook, StudyStatus.RECRUITING));
+                studyMemberRepository.save(makeStudyMember(study, user, OWNED));
                 studies.add(study);
             }
         }
@@ -132,10 +144,10 @@ class StudyRepositoryTest extends RepositoryTest {
             User notStudyMemberUser = userRepository.save(makeUser());
             User studyMemberUser = userRepository.save(makeUser());
             Book book = bookRepository.save(makeBook());
-            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUTING));
+            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUITING));
 
             studyMemberRepository.save(
-                makeStudyMember(study, user, StudyMemberStatus.OWNED));
+                makeStudyMember(study, user, OWNED));
             studyMemberRepository.save(
                 makeStudyMember(study, notStudyMemberUser, StudyMemberStatus.DENIED));
             studyMemberRepository.save(
@@ -203,10 +215,10 @@ class StudyRepositoryTest extends RepositoryTest {
             user3Accepted = userRepository.save(makeUser());
             Book book = bookRepository.save(makeBook());
 
-            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUTING));
+            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUITING));
 
             studyMemberRepository.save(
-                makeStudyMember(study, ownedUser, StudyMemberStatus.OWNED));
+                makeStudyMember(study, ownedUser, OWNED));
             studyMemberRepository.save(
                 makeStudyMember(study, user1Pending, StudyMemberStatus.PENDING));
             studyMemberRepository.save(
@@ -217,6 +229,14 @@ class StudyRepositoryTest extends RepositoryTest {
             userRepository.flush();
             studyMemberRepository.flush();
             studyRepository.flush();
+        }
+
+        @AfterEach
+        void tearDown() {
+            studyMemberRepository.deleteAllInBatch();
+            studyRepository.deleteAllInBatch();
+            bookRepository.deleteAllInBatch();
+            userRepository.deleteAllInBatch();
         }
 
         @Test

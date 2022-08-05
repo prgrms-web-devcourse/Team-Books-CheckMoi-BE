@@ -29,9 +29,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     @Override
     public Long findStudyOwner(Long studyId) {
         return jpaQueryFactory.select(studyMember.user.id)
-            .from(study)
-            .innerJoin(studyMember)
-            .on(study.id.eq(studyMember.study.id))
+            .from(studyMember)
             .where(
                 study.id.eq(studyId),
                 studyMember.status.eq(StudyMemberStatus.OWNED)
@@ -48,7 +46,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 .limit(pageable.getPageSize())
                 .where(
                     study.book.id.eq(bookId),
-                    study.status.eq(StudyStatus.RECRUTING)
+                    study.status.eq(StudyStatus.RECRUITING)
                 )
                 .fetch()
         );
@@ -74,6 +72,15 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         return StudyAppliers.builder()
             .appliers(appliers)
             .build();
+    }
+
+    @Override
+    public void updateAllAppliersAsDenied(Long studyId) {
+        jpaQueryFactory.update(studyMember)
+            .where(studyMember.study.id.eq(studyId),
+                studyMember.status.eq(StudyMemberStatus.PENDING))
+            .set(studyMember.status, StudyMemberStatus.DENIED)
+            .execute();
     }
 
     private StudyDetailInfo getStudyInfo(Long studyId) {

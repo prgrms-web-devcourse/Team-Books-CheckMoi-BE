@@ -259,8 +259,8 @@ class StudyApiTest extends IntegrationTest {
             Studies response = new Studies(
                 new PageImpl<>(
                     List.of(
-                        makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUTING, 1L),
-                        makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUTING, 3L)
+                        makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
+                        makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
                     ))
                     .map(studyConverter::studyToStudyInfo)
             );

@@ -12,18 +12,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class StudyServiceValidatorImpl implements StudyServiceValidator {
 
+    @Override
     public void validateExistStudy(boolean existStudy) {
         if (!existStudy) {
             throw new StudyNotFoundException();
         }
     }
 
+    @Override
     public void validateStudyOwner(Long userId, Long studyOwnerId, String message) {
         if (!studyOwnerId.equals(userId)) {
             throw new NotStudyOwnerException(message, ACCESS_DENIED);
         }
     }
 
+    @Override
     public void validateDuplicateStudyMemberRequest(StudyMember studyMember) {
         if (studyMember.getStatus() != StudyMemberStatus.DENIED) {
             throw new DuplicateStudyJoinRequestException(STUDY_JOIN_REQUEST_DUPLICATE);
