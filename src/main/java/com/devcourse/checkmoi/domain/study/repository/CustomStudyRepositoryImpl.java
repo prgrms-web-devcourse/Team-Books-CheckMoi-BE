@@ -95,12 +95,15 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
 
                     Projections.constructor(
                         StudyBookInfo.class,
-                        study.book.id, study.book.title,
-                        study.book.author, study.book.publisher, study.book.thumbnail,
-
-                        study.book.isbn,
+                        study.book.id,
+                        study.book.title,
+                        study.book.thumbnail,
+                        study.book.author,
+                        study.book.publisher,
                         study.book.publishedAt.publishedAt,
-                        study.book.description
+                        study.book.isbn,
+                        study.book.description,
+                        study.book.createdAt
                     )
                 ))
             .from(study)

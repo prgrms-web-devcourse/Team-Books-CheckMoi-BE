@@ -9,6 +9,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import org.springframework.data.domain.Page;
@@ -66,17 +67,17 @@ public sealed interface StudyResponse permits
     }
 
     record StudyBookInfo(
-        Long bookId,
+        Long id,
         String title,
+        String image,
         String author,
         String publisher,
-        String thumbnail,
-
-        String isbn,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate publishedAt,
-        String description
-
+        LocalDate pubDate,
+        String isbn,
+        String description,
+        @JsonFormat(pattern = "yyyy/MM/dd")
+        LocalDateTime createdAt
     ) implements StudyResponse {
 
         @Builder
