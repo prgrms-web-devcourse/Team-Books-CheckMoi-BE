@@ -6,7 +6,6 @@ import com.devcourse.checkmoi.domain.token.model.Token;
 import com.devcourse.checkmoi.domain.token.repository.TokenRepository;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.Register;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
-import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.global.security.jwt.JwtTokenProvider;
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
@@ -27,6 +26,7 @@ public class TokenService {
     public TokenWithUserInfo createToken(Register user) {
         String accessToken = jwtTokenProvider.createAccessToken(user.id(), user.role());
         String refreshToken = jwtTokenProvider.createRefreshToken();
+
         Token token = tokenRepository.findTokenByUserId(user.id())
             .orElseGet(() -> tokenRepository.save(new Token(refreshToken, user.id())));
 
@@ -45,7 +45,6 @@ public class TokenService {
 
     @Transactional
     public AccessToken refreshAccessToken(String accessToken) {
-
         jwtTokenProvider.validateAccessToken(accessToken);
 
         Claims claims = jwtTokenProvider.getClaims(accessToken);
@@ -64,13 +63,15 @@ public class TokenService {
 
     @Transactional
     public void deleteTokenByUserId(Long userId) {
-        if (!tokenRepository.existsByUserId(userId)) {
-            throw new UserNotFoundException();
-        }
         tokenRepository.deleteByUserId(userId);
     }
 
+    @Transactional
     public String createTemporaryAccessToken(Long userId) {
-        return jwtTokenProvider.createAccessToken(userId, "ROLE_LOGIN");
+        String refreshToken = jwtTokenProvider.createRefreshToken();
+        Token token = tokenRepository.findTokenByUserId(7L)
+            .orElseGet(() -> tokenRepository.save(new Token(refreshToken, 7L)));
+        token.refresh(refreshToken);
+        return jwtTokenProvider.createAccessToken(7L, "ROLE_LOGIN");
     }
 }
