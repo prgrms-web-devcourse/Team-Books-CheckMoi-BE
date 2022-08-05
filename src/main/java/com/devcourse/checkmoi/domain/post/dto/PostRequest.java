@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.post.dto;
 
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
+import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import lombok.Builder;
 
@@ -16,7 +17,9 @@ public sealed interface PostRequest permits Search, Create, Edit {
     }
 
     record Create(
-        Long id
+        String title,
+        String content,
+        Long studyId
     ) implements PostRequest {
 
         @Builder
@@ -25,7 +28,9 @@ public sealed interface PostRequest permits Search, Create, Edit {
     }
 
     record Edit(
-        Long id
+        String title,
+        String content,
+        Long studyId
     ) implements PostRequest {
 
         @Builder
