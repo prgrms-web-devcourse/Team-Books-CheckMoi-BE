@@ -2,6 +2,7 @@ package com.devcourse.checkmoi.domain.book.api;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -60,7 +61,7 @@ class BookApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("책 등록 테스트")
-    public class UpdateBookTest {
+    class UpdateBookTest {
 
         private final PersistedDummyData bookInfo = createDummyBigWhale();
 
@@ -75,10 +76,12 @@ class BookApiTest extends IntegrationTest {
 
             given(bookCommandService.save(createRequest)).willReturn(simpleBook);
 
-            MvcResult mvcResult = mockMvc.perform(RestDocumentationRequestBuilders.put("/api/books")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
-                    .content(toJson(createRequest))).andExpect(status().isOk()).andDo(documentation())
+            MvcResult mvcResult = mockMvc.perform(
+                    RestDocumentationRequestBuilders.post("/api/books")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                        .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                        .content(toJson(createRequest))).andExpect(status().isOk())
+                .andDo(documentation())
                 .andReturn();
 
             SuccessResponse<Long> result = objectMapper.readValue(
@@ -110,7 +113,7 @@ class BookApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("메인화면에 책 목록 불러오기 테스트")
-    public class TopBooksTest {
+    class TopBooksTest {
 
         private LatestAllBooks books;
 
@@ -192,7 +195,7 @@ class BookApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("책 조회 테스트")
-    public class GetTest {
+    class GetTest {
 
         @Test
         @DisplayName("id 를 통해 책을 조회한다")
@@ -234,5 +237,50 @@ class BookApiTest extends IntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("ISBN을 기준으로 책 단일 조회")
+    class GetByIsbnTest {
+
+        @Test
+        @DisplayName("S ISBN을 기준으로 책 단일 조회합니다.")
+        void getByIsbn() throws Exception {
+            PersistedDummyData bigWhaleBook = createDummyBigWhale();
+
+            BookSpecification book = bigWhaleBook.specification();
+
+            given(bookQueryService.getByIsbn(anyString()))
+                .willReturn(book);
+
+            mockMvc.perform(
+                    get("/api/books/isbn/{isbn}", bigWhaleBook.isbn()))
+                .andExpect(status().isOk())
+                .andDo(documentation());
+
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("book-getByIsbn",
+                ResourceSnippetParameters.builder().tag("Book API").summary("책 isbn 에 해당하는 책 가져오기")
+                    .description("ISBN에 해당하는 책을 가져오는 API 입니다")
+                    .responseSchema(Schema.schema("책 상세정보 응답")),
+                pathParameters(
+                    parameterWithName("isbn").description("책 isbn")
+                ),
+                responseFields(
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                    fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("책 id"),
+                    fieldWithPath("data.image").type(JsonFieldType.STRING).description("책 이미지"),
+                    fieldWithPath("data.author").type(JsonFieldType.STRING).description("책 저자"),
+                    fieldWithPath("data.publisher").type(JsonFieldType.STRING).description("책 출판사"),
+                    fieldWithPath("data.title").type(JsonFieldType.STRING).description("책 제목"),
+                    fieldWithPath("data.pubDate").type(JsonFieldType.STRING).description("책 발행날자"),
+                    fieldWithPath("data.isbn").type(JsonFieldType.STRING).description("책 isbn13"),
+                    fieldWithPath("data.description").type(JsonFieldType.STRING)
+                        .description("책에 대한 설명"),
+                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
+                        .description("책 등록 날자"))
+            );
+        }
+    }
 
 }

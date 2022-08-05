@@ -48,11 +48,11 @@ class UserIntegrationTest extends IntegrationTest {
 
     @Nested
     @DisplayName("회원정보를 조회할 수 있다 #4")
-    class UserPage {
+    class MyPage {
 
         @Test
         @DisplayName("S 회원 상세 페이지 조회")
-        void userPage() throws Exception {
+        void myPage() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
             mockMvc.perform(get("/api/me")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
@@ -63,6 +63,8 @@ class UserIntegrationTest extends IntegrationTest {
                     .value(givenUser.userInfo().name()))
                 .andExpect(jsonPath("$.data.email")
                     .value(givenUser.userInfo().email()))
+                .andExpect(jsonPath("$.data.temperature")
+                    .value(givenUser.userInfo().temperature()))
                 .andExpect(jsonPath("$.data.profileImageUrl")
                     .value(givenUser.userInfo().profileImageUrl()))
                 .andDo(documentation());
@@ -161,6 +163,43 @@ class UserIntegrationTest extends IntegrationTest {
                 )
             );
 
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자 정보 조회 #119")
+    class AnotherUserInfo {
+
+        @Test
+        @DisplayName("S 회원 상세 페이지 조회")
+        void myPage() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+            mockMvc.perform(get("/api/users/{userId}", givenUser.userInfo().id())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id")
+                    .value(givenUser.userInfo().id()))
+                .andExpect(jsonPath("$.data.name")
+                    .value(givenUser.userInfo().name()))
+                .andExpect(jsonPath("$.data.email")
+                    .value(givenUser.userInfo().email()))
+                .andExpect(jsonPath("$.data.temperature")
+                    .value(givenUser.userInfo().temperature()))
+                .andExpect(jsonPath("$.data.profileImageUrl")
+                    .value(givenUser.userInfo().profileImageUrl()))
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("another-user-detail",
+                ResourceSnippetParameters.builder()
+                    .tag("User API")
+                    .summary("회원 정보 조회 API (with userId)")
+                    .description("회원 정보를 요청하는 API 입니다."),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader()
+            );
         }
     }
 

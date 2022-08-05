@@ -2,6 +2,7 @@ package com.devcourse.checkmoi.global.security.handler;
 
 import com.devcourse.checkmoi.global.security.oauth.OAuthProvider;
 import com.devcourse.checkmoi.global.security.oauth.OAuthService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +20,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final OAuthService oauthService;
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess(
@@ -39,14 +42,19 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
                 request.getServerName() + ":" + request.getServerPort();
 
             log.info("oauth token request occurred! frontUrl : " + frontUrl);
-            String uri = UriComponentsBuilder.fromUriString("https://checkmoi.vercel.app/login")
+
+            String uri = UriComponentsBuilder.fromUriString("http://localhost:3000/login")
                 .queryParam("token", tokenResponse.accessToken())
                 .build()
                 .toUriString();
 
+//            response.setStatus(HttpStatus.OK.value());
+//            response.setContentType("application/json");
+//            response.setCharacterEncoding("UTF-8");
+//            response.getWriter()
+//                .write(objectMapper.writeValueAsString(new SuccessResponse<>(tokenResponse)));
+
             response.setHeader("Authorization", "Bearer " + tokenResponse.accessToken());
-            response.setHeader("hello", "Bearer " + tokenResponse.accessToken());
-            response.setHeader("su", "Bearer " + tokenResponse.accessToken());
             response.sendRedirect(uri);
 
             log.info("user : " + tokenResponse.userInfo());

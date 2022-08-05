@@ -8,4 +8,5 @@ public interface UserQueryService {
     UserInfo findUserInfo(Long userId);
 
     UserInfoWithStudy findUserInfoWithStudy(Long id);
+
 }
