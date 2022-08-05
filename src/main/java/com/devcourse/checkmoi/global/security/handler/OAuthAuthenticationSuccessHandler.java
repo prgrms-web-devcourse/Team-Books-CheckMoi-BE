@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
@@ -43,20 +44,20 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
                 request.getServerName() + ":" + request.getServerPort();
 
             log.info("oauth token request occurred! frontUrl : " + frontUrl);
-            
-//            String uri = UriComponentsBuilder.fromUriString("https://checkmoi.vercel.app/login")
-//                .queryParam("token", tokenResponse.accessToken())
-//                .build()
-//                .toUriString();
 
-            response.setStatus(HttpStatus.OK.value());
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter()
-                .write(objectMapper.writeValueAsString(new SuccessResponse<>(tokenResponse)));
+            String uri = UriComponentsBuilder.fromUriString("https://checkmoi.vercel.app/login")
+                .queryParam("token", tokenResponse.accessToken())
+                .build()
+                .toUriString();
 
-//            response.setHeader("Authorization", "Bearer " + tokenResponse.accessToken());
-//            response.sendRedirect(uri);
+//            response.setStatus(HttpStatus.OK.value());
+//            response.setContentType("application/json");
+//            response.setCharacterEncoding("UTF-8");
+//            response.getWriter()
+//                .write(objectMapper.writeValueAsString(new SuccessResponse<>(tokenResponse)));
+
+            response.setHeader("Authorization", "Bearer " + tokenResponse.accessToken());
+            response.sendRedirect(uri);
 
             log.info("user : " + tokenResponse.userInfo());
             log.info("a token : " + tokenResponse.accessToken());
