@@ -38,6 +38,7 @@ import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.LongStream;
@@ -439,11 +440,15 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath("data.study.studyEndDate").description("스터디 종료 일자"),
 
                     // study book info
-                    fieldWithPath("data.study.book.bookId").description("스터디 책 아이디"),
+                    fieldWithPath("data.study.book.id").description("스터디 책 아이디"),
                     fieldWithPath("data.study.book.title").description("스터디 책 제목"),
+                    fieldWithPath("data.study.book.image").description("스터디 책 썸네일"),
                     fieldWithPath("data.study.book.author").description("스터디 책 저자"),
                     fieldWithPath("data.study.book.publisher").description("스터디 책 출판사"),
-                    fieldWithPath("data.study.book.thumbnail").description("스터디 책 썸네일"),
+                    fieldWithPath("data.study.book.isbn").description("스터디 책 ISBN"),
+                    fieldWithPath("data.study.book.pubDate").description("스터디 책 출판일"),
+                    fieldWithPath("data.study.book.description").description("스터디 책 설명"),
+                    fieldWithPath("data.study.book.createdAt").description("스터디 책 썸네일"),
 
                     // study member info
                     fieldWithPath("data.members[].id").
@@ -471,11 +476,15 @@ class StudyApiTest extends IntegrationTest {
 
         private StudyBookInfo givenBookInfo() {
             return StudyBookInfo.builder()
-                .bookId(1L)
+                .id(1L)
                 .title("책 제목")
+                .image("책 썸네일")
                 .author("책 저자")
                 .publisher("출판사")
-                .thumbnail("책 썸네일")
+                .pubDate(LocalDate.now())
+                .isbn("1111122222333")
+                .description("책 설명설명")
+                .createdAt(LocalDateTime.now())
                 .build();
         }
 
