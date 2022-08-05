@@ -14,10 +14,10 @@ import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.global.model.PageRequest;
@@ -86,7 +86,7 @@ class StudyRepositoryTest extends RepositoryTest {
 
             studyRepository.updateAllAppliersAsDenied(study.getId());
 
-            List<UserInfo> appliers = studyRepository
+            List<StudyUserInfo> appliers = studyRepository
                 .getStudyAppliers(study.getId())
                 .appliers();
 
@@ -253,7 +253,7 @@ class StudyRepositoryTest extends RepositoryTest {
         void getAllAppliersAscSuccess() {
             StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
 
-            UserInfo firstUserInfo = studyAppliers.appliers().get(0);
+            StudyUserInfo firstUserInfo = studyAppliers.appliers().get(0);
 
             Assertions.assertThat(firstUserInfo.id())
                 .isEqualTo(user1Pending.getId());
