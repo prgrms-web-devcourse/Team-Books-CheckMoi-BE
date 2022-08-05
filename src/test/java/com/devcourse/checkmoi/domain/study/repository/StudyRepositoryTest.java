@@ -1,11 +1,8 @@
-package com.devcourse.checkmoi.domain.study.repository.study;
+package com.devcourse.checkmoi.domain.study.repository;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeNonStudyMemberUser;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeSecondNonStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -16,6 +13,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMemb
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.model.UserRole;
@@ -100,7 +98,7 @@ class StudyRepositoryTest extends RepositoryTest {
 
             int generatedStudyNumber = 4;
             for (int i = 0; i < generatedStudyNumber; i++) {
-                Study study = studyRepository.save(makeStudy(givenBook));
+                Study study = studyRepository.save(makeStudy(givenBook, StudyStatus.RECRUTING));
                 studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
                 studies.add(study);
             }
@@ -131,11 +129,13 @@ class StudyRepositoryTest extends RepositoryTest {
         @BeforeEach
         private void setUpGiven() {
             User user = userRepository.save(makeUser());
-            User notStudyMemberUser = userRepository.save(makeNonStudyMemberUser());
-            User studyMemberUser = userRepository.save(makeStudyMemberUser());
+            User notStudyMemberUser = userRepository.save(makeUser());
+            User studyMemberUser = userRepository.save(makeUser());
             Book book = bookRepository.save(makeBook());
-            study = studyRepository.save(makeStudy(book));
-            studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUTING));
+
+            studyMemberRepository.save(
+                makeStudyMember(study, user, StudyMemberStatus.OWNED));
             studyMemberRepository.save(
                 makeStudyMember(study, notStudyMemberUser, StudyMemberStatus.DENIED));
             studyMemberRepository.save(
@@ -152,8 +152,7 @@ class StudyRepositoryTest extends RepositoryTest {
             validateStudyDetailInfo(response);
             validateMembers(response);
 
-            Assertions.assertThat(response.members().size())
-                .isEqualTo(2);
+            assertThat(response.members().size()).isEqualTo(2);
         }
 
         private void validateStudyDetailInfo(StudyDetailWithMembers response) {
@@ -188,37 +187,36 @@ class StudyRepositoryTest extends RepositoryTest {
 
         private Study study;
 
-        private User user;
+        private User ownedUser;
 
-        private User firstAppliedUser;
+        private User user1Pending;
 
-        private User secondAppliedUser;
+        private User user2Pending;
 
-        private User studyMemberUser;
+        private User user3Accepted;
 
         @BeforeEach
         void setUp() {
-            user = userRepository.save(makeUser());
-            firstAppliedUser = userRepository.save(makeNonStudyMemberUser());
-            secondAppliedUser = userRepository.save(makeSecondNonStudyMemberUser());
-            studyMemberUser = userRepository.save(makeStudyMemberUser());
+            ownedUser = userRepository.save(makeUser());
+            user1Pending = userRepository.save(makeUser());
+            user2Pending = userRepository.save(makeUser());
+            user3Accepted = userRepository.save(makeUser());
             Book book = bookRepository.save(makeBook());
 
-            study = studyRepository.save(makeStudy(book));
+            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUTING));
 
             studyMemberRepository.save(
-                makeStudyMember(study, user, StudyMemberStatus.OWNED));
+                makeStudyMember(study, ownedUser, StudyMemberStatus.OWNED));
             studyMemberRepository.save(
-                makeStudyMember(study, firstAppliedUser, StudyMemberStatus.PENDING));
+                makeStudyMember(study, user1Pending, StudyMemberStatus.PENDING));
             studyMemberRepository.save(
-                makeStudyMember(study, secondAppliedUser, StudyMemberStatus.PENDING));
+                makeStudyMember(study, user2Pending, StudyMemberStatus.PENDING));
             studyMemberRepository.save(
-                makeStudyMember(study, studyMemberUser, StudyMemberStatus.ACCEPTED));
+                makeStudyMember(study, user3Accepted, StudyMemberStatus.ACCEPTED));
 
             userRepository.flush();
             studyMemberRepository.flush();
             studyRepository.flush();
-
         }
 
         @Test
@@ -226,8 +224,8 @@ class StudyRepositoryTest extends RepositoryTest {
         void getAllAppliersSuccess() {
             StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
 
-            Assertions.assertThat(studyAppliers.appliers().size())
-                .isEqualTo(2);
+            Assertions.assertThat(studyAppliers.appliers())
+                .hasSize(2);
         }
 
         @Test
@@ -238,7 +236,7 @@ class StudyRepositoryTest extends RepositoryTest {
             UserInfo firstUserInfo = studyAppliers.appliers().get(0);
 
             Assertions.assertThat(firstUserInfo.id())
-                .isEqualTo(firstAppliedUser.getId());
+                .isEqualTo(user1Pending.getId());
         }
 
         @Test

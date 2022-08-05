@@ -1,17 +1,23 @@
-package com.devcourse.checkmoi.domain.study.service.study;
+package com.devcourse.checkmoi.domain.study.service;
 
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.model.Study;
-import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
-import com.devcourse.checkmoi.domain.study.stub.StudyStub;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import java.util.List;
@@ -39,6 +45,9 @@ class StudyQueryServiceImplTest {
     @Mock
     StudyRepository studyRepository;
 
+    @Mock
+    StudyServiceValidator studyValidator;
+
     @Nested
     @DisplayName("특정 책에 대한 스터디 목록 조회 #43")
     class GetStudiesTest {
@@ -50,7 +59,10 @@ class StudyQueryServiceImplTest {
             PageRequest pageRequest = new PageRequest();
             Pageable pageable = pageRequest.of();
             Page<Study> studies = new PageImpl<>(
-                StudyStub.javaRecrutingStudyStub()
+                List.of(
+                    makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUTING, 1L),
+                    makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUTING, 3L)
+                )
             );
             Page<StudyInfo> studyInfos = studies.map(
                 study -> StudyInfo.builder()
@@ -104,6 +116,10 @@ class StudyQueryServiceImplTest {
             given(studyRepository.getStudyAppliers(studyId))
                 .willReturn(expectedAppliers);
 
+            doNothing()
+                .when(studyValidator)
+                .validateStudyOwner(anyLong(), anyLong(), anyString());
+
             StudyAppliers returnedAppliers = studyQueryService.getStudyAppliers(userId, studyId);
 
             Assertions.assertThat(returnedAppliers)
@@ -118,6 +134,10 @@ class StudyQueryServiceImplTest {
 
             given(studyRepository.findStudyOwner(studyId))
                 .willReturn(studyLeaderId);
+
+            doThrow(NotStudyOwnerException.class)
+                .when(studyValidator)
+                .validateStudyOwner(anyLong(), anyLong(), anyString());
 
             Assertions.assertThatThrownBy(() ->
                 studyQueryService.getStudyAppliers(userId, studyId)

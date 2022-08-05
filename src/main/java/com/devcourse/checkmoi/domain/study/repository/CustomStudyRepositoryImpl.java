@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.domain.study.repository.study;
+package com.devcourse.checkmoi.domain.study.repository;
 
 import static com.devcourse.checkmoi.domain.study.model.QStudy.study;
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
