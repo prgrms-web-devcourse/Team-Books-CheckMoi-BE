@@ -6,10 +6,10 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -55,7 +55,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     @Override
     public StudyDetailWithMembers getStudyInfoWithMembers(Long studyId) {
         StudyDetailInfo studyInfo = getStudyInfo(studyId);
-        List<UserInfo> memberInfo = getStudyMembers(studyId, StudyMemberStatus.ACCEPTED,
+        List<StudyUserInfo> memberInfo = getStudyMembers(studyId, StudyMemberStatus.ACCEPTED,
             StudyMemberStatus.OWNED);
 
         return StudyDetailWithMembers.builder()
@@ -67,7 +67,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     @Override
     public StudyAppliers getStudyAppliers(
         Long studyId) {
-        List<UserInfo> appliers = getStudyMembers(studyId, StudyMemberStatus.PENDING, null);
+        List<StudyUserInfo> appliers = getStudyMembers(studyId, StudyMemberStatus.PENDING, null);
 
         return StudyAppliers.builder()
             .appliers(appliers)
@@ -112,11 +112,11 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .fetchOne();
     }
 
-    private List<UserInfo> getStudyMembers(Long studyId, StudyMemberStatus requiredStatus,
+    private List<StudyUserInfo> getStudyMembers(Long studyId, StudyMemberStatus requiredStatus,
         StudyMemberStatus optionalStatus) {
         return jpaQueryFactory.select(
                 Projections.constructor(
-                    UserInfo.class,
+                    StudyUserInfo.class,
                     studyMember.user.id,
                     studyMember.user.name,
                     studyMember.user.email.value.as("email"),

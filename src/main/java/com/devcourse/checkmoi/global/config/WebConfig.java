@@ -21,6 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
             .addMapping("/**")
             .allowedOrigins("http://localhost:3000", "https://checkmoi.vercel.app")
             .allowedMethods("*")
+            .allowCredentials(true)
             .allowedHeaders("*")
             .exposedHeaders(LOCATION);
     }
