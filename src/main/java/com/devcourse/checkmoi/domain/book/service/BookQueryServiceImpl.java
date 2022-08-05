@@ -56,4 +56,11 @@ public class BookQueryServiceImpl implements BookQueryService {
             .map(bookConverter::bookToSpecification)
             .orElseThrow(() -> new BookNotFoundException(bookId.toString()));
     }
+
+    @Override
+    public BookSpecification getByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn)
+            .map(bookConverter::bookToSpecification)
+            .orElseThrow(() -> new BookNotFoundException(isbn));
+    }
 }

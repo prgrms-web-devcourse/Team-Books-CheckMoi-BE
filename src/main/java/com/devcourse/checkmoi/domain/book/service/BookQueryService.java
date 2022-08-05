@@ -9,4 +9,6 @@ public interface BookQueryService {
     LatestAllBooks getAllTop(SimplePage pageRequest);
 
     BookSpecification getById(Long bookId);
+
+    BookSpecification getByIsbn(String isbn);
 }
