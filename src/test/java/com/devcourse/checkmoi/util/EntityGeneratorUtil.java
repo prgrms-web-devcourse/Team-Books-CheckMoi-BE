@@ -3,6 +3,9 @@ package com.devcourse.checkmoi.util;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.Book.BookBuilder;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
+import com.devcourse.checkmoi.domain.post.model.Post;
+import com.devcourse.checkmoi.domain.post.model.Post.PostBuilder;
+import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.Study.StudyBuilder;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
@@ -35,6 +38,9 @@ public abstract class EntityGeneratorUtil {
         return bookBuilder().build();
     }
 
+    public static Post makePost(PostCategory category, Study study, User user) {
+        return postBuilder(category, study, user).build();
+    }
 
     // with Id
     public static StudyMember makeStudyMemberWithId(
@@ -55,6 +61,9 @@ public abstract class EntityGeneratorUtil {
         return bookBuilder().id(id).build();
     }
 
+    public static Post makePostWithId(PostCategory category, Study study, User user, Long id) {
+        return postBuilder(category, study, user).id(id).build();
+    }
 
     // builder
     private static UserBuilder userBuilder() {
@@ -91,6 +100,16 @@ public abstract class EntityGeneratorUtil {
             .gatherEndDate(LocalDate.now())
             .studyStartDate(LocalDate.now())
             .studyEndDate(LocalDate.now());
+    }
+
+    private static PostBuilder postBuilder(PostCategory category, Study study, User user) {
+        return Post.builder()
+            .title("포스트 타이틀")
+            .content("포스트 본문")
+            .category(category)
+            .study(study) // TODO: 스터디 멤버로 변경?
+            .user(user);
+
     }
 
     private static BookBuilder bookBuilder() {
