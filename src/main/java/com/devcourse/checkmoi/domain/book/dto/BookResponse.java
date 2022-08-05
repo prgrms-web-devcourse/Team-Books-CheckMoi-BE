@@ -22,7 +22,7 @@ public sealed interface BookResponse permits SimpleBook, BookSpecification, Late
         String image,
         String description,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDateTime createAt // TODO : 날짜 포맷
+        LocalDateTime createdAt // TODO : 날짜 포맷
     ) implements BookResponse {
 
         @Builder
@@ -41,7 +41,7 @@ public sealed interface BookResponse permits SimpleBook, BookSpecification, Late
         String isbn,
         String description,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDateTime createAt // TODO : 날짜 포맷
+        LocalDateTime createdAt // TODO : 날짜 포맷
     ) implements BookResponse {
 
         @Builder

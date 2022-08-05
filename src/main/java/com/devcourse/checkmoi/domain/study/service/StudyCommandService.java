@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.domain.study.service.study;
+package com.devcourse.checkmoi.domain.study.service;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;

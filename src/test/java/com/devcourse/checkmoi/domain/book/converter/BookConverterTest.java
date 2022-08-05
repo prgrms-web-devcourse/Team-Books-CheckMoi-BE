@@ -1,11 +1,13 @@
 package com.devcourse.checkmoi.domain.book.converter;
 
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.stub.NewDummyData;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +25,26 @@ class BookConverterTest {
 
         SimpleBook convertedToSimple = bookconverter.bookToSimple(whaleBook);
 
-        Assertions.assertThat(convertedToSimple)
+        assertThat(convertedToSimple)
             .usingRecursiveComparison()
             .isEqualTo(expectedSimple);
+    }
+
+    @Test
+    @DisplayName("Book 엔티티를  책 목록의 단일 책으로 변환한다2")
+    void bookToCreate2() {
+        Book book = makeBookWithId(1L);
+        SimpleBook simpleBook = bookconverter.bookToSimple(book);
+
+        assertAll(
+            () -> assertThat(simpleBook.id()).isEqualTo(book.getId()),
+            () -> assertThat(simpleBook.isbn()).isEqualTo(book.getIsbn()),
+            () -> assertThat(simpleBook.title()).isEqualTo(book.getTitle()),
+            () -> assertThat(simpleBook.author()).isEqualTo(book.getAuthor()),
+            () -> assertThat(
+                simpleBook.pubDate()).isEqualTo(book.getPublishedAt().getPublishedAt()),
+            () -> assertThat(simpleBook.description()).isEqualTo(book.getDescription())
+        );
     }
 
     @Test
@@ -38,7 +57,7 @@ class BookConverterTest {
 
         Book createdBook = bookconverter.CreateToBook(createRequest);
 
-        Assertions.assertThat(createdBook)
+        assertThat(createdBook)
             .usingRecursiveComparison()
             .isEqualTo(expectedBook);
     }
@@ -53,7 +72,7 @@ class BookConverterTest {
 
         BookSpecification specification = bookconverter.bookToSpecification(book);
 
-        Assertions.assertThat(specification)
+        assertThat(specification)
             .usingRecursiveComparison()
             .isEqualTo(expectedSpecification);
     }

@@ -1,22 +1,19 @@
-package com.devcourse.checkmoi.domain.study.service.study;
+package com.devcourse.checkmoi.domain.study.service;
 
-import static com.devcourse.checkmoi.global.exception.ErrorMessage.ACCESS_DENIED;
-import static com.devcourse.checkmoi.global.exception.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
 import static com.devcourse.checkmoi.global.exception.ErrorMessage.STUDY_JOIN_REQUEST_NOT_FOUND;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
-import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
-import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.exception.StudyJoinRequestNotFoundException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
-import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
-import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
+import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
+import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
@@ -37,6 +34,8 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     private final UserRepository userRepository;
 
+    private final StudyServiceValidator studyValidator;
+
     @Override
     public Long createStudy(Create request, Long userId) {
         Study study = studyRepository.save(studyConverter.createToEntity(request));
@@ -55,8 +54,9 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public Long editStudyInfo(Long studyId, Long userId, Edit request) {
-        validateStudyOwner(userId, studyId);
-
+        Long studyOwnerId = studyRepository.findStudyOwner(studyId);
+        studyValidator.validateStudyOwner(userId, studyOwnerId,
+            "스터디 정보 수정 권한이 없습니다. 유저 Id : " + userId + " 스터디장 Id : " + studyOwnerId);
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
         StudyStatus beforeStatus = study.getStatus();
@@ -80,9 +80,9 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request) {
-        validateExistStudy(studyRepository.existsById(studyId));
+        studyValidator.validateExistStudy(studyRepository.existsById(studyId));
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
-        checkStudyOwner(userId, studyOwnerId,
+        studyValidator.validateStudyOwner(userId, studyOwnerId,
             "스터디 승인 권한이 없습니다. 유저 Id : " + userId + " 스터디 장 Id : " + studyOwnerId
         );
         StudyMember studyMember = studyMemberRepository.findById(memberId)
@@ -98,7 +98,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
             .orElseThrow(UserNotFoundException::new);
         StudyMember request = studyMemberRepository.findByUser(user)
             .map(studyMember -> {
-                validateDuplicateStudyMemberRequest(studyMember);
+                studyValidator.validateDuplicateStudyMemberRequest(studyMember);
                 studyMember.changeStatus(StudyMemberStatus.PENDING);
                 return studyMember;
             })
@@ -110,32 +110,6 @@ public class StudyCommandServiceImpl implements StudyCommandService {
                     .build()
             );
 
-        return studyMemberRepository.save(request)
-            .getId();
-    }
-
-    private void validateExistStudy(boolean existStudy) {
-        if (!existStudy) {
-            throw new StudyNotFoundException();
-        }
-    }
-
-    private void validateStudyOwner(Long userId, Long studyId) {
-        Long studyOwnerId = studyRepository.findStudyOwner(studyId);
-
-        checkStudyOwner(userId, studyOwnerId,
-            "스터디 정보 수정 권한이 없습니다. 유저 Id : " + userId + " 스터디장 Id : " + studyOwnerId);
-    }
-
-    private void checkStudyOwner(Long userId, Long studyOwnerId, String message) {
-        if (!studyOwnerId.equals(userId)) {
-            throw new NotStudyOwnerException(message, ACCESS_DENIED);
-        }
-    }
-
-    private void validateDuplicateStudyMemberRequest(StudyMember studyMember) {
-        if (studyMember.getStatus() != StudyMemberStatus.DENIED) {
-            throw new DuplicateStudyJoinRequestException(STUDY_JOIN_REQUEST_DUPLICATE);
-        }
+        return studyMemberRepository.save(request).getId();
     }
 }

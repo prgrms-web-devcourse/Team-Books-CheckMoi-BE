@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.domain.study.repository.study;
+package com.devcourse.checkmoi.domain.study.repository;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;

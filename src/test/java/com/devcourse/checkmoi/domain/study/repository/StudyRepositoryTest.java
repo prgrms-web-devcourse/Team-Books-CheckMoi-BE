@@ -1,30 +1,27 @@
-package com.devcourse.checkmoi.domain.study.repository.study;
+package com.devcourse.checkmoi.domain.study.repository;
 
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.PENDING;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeNonStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMemberUser;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.model.Book;
-import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.model.Study;
-import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
-import com.devcourse.checkmoi.domain.user.model.UserRole;
-import com.devcourse.checkmoi.domain.user.model.vo.Email;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.template.RepositoryTest;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -59,77 +56,42 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("해당 스터디의 스터디장의 ID를 찾는다")
         void test() {
-            String name = "name";
-            User user = userRepository.saveAndFlush(
-                User.builder().oauthId(name).provider("kakao").name(name)
-                    .email(new Email(name + "@gmail.com")).userRole(UserRole.LOGIN)
-                    .profileImgUrl("url")
-                    .build());
-            Study study = studyRepository.saveAndFlush(
-                Study.builder()
-                    .id(1L)
-                    .build());
-            StudyMember studyMember = studyMemberRepository.saveAndFlush(
-                StudyMember.builder()
-                    .id(1L)
-                    .status(StudyMemberStatus.OWNED)
-                    .study(study)
-                    .user(user)
-                    .build());
+            User ownedUser = userRepository.saveAndFlush(makeUser());
+            User memberUser = userRepository.saveAndFlush(makeUser());
+            Book book = bookRepository.saveAndFlush(makeBook());
+            Study study = studyRepository.saveAndFlush(makeStudy(book, IN_PROGRESS));
+
+            studyMemberRepository.saveAndFlush(makeStudyMember(study, ownedUser, OWNED));
+            studyMemberRepository.saveAndFlush(makeStudyMember(study, memberUser, ACCEPTED));
+
             Long got = studyRepository.findStudyOwner(study.getId());
 
             assertThat(got)
-                .isEqualTo(studyMember.getUser().getId());
+                .isEqualTo(ownedUser.getId());
         }
 
         @Test
         @DisplayName("S 해당 스터디에 대한 스터디 신청 중 PENDING 상태인 스터디 신청들을 모두 DENIED 상태로 변경한다")
         void denySuccess() {
-            String name = "name";
-            User owner = userRepository.saveAndFlush(
-                User.builder()
-                    .oauthId(name)
-                    .provider("kakao")
-                    .name(name)
-                    .email(new Email(name + "@gmail.com"))
-                    .userRole(UserRole.LOGIN)
-                    .profileImgUrl("url")
-                    .build());
-            User studyMemberUser = userRepository.saveAndFlush(
-                User.builder()
-                    .oauthId(name)
-                    .provider("kakao")
-                    .name(name)
-                    .email(new Email(name + 1 + "@gmail.com"))
-                    .userRole(UserRole.LOGIN)
-                    .profileImgUrl("url")
-                    .build());
-            Study study = studyRepository.saveAndFlush(
-                Study.builder()
-                    .id(1L)
-                    .build());
+            User owner = userRepository.save(makeUser());
+            User pendingUser = userRepository.save(makeUser());
+            User acceptedUser = userRepository.save(makeUser());
 
-            studyMemberRepository.saveAndFlush(
-                StudyMember.builder()
-                    .id(1L)
-                    .status(StudyMemberStatus.OWNED)
-                    .study(study)
-                    .user(owner)
-                    .build());
-            studyMemberRepository.saveAndFlush(
-                StudyMember.builder()
-                    .id(1L)
-                    .status(StudyMemberStatus.OWNED)
-                    .study(study)
-                    .user(studyMemberUser)
-                    .build());
+            Book book = bookRepository.save(makeBook());
+            Study study = studyRepository.save(makeStudy(book, IN_PROGRESS));
+
+            studyMemberRepository.save(makeStudyMember(study, owner, OWNED));
+            studyMemberRepository.save(makeStudyMember(study, pendingUser, PENDING));
+            studyMemberRepository.save(makeStudyMember(study, acceptedUser, ACCEPTED));
+
             studyRepository.updateAllAppliersAsDenied(study.getId());
 
-            List<UserInfo> appliers = studyRepository.getStudyAppliers(study.getId())
+            List<UserInfo> appliers = studyRepository
+                .getStudyAppliers(study.getId())
                 .appliers();
 
-            Assertions.assertThat(appliers.size())
-                .isEqualTo(0);
+            Assertions.assertThat(appliers)
+                .isEmpty();
         }
     }
 
@@ -148,8 +110,8 @@ class StudyRepositoryTest extends RepositoryTest {
 
             int generatedStudyNumber = 4;
             for (int i = 0; i < generatedStudyNumber; i++) {
-                Study study = studyRepository.save(makeStudy(givenBook));
-                studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+                Study study = studyRepository.save(makeStudy(givenBook, StudyStatus.RECRUITING));
+                studyMemberRepository.save(makeStudyMember(study, user, OWNED));
                 studies.add(study);
             }
         }
@@ -179,11 +141,13 @@ class StudyRepositoryTest extends RepositoryTest {
         @BeforeEach
         private void setUpGiven() {
             User user = userRepository.save(makeUser());
-            User notStudyMemberUser = userRepository.save(makeNonStudyMemberUser());
-            User studyMemberUser = userRepository.save(makeStudyMemberUser());
+            User notStudyMemberUser = userRepository.save(makeUser());
+            User studyMemberUser = userRepository.save(makeUser());
             Book book = bookRepository.save(makeBook());
-            study = studyRepository.save(makeStudy(book));
-            studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
+            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUITING));
+
+            studyMemberRepository.save(
+                makeStudyMember(study, user, OWNED));
             studyMemberRepository.save(
                 makeStudyMember(study, notStudyMemberUser, StudyMemberStatus.DENIED));
             studyMemberRepository.save(
@@ -200,8 +164,7 @@ class StudyRepositoryTest extends RepositoryTest {
             validateStudyDetailInfo(response);
             validateMembers(response);
 
-            Assertions.assertThat(response.members().size())
-                .isEqualTo(2);
+            assertThat(response.members().size()).isEqualTo(2);
         }
 
         private void validateStudyDetailInfo(StudyDetailWithMembers response) {
@@ -236,90 +199,36 @@ class StudyRepositoryTest extends RepositoryTest {
 
         private Study study;
 
-        private User ownerUser;
+        private User ownedUser;
 
-        private User firstAppliedButNotAcceptedUser;
+        private User user1Pending;
 
-        private User secondAppliedButNotAcceptedUser;
+        private User user2Pending;
 
-        private User studyMemberUser;
+        private User user3Accepted;
 
         @BeforeEach
         void setUp() {
-            ownerUser = userRepository.save(User.builder()
-                .oauthId("ASDASDQWDAASDZFWEF1")
-                .provider("KAKAO")
-                .name("카일")
-                .temperature(36.5f)
-                .email(new Email("khyle@test.com"))
-                .profileImgUrl("https://example.com/java.png")
-                .userRole(UserRole.LOGIN)
-                .build());
+            ownedUser = userRepository.save(makeUser());
+            user1Pending = userRepository.save(makeUser());
+            user2Pending = userRepository.save(makeUser());
+            user3Accepted = userRepository.save(makeUser());
+            Book book = bookRepository.save(makeBook());
 
-            firstAppliedButNotAcceptedUser = userRepository.save(
-                User.builder()
-                    .oauthId("ASDASDQWDAASDZFWEF2")
-                    .provider("KAKAO")
-                    .name("거절당한_에밀리")
-                    .temperature(36.5f)
-                    .email(new Email("emily@test.com"))
-                    .profileImgUrl("https://example.com/java.png")
-                    .userRole(UserRole.LOGIN)
-                    .build()
-            );
-            secondAppliedButNotAcceptedUser = userRepository.save(
-                User.builder()
-                    .oauthId("ASDASDQWDAASDZFWEF3")
-                    .provider("KAKAO")
-                    .name("거절당한 톰슨")
-                    .temperature(36.5f)
-                    .email(new Email("thompson@test.com"))
-                    .profileImgUrl("https://example.com/java.png")
-                    .userRole(UserRole.LOGIN)
-                    .build()
-            );
+            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUITING));
 
-            studyMemberUser = userRepository.save(User.builder()
-                .oauthId("ASDASDQWDAASDZFWEF4")
-                .provider("KAKAO")
-                .name("그레이스")
-                .temperature(36.5f)
-                .email(new Email("grace@test.com"))
-                .profileImgUrl("https://example.com/java.png")
-                .userRole(UserRole.LOGIN)
-                .build()
-            );
-
-            Book book = bookRepository.save(Book.builder()
-                .title("대왕고래")
-                .description("대왕고래는 진짜 크다")
-                .author("김자바")
-                .publisher("자바출판")
-                .isbn("1234123412341")
-                .thumbnail("https://example.com/java.png")
-                .publishedAt(new PublishedDate("20121111"))
-                .build());
-
-            study = studyRepository.save(Study.builder()
-                .name("스터디-대왕고래책")
-                .thumbnailUrl("https://example.com/java.png")
-                .description("대왕고래 스터디")
-                .maxParticipant(3)
-                .status(StudyStatus.RECRUITING)
-                .book(book)
-                .gatherStartDate(LocalDate.now())
-                .gatherEndDate(LocalDate.now())
-                .studyStartDate(LocalDate.now())
-                .studyEndDate(LocalDate.now())
-                .build());
-
-            studyMemberRepository.save(makeStudyMember(study, ownerUser, StudyMemberStatus.OWNED));
             studyMemberRepository.save(
-                makeStudyMember(study, firstAppliedButNotAcceptedUser, StudyMemberStatus.PENDING));
+                makeStudyMember(study, ownedUser, OWNED));
             studyMemberRepository.save(
-                makeStudyMember(study, secondAppliedButNotAcceptedUser, StudyMemberStatus.PENDING));
+                makeStudyMember(study, user1Pending, StudyMemberStatus.PENDING));
             studyMemberRepository.save(
-                makeStudyMember(study, studyMemberUser, StudyMemberStatus.ACCEPTED));
+                makeStudyMember(study, user2Pending, StudyMemberStatus.PENDING));
+            studyMemberRepository.save(
+                makeStudyMember(study, user3Accepted, StudyMemberStatus.ACCEPTED));
+
+            userRepository.flush();
+            studyMemberRepository.flush();
+            studyRepository.flush();
         }
 
         @AfterEach
@@ -335,8 +244,8 @@ class StudyRepositoryTest extends RepositoryTest {
         void getAllAppliersSuccess() {
             StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
 
-            Assertions.assertThat(studyAppliers.appliers().size())
-                .isEqualTo(2);
+            Assertions.assertThat(studyAppliers.appliers())
+                .hasSize(2);
         }
 
         @Test
@@ -347,7 +256,7 @@ class StudyRepositoryTest extends RepositoryTest {
             UserInfo firstUserInfo = studyAppliers.appliers().get(0);
 
             Assertions.assertThat(firstUserInfo.id())
-                .isEqualTo(firstAppliedButNotAcceptedUser.getId());
+                .isEqualTo(user1Pending.getId());
         }
 
         @Test

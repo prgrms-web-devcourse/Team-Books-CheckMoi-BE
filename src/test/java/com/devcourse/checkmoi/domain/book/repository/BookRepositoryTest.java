@@ -1,14 +1,13 @@
 package com.devcourse.checkmoi.domain.book.repository;
 
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import com.devcourse.checkmoi.domain.book.model.Book;
-import com.devcourse.checkmoi.domain.book.model.PublishedDate;
-import com.devcourse.checkmoi.domain.study.model.Study;
-import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
-import com.devcourse.checkmoi.domain.study.stub.StudyStub;
-import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
-import com.devcourse.checkmoi.domain.user.stub.UserStub;
 import com.devcourse.checkmoi.template.RepositoryTest;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -40,22 +39,8 @@ class BookRepositoryTest extends RepositoryTest {
 
     @BeforeEach
     void setUp() {
-        birdBook = Book.builder()
-            .author("제비")
-            .isbn("1231231231231")
-            .description("제비가 좋아")
-            .publisher("Hanbit")
-            .thumbnail("abc/jebi.jpeg")
-            .publishedAt(new PublishedDate("20021011"))
-            .title("제비란 무엇인가")
-            .build();
-
-        whaleBook = Book.builder().author("고래").isbn("1231231231232").description("고래가 좋아")
-            .publisher("Hanbit").thumbnail("abc/whale.jpeg")
-            .publishedAt(new PublishedDate("20021011")).title("고래 무엇인가").build();
-
-        bookRepository.save(birdBook);
-        bookRepository.save(whaleBook);
+        birdBook = bookRepository.save(makeBook());
+        whaleBook = bookRepository.save(makeBook());
     }
 
     @Test
@@ -65,8 +50,8 @@ class BookRepositoryTest extends RepositoryTest {
 
         List<Book> topBooks = bookRepository.findAllTop(pageable);
 
-        Assertions.assertThat(topBooks.size())
-            .isEqualTo(1);
+        Assertions.assertThat(topBooks)
+            .hasSize(1);
     }
 
     @Nested
@@ -75,12 +60,8 @@ class BookRepositoryTest extends RepositoryTest {
 
         @BeforeEach
         void setUp() {
-            User user = UserStub.user();
-            Study study = StudyStub.study(birdBook);
-
-            userRepository.save(user);
-            studyRepository.save(study);
-
+            userRepository.save(makeUser());
+            studyRepository.save(makeStudy(birdBook, StudyStatus.RECRUITING));
         }
 
         @Test

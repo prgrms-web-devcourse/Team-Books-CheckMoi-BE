@@ -5,8 +5,7 @@ import com.devcourse.checkmoi.global.exception.ErrorMessage;
 
 public class DuplicateStudyJoinRequestException extends DuplicateException {
 
-    public DuplicateStudyJoinRequestException(
-        ErrorMessage errorCode) {
+    public DuplicateStudyJoinRequestException(ErrorMessage errorCode) {
         super(errorCode);
     }
 }
