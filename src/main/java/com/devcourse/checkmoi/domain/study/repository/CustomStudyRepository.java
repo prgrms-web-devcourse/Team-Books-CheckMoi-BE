@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.domain.study.repository.study;
+package com.devcourse.checkmoi.domain.study.repository;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
@@ -15,4 +15,6 @@ public interface CustomStudyRepository {
     StudyDetailWithMembers getStudyInfoWithMembers(Long studyId);
 
     StudyAppliers getStudyAppliers(Long studyId);
+
+    void updateAllAppliersAsDenied(Long studyId);
 }

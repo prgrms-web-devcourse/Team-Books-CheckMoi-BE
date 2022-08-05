@@ -131,7 +131,7 @@ class BookApiTest extends IntegrationTest {
             given(bookQueryService.getAllTop(any()))
                 .willReturn(books);
 
-            MvcResult mvcResult = mockMvc.perform(get("/api/books"))
+            mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
                 .andDo(documentation())
                 .andReturn();
@@ -162,7 +162,7 @@ class BookApiTest extends IntegrationTest {
                         .description("책 ISBN"),
                     fieldWithPath(latestPath + ".description").type(JsonFieldType.STRING)
                         .description("책 설명"),
-                    fieldWithPath(latestPath + ".createAt").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".createdAt").type(JsonFieldType.STRING)
                         .description("책 등록날자"),
                     fieldWithPath(latestPath + ".pubDate").type(JsonFieldType.STRING)
                         .description("책 발행날자"),
@@ -182,7 +182,7 @@ class BookApiTest extends IntegrationTest {
                         .description("책 ISBN"),
                     fieldWithPath(studyLatestPath + ".description").type(JsonFieldType.STRING)
                         .description("책 설명"),
-                    fieldWithPath(studyLatestPath + ".createAt").type(JsonFieldType.STRING)
+                    fieldWithPath(studyLatestPath + ".createdAt").type(JsonFieldType.STRING)
                         .description("책 등록날자"),
                     fieldWithPath(studyLatestPath + ".pubDate").type(JsonFieldType.STRING)
                         .description("책 발행날자")
@@ -203,7 +203,7 @@ class BookApiTest extends IntegrationTest {
 
             given(bookQueryService.getById(anyLong())).willReturn(specification);
 
-            MvcResult mvcResult = mockMvc.perform(get("/api/books/{bookId}", bigWhaleBook.bookId()))
+            mockMvc.perform(get("/api/books/{bookId}", bigWhaleBook.bookId()))
                 .andExpect(status().isOk())
                 .andDo(documentation())
                 .andReturn();
@@ -228,7 +228,7 @@ class BookApiTest extends IntegrationTest {
                     fieldWithPath("data.isbn").type(JsonFieldType.STRING).description("책 isbn13"),
                     fieldWithPath("data.description").type(JsonFieldType.STRING)
                         .description("책에 대한 설명"),
-                    fieldWithPath("data.createAt").type(JsonFieldType.STRING)
+                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
                         .description("책 등록 날자"))
             );
         }
