@@ -29,7 +29,7 @@ public abstract class EntityGeneratorUtil {
             .thumbnailUrl("https://example.com/java.png")
             .description("자바 스터디")
             .maxParticipant(3)
-            .status(StudyStatus.RECRUTING)
+            .status(StudyStatus.RECRUITING)
             .book(book)
             .gatherStartDate(LocalDate.now())
             .gatherEndDate(LocalDate.now())

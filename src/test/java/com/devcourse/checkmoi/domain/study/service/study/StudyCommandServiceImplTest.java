@@ -17,6 +17,7 @@ import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.study.StudyRepository;
 import com.devcourse.checkmoi.domain.study.stub.StudyMemberStub;
@@ -117,6 +118,7 @@ class StudyCommandServiceImplTest {
             Long studyId = 1L;
             Study study = Study.builder()
                 .id(1L)
+                .status(StudyStatus.RECRUITING)
                 .build();
             when(studyRepository.findStudyOwner(anyLong()))
                 .thenReturn(userId);
