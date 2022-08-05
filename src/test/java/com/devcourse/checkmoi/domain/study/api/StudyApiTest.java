@@ -1,6 +1,8 @@
 package com.devcourse.checkmoi.domain.study.api;
 
 import static com.devcourse.checkmoi.util.DocumentUtil.getDateFormat;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -25,9 +27,9 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
-import com.devcourse.checkmoi.domain.study.service.study.StudyCommandService;
-import com.devcourse.checkmoi.domain.study.service.study.StudyQueryService;
-import com.devcourse.checkmoi.domain.study.stub.StudyStub;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
+import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.global.model.PageRequest;
@@ -253,11 +255,16 @@ class StudyApiTest extends IntegrationTest {
             Long bookId = 1L;
             PageRequest pageRequest = new PageRequest();
             Pageable pageable = pageRequest.of();
+
             Studies response = new Studies(
                 new PageImpl<>(
-                    StudyStub.javaRecrutingStudyStub())
+                    List.of(
+                        makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUTING, 1L),
+                        makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUTING, 3L)
+                    ))
                     .map(studyConverter::studyToStudyInfo)
             );
+
             given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
                 .willReturn(response);
 
@@ -347,8 +354,10 @@ class StudyApiTest extends IntegrationTest {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
             Long studyId = 1L;
             Long studyMemberId = 1L;
+
             given(studyCommandService.requestStudyJoin(studyId, givenUser.userInfo().id()))
                 .willReturn(studyMemberId);
+
             ResultActions result = mockMvc.perform(
                 put("/api/studies/{studyId}/members", studyId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()));
