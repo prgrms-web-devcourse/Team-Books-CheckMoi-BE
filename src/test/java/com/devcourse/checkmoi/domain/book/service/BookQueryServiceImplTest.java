@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.domain.book.service;
 
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.SimplePage;
@@ -29,16 +30,7 @@ class BookQueryServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        lastCatBook = Book.builder()
-            .title("고양이란 무엇인가")
-            .thumbnail("abc/cat.jpeg")
-            .author("냥찬가")
-            .publisher("Hanbit")
-            .publishedAt(new PublishedDate("22011020"))
-            .isbn("1231231231235")
-            .description("고양이의 귀여움을 설명한다")
-            .build();
-
+        lastCatBook = makeBook();
         bookRepository.save(lastCatBook);
     }
 
@@ -84,9 +76,7 @@ class BookQueryServiceImplTest {
         @Test
         @DisplayName("ISBN 기준으로 책을 조회한다.")
         void getByIsbn() {
-            String isbn = "1231231231235";
-
-            BookSpecification book = bookQueryService.getByIsbn(isbn);
+            BookSpecification book = bookQueryService.getByIsbn(lastCatBook.getIsbn());
 
             Assertions.assertThat(book.id()).isEqualTo(lastCatBook.getId());
         }
