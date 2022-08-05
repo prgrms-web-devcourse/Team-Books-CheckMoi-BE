@@ -6,7 +6,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,7 +15,8 @@ import lombok.Builder;
 import org.springframework.data.domain.Page;
 
 public sealed interface StudyResponse permits
-    StudyInfo, StudyDetailWithMembers, Studies, StudyDetailInfo, StudyBookInfo, StudyAppliers {
+    StudyInfo, StudyDetailWithMembers, Studies, StudyDetailInfo, StudyBookInfo, StudyAppliers,
+    StudyUserInfo {
 
     record StudyInfo(
         Long id,
@@ -86,9 +87,22 @@ public sealed interface StudyResponse permits
         }
     }
 
+    record StudyUserInfo(
+        Long id,
+        String name,
+        String email,
+        Float temperature,
+        String profileImageUrl
+    ) implements StudyResponse {
+
+        @Builder
+        public StudyUserInfo {
+        }
+    }
+
     record StudyDetailWithMembers(
         StudyDetailInfo study,
-        List<UserInfo> members
+        List<StudyUserInfo> members
     ) implements StudyResponse {
 
         @Builder
@@ -108,7 +122,7 @@ public sealed interface StudyResponse permits
     }
 
     record StudyAppliers(
-        List<UserInfo> appliers
+        List<StudyUserInfo> appliers
     ) implements StudyResponse {
 
         @Builder
