@@ -1,29 +1,46 @@
 package com.devcourse.checkmoi.domain.post.service;
 
+import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
+import com.devcourse.checkmoi.domain.post.exception.PostNotFoundException;
+import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
+import com.devcourse.checkmoi.domain.post.service.validator.PostServiceValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PostCommandServiceImpl implements PostCommandService {
 
     private final PostRepository postRepository;
 
+    private final PostConverter postConverter;
+
+    private final PostServiceValidator postValidator;
+
     @Override
-    public Long createPost(Long id, Create request) {
-        return null;
+    public Long createPost(Long userId, Create request) {
+        // validation
+        return postRepository.save(postConverter.createToPost(request)).getId();
     }
 
     @Override
-    public void editPost(Long id, Edit request) {
-
+    public void editPost(Long userId, Long postId, Edit request) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFoundException::new);
+        post.changeTitle(request.title());
+        post.changeContent(request.content());
     }
 
     @Override
-    public void deletePost(Long id, Long postId) {
-
+    public void deletePost(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFoundException::new);
+        postValidator.validatePostOwner(userId, post.getUser().getId());
+        postRepository.deleteById(postId);
     }
 }

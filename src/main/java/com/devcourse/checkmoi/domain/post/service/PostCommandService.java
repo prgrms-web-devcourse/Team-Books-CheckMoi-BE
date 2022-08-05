@@ -5,9 +5,9 @@ import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 
 public interface PostCommandService {
 
-    Long createPost(Long id, Create request);
+    Long createPost(Long userId, Create request);
 
-    void editPost(Long id, Edit request);
+    void editPost(Long userId, Long postId, Edit request);
 
-    void deletePost(Long id, Long postId);
+    void deletePost(Long userId, Long postId);
 }
