@@ -63,12 +63,13 @@ public class PostApi {
             .body(new SuccessResponse<>(postId));
     }
 
-    @PutMapping("/posts")
+    @PutMapping("/posts/{postId}")
     ResponseEntity<SuccessResponse<Void>> editPost(
         @AuthenticationPrincipal JwtAuthentication user,
+        Long postId,
         @RequestBody Edit request
     ) {
-        postCommandService.editPost(user.id(), request);
+        postCommandService.editPost(user.id(), postId, request);
         return ResponseEntity.noContent().build();
     }
 
