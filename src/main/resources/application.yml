@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: local
+    include: |
+      security,
+      aws
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;
+    username: sa
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
