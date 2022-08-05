@@ -83,7 +83,6 @@ class StudyApiTest extends IntegrationTest {
                 .studyEndDate(LocalDate.now())
                 .build();
             Long createdStudyId = 1L;
-            Long userId = 1L;
 
             when(studyCommandService.createStudy(any(StudyRequest.Create.class), anyLong()))
                 .thenReturn(createdStudyId);

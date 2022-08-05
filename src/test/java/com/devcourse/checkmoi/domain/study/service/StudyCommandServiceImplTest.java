@@ -3,6 +3,7 @@ package com.devcourse.checkmoi.domain.study.service;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.global.exception.ErrorMessage.ACCESS_DENIED;
+import static com.devcourse.checkmoi.global.exception.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
@@ -404,7 +405,7 @@ class StudyCommandServiceImplTest {
             given(studyMemberRepository.findByUser(any(User.class)))
                 .willReturn(Optional.of(studyMember));
 
-            doThrow(DuplicateStudyJoinRequestException.class)
+            doThrow(new DuplicateStudyJoinRequestException(STUDY_JOIN_REQUEST_DUPLICATE))
                 .when(studyValidator)
                 .validateDuplicateStudyMemberRequest(any(StudyMember.class));
 
