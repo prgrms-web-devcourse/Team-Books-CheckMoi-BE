@@ -27,7 +27,7 @@ public record PersistedDummyData(String author, String title, String thumbnail, 
     public SimpleBook simple() {
         return SimpleBook.builder()
             .author(this.author)
-            .createAt(this.createdAt)
+            .createdAt(this.createdAt)
             .title(this.title)
             .image(this.thumbnail)
             .description(this.description)
@@ -73,7 +73,7 @@ public record PersistedDummyData(String author, String title, String thumbnail, 
             .image(this.thumbnail)
             .description(this.description)
             .title(this.title)
-            .createAt(this.createdAt)
+            .createdAt(this.createdAt)
             .build();
     }
 
