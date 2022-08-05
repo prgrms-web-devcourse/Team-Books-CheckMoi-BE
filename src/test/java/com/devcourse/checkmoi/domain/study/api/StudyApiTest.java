@@ -27,11 +27,11 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
@@ -398,7 +398,7 @@ class StudyApiTest extends IntegrationTest {
         void studyDetailInfoTest() throws Exception {
 
             StudyDetailInfo givenStudyInfo = givenStudyDetailInfo(givenBookInfo());
-            List<UserInfo> givenMembers = List.of(givenUserInfo(), givenUserInfo());
+            List<StudyUserInfo> givenMembers = List.of(givenUserInfo(), givenUserInfo());
 
             StudyDetailWithMembers expected = StudyDetailWithMembers.builder()
                 .study(givenStudyInfo)
@@ -464,8 +464,8 @@ class StudyApiTest extends IntegrationTest {
                 ));
         }
 
-        private UserInfo givenUserInfo() {
-            return UserInfo.builder()
+        private StudyUserInfo givenUserInfo() {
+            return StudyUserInfo.builder()
                 .id(userId++)
                 .name(UUID.randomUUID().toString().substring(10))
                 .email("asdf@asdf.com")
@@ -551,13 +551,13 @@ class StudyApiTest extends IntegrationTest {
                 ));
         }
 
-        private List<UserInfo> userInfoList() {
+        private List<StudyUserInfo> userInfoList() {
 
             return LongStream.range(1, 3).mapToObj(this::createUserInfo).toList();
         }
 
-        private UserInfo createUserInfo(Long id) {
-            return UserInfo.builder()
+        private StudyUserInfo createUserInfo(Long id) {
+            return StudyUserInfo.builder()
                 .id(id)
                 .temperature(36.5f)
                 .email("abc" + id + "@naver.com")

@@ -13,12 +13,12 @@ import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -149,21 +149,21 @@ class StudyQueryServiceImplTest {
             return StudyAppliers.builder()
                 .appliers(
                     List.of(
-                        UserInfo.builder()
+                        StudyUserInfo.builder()
                             .id(1L)
                             .email("abc@naver.com")
                             .name("abc")
                             .profileImageUrl("https://south/dev/abc.png")
                             .temperature(36.5f)
                             .build(),
-                        UserInfo.builder()
+                        StudyUserInfo.builder()
                             .id(2L)
                             .email("abcd@naver.com")
                             .name("abcd")
                             .profileImageUrl("https://south/dev/abcd.png")
                             .temperature(36.5f)
                             .build(),
-                        UserInfo.builder()
+                        StudyUserInfo.builder()
                             .id(3L)
                             .email("abce@naver.com")
                             .name("abce")
