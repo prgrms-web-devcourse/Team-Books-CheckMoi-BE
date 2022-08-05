@@ -1,6 +1,5 @@
 package com.devcourse.checkmoi.global.security.handler;
 
-import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.oauth.OAuthProvider;
 import com.devcourse.checkmoi.global.security.oauth.OAuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -45,7 +43,7 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
 
             log.info("oauth token request occurred! frontUrl : " + frontUrl);
 
-            String uri = UriComponentsBuilder.fromUriString("https://checkmoi.vercel.app/login")
+            String uri = UriComponentsBuilder.fromUriString("http://localhost:3000/login")
                 .queryParam("token", tokenResponse.accessToken())
                 .build()
                 .toUriString();
