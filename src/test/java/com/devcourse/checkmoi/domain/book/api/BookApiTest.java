@@ -277,7 +277,7 @@ class BookApiTest extends IntegrationTest {
                     fieldWithPath("data.isbn").type(JsonFieldType.STRING).description("책 isbn13"),
                     fieldWithPath("data.description").type(JsonFieldType.STRING)
                         .description("책에 대한 설명"),
-                    fieldWithPath("data.createAt").type(JsonFieldType.STRING)
+                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
                         .description("책 등록 날자"))
             );
         }
