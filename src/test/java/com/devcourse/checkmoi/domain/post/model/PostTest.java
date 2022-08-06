@@ -20,7 +20,7 @@ class PostTest {
         Post post = Post.builder()
             .writer(writer)
             .content(content)
-            .category(PostCategory.FREE)
+            .category(PostCategory.GENERAL)
             .title(title)
             .build();
         String editedContent = "수정된 내용";
@@ -37,7 +37,7 @@ class PostTest {
         Post post = Post.builder()
             .writer(writer)
             .content(content)
-            .category(PostCategory.FREE)
+            .category(PostCategory.GENERAL)
             .title(title)
             .build();
         String editedTitle = "수정된 제목";

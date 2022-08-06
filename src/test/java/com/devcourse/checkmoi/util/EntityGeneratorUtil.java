@@ -38,10 +38,9 @@ public abstract class EntityGeneratorUtil {
         return bookBuilder().build();
     }
 
-    public static Post makePost() {
-        return postBuilder().build();
+    public static Post makePost(PostCategory category, Study study, User user) {
+        return postBuilder(category, study, user).build();
     }
-
 
     // with Id
     public static StudyMember makeStudyMemberWithId(
@@ -62,6 +61,9 @@ public abstract class EntityGeneratorUtil {
         return bookBuilder().id(id).build();
     }
 
+    public static Post makePostWithId(PostCategory category, Study study, User user, Long id) {
+        return postBuilder(category, study, user).id(id).build();
+    }
 
     // builder
     private static UserBuilder userBuilder() {
@@ -100,6 +102,17 @@ public abstract class EntityGeneratorUtil {
             .studyEndDate(LocalDate.now());
     }
 
+    private static PostBuilder postBuilder(PostCategory category, Study study, User user) {
+        String title = UUID.randomUUID().toString().substring(10);
+
+        return Post.builder()
+            .title("제목-" + title)
+            .content("본문-" + title)
+            .category(category)
+            .study(study) // TODO: 스터디 멤버로 변경?
+            .writer(user);
+    }
+
     private static BookBuilder bookBuilder() {
         String title = UUID.randomUUID().toString().substring(10);
         String isbn = UUID.randomUUID().toString().substring(20);
@@ -112,16 +125,5 @@ public abstract class EntityGeneratorUtil {
             .isbn(isbn)
             .thumbnail("https://example.com/abc/jebi.png")
             .publishedAt(new PublishedDate("20121111"));
-    }
-
-    private static PostBuilder postBuilder() {
-        String title = "게시글입니다" + UUID.randomUUID();
-        String content = "게시글 내용입니다 " + UUID.randomUUID();
-
-        return Post.builder()
-            .title(title)
-            .content(content)
-            .writer(makeUser())
-            .category(PostCategory.FREE);
     }
 }

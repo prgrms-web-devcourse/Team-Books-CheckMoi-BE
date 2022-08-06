@@ -1,6 +1,10 @@
 package com.devcourse.checkmoi.domain.comment.model;
 
+import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePost;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.user.model.User;
@@ -10,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 class CommentTest {
 
-    private Post post = makePost();
+    private Post post = makePost(GENERAL, makeStudy(makeBook(), IN_PROGRESS), makeUser());
 
     private String content = "댓글 내용입니다";
 
