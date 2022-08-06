@@ -20,6 +20,7 @@ public sealed interface PostRequest permits Search, Create, Edit {
     record Create(
         String title,
         String content,
+        String category,
         Long studyId
     ) implements PostRequest {
 
