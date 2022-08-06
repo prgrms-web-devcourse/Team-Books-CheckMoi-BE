@@ -32,7 +32,7 @@ public class PostApi {
     private final PostQueryService postQueryService;
 
     @GetMapping("/posts")
-    ResponseEntity<SuccessResponse<List<PostInfo>>> findAllPosts(
+    public ResponseEntity<SuccessResponse<List<PostInfo>>> findAllPosts(
         @AuthenticationPrincipal JwtAuthentication user,
         @RequestBody Search request
     ) {
@@ -41,7 +41,7 @@ public class PostApi {
     }
 
     @GetMapping("/posts/{postId}")
-    ResponseEntity<SuccessResponse<PostInfo>> findPost(
+    public ResponseEntity<SuccessResponse<PostInfo>> findPost(
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long postId
     ) {
@@ -50,7 +50,7 @@ public class PostApi {
     }
 
     @PostMapping("/posts")
-    ResponseEntity<SuccessResponse<Long>> createPost(
+    public ResponseEntity<SuccessResponse<Long>> createPost(
         @AuthenticationPrincipal JwtAuthentication user,
         @RequestBody Create request
     ) {
@@ -61,9 +61,9 @@ public class PostApi {
     }
 
     @PutMapping("/posts/{postId}")
-    ResponseEntity<SuccessResponse<Void>> editPost(
+    public ResponseEntity<SuccessResponse<Void>> editPost(
         @AuthenticationPrincipal JwtAuthentication user,
-        Long postId,
+        @PathVariable Long postId,
         @RequestBody Edit request
     ) {
         postCommandService.editPost(user.id(), postId, request);
@@ -71,7 +71,7 @@ public class PostApi {
     }
 
     @DeleteMapping("/posts/{postId}")
-    ResponseEntity<SuccessResponse<Void>> deletePost(
+    public ResponseEntity<SuccessResponse<Void>> deletePost(
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long postId
     ) {
