@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,51 +25,51 @@ public class Post extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
-    private PostCategory category;
-
     @Column(nullable = false, length = 50)
     private String title;
 
     @Column(nullable = false, length = 6000)
     private String content;
 
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private PostCategory category;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Study study;
 
     @ManyToOne(optional = false)
-    private User user;
+    private User writer;
+
+    @Formula("(select count(*) from comment c where c.post_id = id)")
+    private int commentCount;
 
     public Post(PostCategory category, String title, String content, Study study, User user) {
         this(null, category, title, content, study, user);
     }
 
     @Builder
-    public Post(Long id, PostCategory category, String title, String content,
-        Study study, User user) {
+    public Post(
+        Long id, PostCategory category, String title, String content, Study study, User writer
+    ) {
         this.id = id;
         this.category = category;
         this.title = title;
         this.content = content;
         this.study = study;
-        this.user = user;
+        this.writer = writer;
     }
 
-    public void changeTitle(String title) {
+    public void editTitle(String title) {
         this.title = title;
     }
 
-    public void changeContent(String content) {
+    public void editContent(String content) {
         this.content = content;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public PostCategory getCategory() {
-        return category;
     }
 
     public String getTitle() {
@@ -79,11 +80,19 @@ public class Post extends BaseEntity {
         return content;
     }
 
+    public PostCategory getCategory() {
+        return category;
+    }
+
     public Study getStudy() {
         return study;
     }
 
-    public User getUser() {
-        return user;
+    public User getWriter() {
+        return writer;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
     }
 }

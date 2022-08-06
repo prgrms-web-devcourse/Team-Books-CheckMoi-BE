@@ -31,9 +31,6 @@ public class PostApi {
 
     private final PostQueryService postQueryService;
 
-    // 공통 : 스터디에 해당하는 유저만 Post CR 권한이 있다
-    // 공통 : 글을 작성한 본인만 UD 권한이 있다
-
     @GetMapping("/posts")
     ResponseEntity<SuccessResponse<List<PostInfo>>> findAllPosts(
         @AuthenticationPrincipal JwtAuthentication user,

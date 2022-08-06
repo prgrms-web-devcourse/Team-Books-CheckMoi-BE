@@ -108,7 +108,7 @@ public abstract class EntityGeneratorUtil {
             .content("포스트 본문")
             .category(category)
             .study(study) // TODO: 스터디 멤버로 변경?
-            .user(user);
+            .writer(user);
     }
 
     private static BookBuilder bookBuilder() {
