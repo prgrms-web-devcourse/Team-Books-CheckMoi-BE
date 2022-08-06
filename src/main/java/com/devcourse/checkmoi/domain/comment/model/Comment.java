@@ -50,23 +50,11 @@ public class Comment extends BaseEntity {
         this(null, post, user, content);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void updateComment(String comment) {
-        this.content = comment;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
     public String getContent() {
         return content;
+    }
+
+    public void editComment(String comment) {
+        this.content = comment;
     }
 }

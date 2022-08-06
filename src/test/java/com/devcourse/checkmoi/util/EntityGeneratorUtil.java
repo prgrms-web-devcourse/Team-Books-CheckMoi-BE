@@ -3,6 +3,9 @@ package com.devcourse.checkmoi.util;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.Book.BookBuilder;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
+import com.devcourse.checkmoi.domain.post.model.Post;
+import com.devcourse.checkmoi.domain.post.model.Post.PostBuilder;
+import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.Study.StudyBuilder;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
@@ -33,6 +36,10 @@ public abstract class EntityGeneratorUtil {
 
     public static Book makeBook() {
         return bookBuilder().build();
+    }
+
+    public static Post makePost() {
+        return postBuilder().build();
     }
 
 
@@ -105,5 +112,16 @@ public abstract class EntityGeneratorUtil {
             .isbn(isbn)
             .thumbnail("https://example.com/abc/jebi.png")
             .publishedAt(new PublishedDate("20121111"));
+    }
+
+    private static PostBuilder postBuilder() {
+        String title = "게시글입니다" + UUID.randomUUID();
+        String content = "게시글 내용입니다 " + UUID.randomUUID();
+
+        return Post.builder()
+            .title(title)
+            .content(content)
+            .writer(makeUser())
+            .category(PostCategory.FREE);
     }
 }

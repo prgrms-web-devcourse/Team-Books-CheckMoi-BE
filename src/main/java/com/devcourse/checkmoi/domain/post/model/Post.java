@@ -74,11 +74,11 @@ public class Post extends BaseEntity {
         return commentCount;
     }
 
-    public void updateTitle(String title) {
+    public void editTitle(String title) {
         this.title = title;
     }
 
-    public void updateContent(String content) {
+    public void editContent(String content) {
         this.content = content;
     }
 }
