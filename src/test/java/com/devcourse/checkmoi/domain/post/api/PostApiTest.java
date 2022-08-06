@@ -8,17 +8,23 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
+import com.devcourse.checkmoi.domain.post.dto.PostRequest;
+import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
@@ -41,6 +47,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.JsonFieldType;
 
 class PostApiTest extends IntegrationTest {
 
@@ -49,6 +56,55 @@ class PostApiTest extends IntegrationTest {
 
     @MockBean
     private PostQueryService postQueryService;
+
+    @Nested
+    @DisplayName("게시글을 작성할 수 있다 #86")
+    class CreatePostTest {
+
+        @Test
+        void createPost() throws Exception {
+            Long createdPostId = 1L;
+            PostRequest.Create create = Create.builder()
+                .title("게시글 제목 샘플")
+                .content("게시글 본문 샘플")
+                .category("NOTICE")
+                .studyId(1L)
+                .build();
+
+            given(postCommandService.createPost(anyLong(), any(Create.class)))
+                .willReturn(createdPostId);
+
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+            mockMvc.perform(post("/api/posts")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
+                    .content(toJson(create)))
+                .andExpect(status().isCreated())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("post-create",
+                ResourceSnippetParameters.builder()
+                    .tag("Post API")
+                    .summary("게시글 생성 API")
+                    .description("게시글을 생성하는 API 입니다."),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
+                responseHeaders(
+                    headerWithName("Location").description("생성된 게시글 URI")
+                ),
+                requestFields(
+                    fieldWithPath("title").type(JsonFieldType.STRING).description("게시글 제목"),
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("게시글 본문"),
+                    fieldWithPath("category").type(JsonFieldType.STRING).description("게시글 카테고리"),
+                    fieldWithPath("studyId").type(JsonFieldType.NUMBER).description("스터디 아이디")
+                )
+            );
+        }
+    }
+
 
     @Nested
     @DisplayName("게시글을 단일 조회할 수 있다 #86")
@@ -131,7 +187,7 @@ class PostApiTest extends IntegrationTest {
                     fieldWithPath("data[].content").description("게시글 본문"),
                     fieldWithPath("data[].category").description("게시글 카테고리"),
                     fieldWithPath("data[].studyId").description("게시글이 작성된 스터디"),
-                    fieldWithPath("data[].userId").description("게시글을 작성한 유저")
+                    fieldWithPath("data[].writerId").description("게시글을 작성한 유저")
                 )
             );
         }
