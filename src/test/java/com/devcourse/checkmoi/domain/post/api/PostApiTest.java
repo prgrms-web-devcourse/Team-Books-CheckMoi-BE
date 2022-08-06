@@ -1,5 +1,10 @@
 package com.devcourse.checkmoi.domain.post.api;
 
+import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePostWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -9,15 +14,20 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
-import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.service.PostCommandService;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
+import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
+import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -83,12 +93,14 @@ class PostApiTest extends IntegrationTest {
         void findAllPosts() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
 
-            Search request = Search.builder().id(1L).build();
+            Search request = Search.builder().build();
 
+            Study study = makeStudy(makeBook(), StudyStatus.IN_PROGRESS);
+            User user = makeUserWithId(givenUser.userInfo().id());
             List<PostInfo> postInfos = Stream.of(
-                Post.builder().id(1L).build(),
-                Post.builder().id(2L).build(),
-                Post.builder().id(3L).build()
+                makePostWithId(GENERAL, study, user, 1L),
+                makePostWithId(GENERAL, study, user, 2L),
+                makePostWithId(GENERAL, study, user, 3L)
             ).map(postConverter::postToInfo).toList();
 
             given(postQueryService.findAllPosts(anyLong(), any(Search.class)))
@@ -99,7 +111,7 @@ class PostApiTest extends IntegrationTest {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
                     .content(toJson(request)))
                 .andExpect(status().isOk())
-                .andDo(documentation());
+                .andDo(print());
         }
 
         private RestDocumentationResultHandler documentation() {
@@ -111,7 +123,16 @@ class PostApiTest extends IntegrationTest {
                     .description("게시글을 검색하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                tokenRequestHeader()
+                tokenRequestHeader(),
+                responseFields(
+                    // post infos
+                    fieldWithPath("data[].id").description("게시글 아이디"),
+                    fieldWithPath("data[].title").description("게시글 제목"),
+                    fieldWithPath("data[].content").description("게시글 본문"),
+                    fieldWithPath("data[].category").description("게시글 카테고리"),
+                    fieldWithPath("data[].studyId").description("게시글이 작성된 스터디"),
+                    fieldWithPath("data[].userId").description("게시글을 작성한 유저")
+                )
             );
         }
     }

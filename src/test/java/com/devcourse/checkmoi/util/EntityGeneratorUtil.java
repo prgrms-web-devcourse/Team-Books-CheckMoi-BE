@@ -109,7 +109,6 @@ public abstract class EntityGeneratorUtil {
             .category(category)
             .study(study) // TODO: 스터디 멤버로 변경?
             .user(user);
-
     }
 
     private static BookBuilder bookBuilder() {

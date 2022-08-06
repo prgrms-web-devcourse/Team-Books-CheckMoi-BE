@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class PostCommandServiceImpl implements PostCommandService {
+    
+    // 공통 : 글을 작성한 본인만 UD 권한이 있다
 
     private final PostRepository postRepository;
 
