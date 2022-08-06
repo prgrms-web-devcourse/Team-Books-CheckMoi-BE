@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class PostCommandServiceImpl implements PostCommandService {
-    
+
     // 공통 : 글을 작성한 본인만 UD 권한이 있다
 
     private final PostRepository postRepository;
@@ -27,22 +27,24 @@ public class PostCommandServiceImpl implements PostCommandService {
     @Override
     public Long createPost(Long userId, Create request) {
         // validation
-        return postRepository.save(postConverter.createToPost(request)).getId();
+        return postRepository.save(postConverter.createToPost(request, userId)).getId();
     }
 
     @Override
     public void editPost(Long userId, Long postId, Edit request) {
         Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
-        post.changeTitle(request.title());
-        post.changeContent(request.content());
+        postValidator.validatePostOwner(userId, post.getWriter().getId());
+
+        post.editTitle(request.title());
+        post.editContent(request.content());
     }
 
     @Override
     public void deletePost(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
-        postValidator.validatePostOwner(userId, post.getUser().getId());
+        postValidator.validatePostOwner(userId, post.getWriter().getId());
         postRepository.deleteById(postId);
     }
 }

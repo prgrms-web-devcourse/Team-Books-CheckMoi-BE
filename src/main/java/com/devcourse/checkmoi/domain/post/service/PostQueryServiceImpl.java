@@ -15,21 +15,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PostQueryServiceImpl implements PostQueryService {
-    
-    // 공통 : 스터디에 해당하는 유저만 Post CR 권한이 있다
 
     private final PostRepository postRepository;
 
     private final PostConverter postConverter;
 
-    @Override // TODO: pageable & dynamic search
-    public List<PostInfo> findAllPosts(Long id, Search request) {
+    // TODO: validation
+    // TODO: pageable & dynamic search
+    @Override
+    public List<PostInfo> findAllPosts(Long userId, Search request) {
         return postRepository.findAll().stream()
             .map(postConverter::postToInfo).toList();
     }
 
     @Override
-    public PostInfo findByPostId(Long id, Long postId) {
+    public PostInfo findByPostId(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
         return postConverter.postToInfo(post);
