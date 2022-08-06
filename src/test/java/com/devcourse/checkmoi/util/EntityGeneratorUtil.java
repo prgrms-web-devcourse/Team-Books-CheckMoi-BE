@@ -103,9 +103,11 @@ public abstract class EntityGeneratorUtil {
     }
 
     private static PostBuilder postBuilder(PostCategory category, Study study, User user) {
+        String title = UUID.randomUUID().toString().substring(10);
+
         return Post.builder()
-            .title("포스트 타이틀")
-            .content("포스트 본문")
+            .title("제목-" + title)
+            .content("본문-" + title)
             .category(category)
             .study(study) // TODO: 스터디 멤버로 변경?
             .writer(user);

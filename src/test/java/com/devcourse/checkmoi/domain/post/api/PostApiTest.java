@@ -3,7 +3,7 @@ package com.devcourse.checkmoi.domain.post.api;
 import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePostWithId;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -20,7 +20,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest;
@@ -37,6 +36,7 @@ import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -87,7 +87,7 @@ class PostApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("post-create",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 생성 API")
+                    .summary("게시글 생성 API (준비중)")
                     .description("게시글을 생성하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -112,12 +112,24 @@ class PostApiTest extends IntegrationTest {
 
         @Test
         void findPost() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+
             Long postId = 1L;
-            PostInfo postInfo = PostInfo.builder().id(postId).build();
+
+            PostInfo postInfo = PostInfo.builder()
+                .id(postId)
+                .title("샘플 제목")
+                .content("샘플 본문")
+                .category("NOTICE")
+                .studyId(1L)
+                .writerId(givenUser.userInfo().id())
+                .createdAt(LocalDate.now())
+                .updatedAt(LocalDate.now())
+                .build();
+
             // TODO: IN_PROGRESS 중인 스터디에서만 포스트가 작성 가능하다
             given(postQueryService.findByPostId(anyLong(), anyLong())).willReturn(postInfo);
 
-            TokenWithUserInfo givenUser = getTokenWithUserInfo();
             mockMvc.perform(get("/api/posts/{postId}", postId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
                 .andExpect(status().isOk())
@@ -125,11 +137,10 @@ class PostApiTest extends IntegrationTest {
         }
 
         private RestDocumentationResultHandler documentation() {
-            //{"data":{"id":1}}
             return MockMvcRestDocumentationWrapper.document("post-detail",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 단일 조회 API")
+                    .summary("게시글 단일 조회 API (준비중)")
                     .description("게시글을 단일 조회하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -151,7 +162,7 @@ class PostApiTest extends IntegrationTest {
 
             Search request = Search.builder().build();
 
-            Study study = makeStudy(makeBook(), StudyStatus.IN_PROGRESS);
+            Study study = makeStudyWithId(makeBook(), StudyStatus.IN_PROGRESS, 1L);
             User user = makeUserWithId(givenUser.userInfo().id());
             List<PostInfo> postInfos = Stream.of(
                 makePostWithId(GENERAL, study, user, 1L),
@@ -167,15 +178,14 @@ class PostApiTest extends IntegrationTest {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
                     .content(toJson(request)))
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(documentation());
         }
 
         private RestDocumentationResultHandler documentation() {
-            //             Body = {"data":[{"id":1},{"id":2},{"id":3}]}
             return MockMvcRestDocumentationWrapper.document("many-post-detail",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 검색 API")
+                    .summary("게시글 검색 API (준비중)")
                     .description("게시글을 검색하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -187,7 +197,9 @@ class PostApiTest extends IntegrationTest {
                     fieldWithPath("data[].content").description("게시글 본문"),
                     fieldWithPath("data[].category").description("게시글 카테고리"),
                     fieldWithPath("data[].studyId").description("게시글이 작성된 스터디"),
-                    fieldWithPath("data[].writerId").description("게시글을 작성한 유저")
+                    fieldWithPath("data[].writerId").description("게시글을 작성한 유저"),
+                    fieldWithPath("data[].createdAt").description("게시글 작성 일자"),
+                    fieldWithPath("data[].updatedAt").description("게시글 수정 일자")
                 )
             );
         }
@@ -203,7 +215,11 @@ class PostApiTest extends IntegrationTest {
         @Test
         void editPost() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
-            Edit request = Edit.builder().title("수정된 제목").content("수정된 본문").build();
+            Edit request = Edit.builder()
+                .title("수정된 제목")
+                .content("수정된 본문")
+                .studyId(1L)
+                .build();
 
             Long postId = 1L;
 
@@ -219,7 +235,7 @@ class PostApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("post-edit",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 수정 API")
+                    .summary("게시글 수정 API (준비중)")
                     .description("게시글을 수정하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -245,10 +261,10 @@ class PostApiTest extends IntegrationTest {
         }
 
         private RestDocumentationResultHandler documentation() {
-            return MockMvcRestDocumentationWrapper.document("post-edit",
+            return MockMvcRestDocumentationWrapper.document("post-delete",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 삭제 API")
+                    .summary("게시글 삭제 API (준비중)")
                     .description("게시글을 삭제하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
