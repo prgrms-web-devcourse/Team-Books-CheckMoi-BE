@@ -2,6 +2,9 @@ package com.devcourse.checkmoi.domain.study.repository;
 
 import static com.devcourse.checkmoi.domain.study.model.QStudy.study;
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
@@ -15,8 +18,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -38,24 +39,22 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     @Override
-    public Page<Study> findRecruitingStudyByBookId(Long bookId, Pageable pageable) {
-        return new PageImpl<>(
-            jpaQueryFactory.select(study)
-                .from(study)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .where(
-                    study.book.id.eq(bookId),
-                    study.status.eq(StudyStatus.RECRUITING)
-                )
-                .fetch()
-        );
+    public List<Study> findRecruitingStudyByBookId(Long bookId, Pageable pageable) {
+        return jpaQueryFactory.select(study)
+            .from(study)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .where(
+                study.book.id.eq(bookId),
+                study.status.eq(StudyStatus.RECRUITING)
+            )
+            .fetch();
     }
 
     @Override
     public StudyDetailWithMembers getStudyInfoWithMembers(Long studyId) {
         StudyDetailInfo studyInfo = getStudyInfo(studyId);
-        List<StudyUserInfo> memberInfo = getStudyMembers(studyId, StudyMemberStatus.ACCEPTED,
+        List<StudyUserInfo> memberInfo = getStudyMembers(studyId, ACCEPTED,
             StudyMemberStatus.OWNED);
 
         return StudyDetailWithMembers.builder()
@@ -83,6 +82,29 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .execute();
     }
 
+    @Override
+    public List<MyStudyInfo> getMyStudies(Long userId) {
+        return jpaQueryFactory.select(
+                Projections.constructor(
+                    MyStudyInfo.class,
+                    study.id, study.name, study.status.stringValue(),
+                    study.thumbnailUrl, study.description,
+                    study.currentParticipant, study.maxParticipant,
+                    study.gatherStartDate, study.gatherEndDate,
+                    study.studyStartDate, study.studyEndDate,
+                    studyMember.status.stringValue().eq("OWNED")
+                )
+            )
+            .from(study)
+            .innerJoin(studyMember)
+            .where(
+                studyMember.user.id.eq(userId),
+                (eqStudyMemberStatus(ACCEPTED).and(eqStudyStatus(IN_PROGRESS)))
+                    .or(study.status.eq(StudyStatus.FINISHED).and(studyMember.status.eq(ACCEPTED)))
+                    .or(studyMember.status.eq(StudyMemberStatus.OWNED))
+            )
+            .fetch();
+    }
     private StudyDetailInfo getStudyInfo(Long studyId) {
         return jpaQueryFactory.select(
                 Projections.constructor(
@@ -128,17 +150,21 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .innerJoin(studyMember.user)
             .where(
                 eqStudyId(studyId),
-                eqStatus(requiredStatus)
-                    .or(eqStatus(optionalStatus)))
+                eqStudyMemberStatus(requiredStatus)
+                    .or(eqStudyMemberStatus(optionalStatus)))
             .orderBy(studyMember.createdAt.asc())
             .fetch();
     }
 
-    private BooleanExpression eqStatus(StudyMemberStatus status) {
+    private BooleanExpression eqStudyMemberStatus(StudyMemberStatus status) {
         if (status == null) {
             return null;
         }
         return studyMember.status.eq(status);
+    }
+
+    private BooleanExpression eqStudyStatus(StudyStatus status) {
+        return study.status.eq(status);
     }
 
     private BooleanExpression eqStudyId(Long studyId) {
