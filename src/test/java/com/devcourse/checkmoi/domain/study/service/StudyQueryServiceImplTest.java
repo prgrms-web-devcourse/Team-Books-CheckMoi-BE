@@ -58,13 +58,11 @@ class StudyQueryServiceImplTest {
             Long bookId = 1L;
             PageRequest pageRequest = new PageRequest();
             Pageable pageable = pageRequest.of();
-            Page<Study> studies = new PageImpl<>(
-                List.of(
+            List<Study> studies = List.of(
                     makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
                     makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
-                )
-            );
-            Page<StudyInfo> studyInfos = studies.map(
+                );
+            List<StudyInfo> studyInfos = studies.stream().map(
                 study -> StudyInfo.builder()
                     .id(study.getId())
                     .name(study.getName())
@@ -77,16 +75,17 @@ class StudyQueryServiceImplTest {
                     .studyStartDate(study.getStudyStartDate())
                     .studyEndDate(study.getStudyEndDate())
                     .build()
-            );
+            ).toList();
+
             Studies want = Studies.builder()
                 .studies(studyInfos)
                 .build();
             given(studyRepository.findRecruitingStudyByBookId(anyLong(), any(Pageable.class)))
                 .willReturn(studies);
-            given(studyConverter.studyToStudyInfo(studies.getContent().get(0))).willReturn(
-                studyInfos.getContent().get(0));
-            given(studyConverter.studyToStudyInfo(studies.getContent().get(1))).willReturn(
-                studyInfos.getContent().get(1));
+            given(studyConverter.studyToStudyInfo(studies.get(0))).willReturn(
+                studyInfos.get(0));
+            given(studyConverter.studyToStudyInfo(studies.get(1))).willReturn(
+                studyInfos.get(1));
 
             Studies got = studyQueryService.getStudies(bookId, pageable);
 

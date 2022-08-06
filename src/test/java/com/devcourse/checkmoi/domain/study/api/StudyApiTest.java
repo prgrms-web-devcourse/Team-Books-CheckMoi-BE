@@ -46,7 +46,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -257,12 +256,12 @@ class StudyApiTest extends IntegrationTest {
             Pageable pageable = pageRequest.of();
 
             Studies response = new Studies(
-                new PageImpl<>(
-                    List.of(
+                List.of(
                         makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
                         makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
-                    ))
+                    ).stream()
                     .map(studyConverter::studyToStudyInfo)
+                    .toList()
             );
 
             given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
