@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.study.facade;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudyInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.service.UserQueryService;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class StudyUserFacadeImpl implements
     StudyUserFacade {
 
-    private static final int IN_PROGRESS = 0;
+    private static final int PARTICIPATION = 0;
 
     private static final int FINISHED = 1;
 
@@ -27,11 +27,11 @@ public class StudyUserFacadeImpl implements
     @Override
     public MyStudies getMyStudies(Long userId) {
         UserInfo user = userQueryService.findUserInfo(userId);
-        List<List<MyStudyInfo>> studies = studyQueryService.getMyStudies(userId);
+        List<Studies> studies = studyQueryService.getMyStudies(userId);
 
         return MyStudies.builder()
             .user(user)
-            .progress(studies.get(IN_PROGRESS))
+            .participation(studies.get(PARTICIPATION))
             .finished(studies.get(FINISHED))
             .owned(studies.get(OWNED))
             .build();

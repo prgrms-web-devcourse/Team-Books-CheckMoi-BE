@@ -1,18 +1,12 @@
 package com.devcourse.checkmoi.domain.study.service;
 
-import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
-import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
-import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -60,24 +54,13 @@ public class StudyQueryServiceImpl implements StudyQueryService {
     }
 
     @Override
-    public List<List<MyStudyInfo>> getMyStudies(Long userId) {
-        List<MyStudyInfo> studies = studyRepository.getMyStudies(userId);
-        List<MyStudyInfo> progress = new ArrayList<>();
-        List<MyStudyInfo> finished = new ArrayList<>();
-        List<MyStudyInfo> owned = new ArrayList<>();
+    public List<Studies> getMyStudies(Long userId) {
+        Studies participation = studyRepository.getParticipationStudies(userId);
+        Studies finished = studyRepository.getFinishedStudies(userId);
+        Studies owned = studyRepository.getOwnedStudies(userId);
 
-        for (MyStudyInfo study : studies) {
-            if (IN_PROGRESS.name().equals(study.category())) {
-                progress.add(study);
-            } else if (FINISHED.name().equals(study.category())) {
-                finished.add(study);
-            }
-            if (study.isOwner()) {
-                owned.add(study);
-            }
-        }
         return List.of(
-            progress,
+            participation,
             finished,
             owned
         );

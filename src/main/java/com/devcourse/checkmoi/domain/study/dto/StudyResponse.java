@@ -8,6 +8,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -44,27 +45,6 @@ public sealed interface StudyResponse permits
         }
     }
 
-    record MyStudyInfo(
-        Long id,
-        String name,
-        String category,
-        String thumbnailUrl,
-        String description,
-        int currentParticipant,
-        Integer maxParticipant,
-        @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate gatherStartDate,
-        @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate gatherEndDate,
-        @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate studyStartDate,
-        @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate studyEndDate,
-        boolean isOwner
-
-    ) {
-
-    }
     record StudyDetailInfo(
         Long id,
         String name,
@@ -156,9 +136,9 @@ public sealed interface StudyResponse permits
 
     record MyStudies(
         UserInfo user,
-        List<MyStudyInfo> progress,
-        List<MyStudyInfo> owned,
-        List<MyStudyInfo> finished
+        Studies participation,
+        Studies owned,
+        Studies finished
     ) implements StudyResponse {
 
         @Builder

@@ -1,7 +1,10 @@
 package com.devcourse.checkmoi.domain.study.service;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyInfo;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -9,6 +12,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -16,12 +20,15 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import java.util.List;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,8 +36,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,9 +64,9 @@ class StudyQueryServiceImplTest {
             PageRequest pageRequest = new PageRequest();
             Pageable pageable = pageRequest.of();
             List<Study> studies = List.of(
-                    makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
-                    makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
-                );
+                makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
+                makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
+            );
             List<StudyInfo> studyInfos = studies.stream().map(
                 study -> StudyInfo.builder()
                     .id(study.getId())
@@ -171,6 +176,52 @@ class StudyQueryServiceImplTest {
                             .build()
                     )
                 ).build();
+        }
+    }
+
+    @Nested
+    @DisplayName("내 스터디 참여 현황 조회 #116")
+    class MyStudiesTest {
+
+        Study study1;
+
+        Study study2;
+
+        Study study3;
+
+        @BeforeEach
+        void setUp() {
+            Book book = makeBookWithId(1L);
+            study1 = makeStudyWithId(book, StudyStatus.IN_PROGRESS, 1L);
+            study2 = makeStudyWithId(book, StudyStatus.FINISHED, 2L);
+            study3 = makeStudyWithId(book, StudyStatus.RECRUITING, 3L);
+        }
+
+        @Test
+        @DisplayName("S 내가 참여한 스터디 목록을 조회한다.")
+        void getMyStudies() {
+            Long userId = 1L;
+            Studies participation = new Studies(
+                List.of(makeStudyInfo(study1))
+            );
+            Studies finished = new Studies(
+                List.of(makeStudyInfo(study2))
+            );
+            Studies owned = new Studies(
+                List.of(makeStudyInfo(study3))
+            );
+            given(studyRepository.getParticipationStudies(anyLong()))
+                .willReturn(participation);
+            given(studyRepository.getFinishedStudies(anyLong()))
+                .willReturn(finished);
+            given(studyRepository.getOwnedStudies(anyLong()))
+                .willReturn(owned);
+
+            List<Studies> got = studyQueryService.getMyStudies(userId);
+
+            assertThat(got.get(0)).usingRecursiveComparison().isEqualTo(participation);
+            assertThat(got.get(1)).usingRecursiveComparison().isEqualTo(finished);
+            assertThat(got.get(2)).usingRecursiveComparison().isEqualTo(owned);
         }
     }
 }
