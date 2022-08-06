@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.post.model;
 
 import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.global.model.BaseEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -20,7 +21,7 @@ import org.hibernate.annotations.Formula;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "post")
-public class Post {
+public class Post extends BaseEntity {
 
     @Id
     @Column(name = "id")

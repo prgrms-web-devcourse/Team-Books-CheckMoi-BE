@@ -2,6 +2,7 @@ package com.devcourse.checkmoi.domain.comment.model;
 
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.global.model.BaseEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,7 +19,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment {
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
