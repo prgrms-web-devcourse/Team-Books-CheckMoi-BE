@@ -233,7 +233,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-audit",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("스터디 가입 승낙 및 거절 (개발중)")
+                    .summary("스터디 가입 승낙 및 거절")
                     .description("스터디 가입 승낙 및 거절에 사용되는 API입니다.")
                     .requestSchema(Schema.schema("스터디 가입 승낙 및 거절 요청")),
                 preprocessRequest(prettyPrint()),
@@ -353,7 +353,7 @@ class StudyApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("study-join-request",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
-                    .summary("스터디 가입 신청 (개발중)")
+                    .summary("스터디 가입 신청")
                     .description("스터디 가입 신청에 사용되는 API입니다.")
                     .responseSchema(Schema.schema("스터디 가입 요청 응답")),
                 preprocessRequest(prettyPrint()),
