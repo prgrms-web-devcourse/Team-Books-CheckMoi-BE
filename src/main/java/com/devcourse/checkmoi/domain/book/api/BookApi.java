@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.domain.book.api;
 
+import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
@@ -11,10 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,9 +35,9 @@ public class BookApi {
         @RequestBody CreateBook createRequest) {
         Long bookId = bookCommandService.save(createRequest).id();
 
-        return ResponseEntity.ok(
-            new SuccessResponse<>(bookId)
-        );
+        return ResponseEntity
+            .created(generatedUri(bookId))
+            .body(new SuccessResponse<>(bookId));
     }
 
     @GetMapping
