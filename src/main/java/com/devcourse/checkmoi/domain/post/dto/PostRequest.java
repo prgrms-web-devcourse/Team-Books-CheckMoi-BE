@@ -9,7 +9,7 @@ import org.springframework.lang.Nullable;
 public sealed interface PostRequest permits Search, Create, Edit {
 
     record Search(
-        @Nullable Long id
+        @Nullable Long studyId
     ) implements PostRequest {
 
         @Builder

@@ -1,8 +1,9 @@
 package com.devcourse.checkmoi.domain.post.dto;
 
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
+import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 
 public sealed interface PostResponse permits PostInfo {
@@ -11,13 +12,16 @@ public sealed interface PostResponse permits PostInfo {
         Long id,
         String title,
         String content,
-        String category,
+        PostCategory category,
         Long studyId,
-        Long writerId,
+        String writerName,
+        String writerProfileImg,
+        Integer commentCount,
+
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate createdAt,
+        LocalDateTime createdAt,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate updatedAt
+        LocalDateTime updatedAt
     ) implements PostResponse {
 
         @Builder
