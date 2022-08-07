@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.post.api;
 
 import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
+import static com.devcourse.checkmoi.domain.post.model.PostCategory.NOTICE;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePostWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
@@ -36,7 +37,7 @@ import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -105,7 +106,6 @@ class PostApiTest extends IntegrationTest {
         }
     }
 
-
     @Nested
     @DisplayName("게시글을 단일 조회할 수 있다 #86")
     class FindPostTest {
@@ -120,11 +120,15 @@ class PostApiTest extends IntegrationTest {
                 .id(postId)
                 .title("샘플 제목")
                 .content("샘플 본문")
-                .category("NOTICE")
+                .category(NOTICE)
                 .studyId(1L)
-                .writerId(givenUser.userInfo().id())
-                .createdAt(LocalDate.now())
-                .updatedAt(LocalDate.now())
+
+                .writerName(givenUser.userInfo().name())
+                .writerProfileImg(givenUser.userInfo().profileImageUrl())
+                .commentCount(12)
+
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
             // TODO: IN_PROGRESS 중인 스터디에서만 포스트가 작성 가능하다
@@ -170,7 +174,7 @@ class PostApiTest extends IntegrationTest {
                 makePostWithId(GENERAL, study, user, 3L)
             ).map(postConverter::postToInfo).toList();
 
-            given(postQueryService.findAllPosts(anyLong(), any(Search.class)))
+            given(postQueryService.findAllByCondition(anyLong(), any(Search.class)))
                 .willReturn(postInfos);
 
             mockMvc.perform(get("/api/posts")
@@ -197,7 +201,9 @@ class PostApiTest extends IntegrationTest {
                     fieldWithPath("data[].content").description("게시글 본문"),
                     fieldWithPath("data[].category").description("게시글 카테고리"),
                     fieldWithPath("data[].studyId").description("게시글이 작성된 스터디"),
-                    fieldWithPath("data[].writerId").description("게시글을 작성한 유저"),
+                    fieldWithPath("data[].writerName").description("게시글을 작성한 유저 이름"),
+                    fieldWithPath("data[].writerProfileImg").description("게시글을 작성한 유저 프로필 사진"),
+                    fieldWithPath("data[].commentCount").description("게시글 댓글 수"),
                     fieldWithPath("data[].createdAt").description("게시글 작성 일자"),
                     fieldWithPath("data[].updatedAt").description("게시글 수정 일자")
                 )
