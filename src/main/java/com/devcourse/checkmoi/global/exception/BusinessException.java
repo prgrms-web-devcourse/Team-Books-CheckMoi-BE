@@ -22,3 +22,4 @@ public class BusinessException extends RuntimeException {
         return this.errorMessage;
     }
 }
+

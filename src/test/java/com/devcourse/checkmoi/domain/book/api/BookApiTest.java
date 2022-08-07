@@ -80,7 +80,7 @@ class BookApiTest extends IntegrationTest {
                     RestDocumentationRequestBuilders.post("/api/books")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
                         .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
-                        .content(toJson(createRequest))).andExpect(status().isOk())
+                        .content(toJson(createRequest))).andExpect(status().isCreated())
                 .andDo(documentation())
                 .andReturn();
 
