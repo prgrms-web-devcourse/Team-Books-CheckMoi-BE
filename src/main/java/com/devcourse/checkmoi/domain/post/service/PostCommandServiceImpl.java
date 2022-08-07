@@ -5,8 +5,12 @@ import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.exception.PostNotFoundException;
 import com.devcourse.checkmoi.domain.post.model.Post;
+import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.post.service.validator.PostServiceValidator;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
+import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
+import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +24,20 @@ public class PostCommandServiceImpl implements PostCommandService {
 
     private final PostRepository postRepository;
 
+    private final StudyMemberRepository studyMemberRepository;
+
     private final PostConverter postConverter;
 
     private final PostServiceValidator postValidator;
 
     @Override
     public Long createPost(Long userId, Create request) {
-        // validation
+        StudyMember studyMember = studyMemberRepository.findByUser(userId)
+            .orElseThrow(UserNotFoundException::new);
+
+        PostCategory.valueOf(request.category())
+            .checkAllowedWriter(studyMember);
+
         return postRepository.save(postConverter.createToPost(request, userId)).getId();
     }
 

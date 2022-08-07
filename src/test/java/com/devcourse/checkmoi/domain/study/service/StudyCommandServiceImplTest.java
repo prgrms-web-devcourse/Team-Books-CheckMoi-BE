@@ -321,7 +321,7 @@ class StudyCommandServiceImplTest {
                 .willReturn(Optional.of(study));
             given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
-            given(studyMemberRepository.findByUser(any(User.class)))
+            given(studyMemberRepository.findByUser(anyLong()))
                 .willReturn(Optional.empty());
             given(studyMemberRepository.save(any(StudyMember.class)))
                 .willReturn(studyMember);
@@ -344,7 +344,7 @@ class StudyCommandServiceImplTest {
                 .willReturn(Optional.of(study));
             given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
-            given(studyMemberRepository.findByUser(any(User.class)))
+            given(studyMemberRepository.findByUser(anyLong()))
                 .willReturn(Optional.of(studyMember));
             given(studyMemberRepository.save(any(StudyMember.class)))
                 .willReturn(studyMember);
@@ -402,7 +402,7 @@ class StudyCommandServiceImplTest {
                 .willReturn(Optional.of(study));
             given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
-            given(studyMemberRepository.findByUser(any(User.class)))
+            given(studyMemberRepository.findByUser(anyLong()))
                 .willReturn(Optional.of(studyMember));
 
             doThrow(new DuplicateStudyJoinRequestException(STUDY_JOIN_REQUEST_DUPLICATE))

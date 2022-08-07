@@ -29,7 +29,11 @@ public enum ErrorMessage {
     // file error
     NOT_ALLOWED_FILE("허용할 수 없는 파일입니다", HttpStatus.BAD_REQUEST),
 
-    NOT_ALLOWED_STUDY_STATUS("스터디 상태 변경을 할 수 없습니다", HttpStatus.BAD_REQUEST);
+    // study error
+    NOT_ALLOWED_STUDY_STATUS("스터디 상태 변경을 할 수 없습니다", HttpStatus.BAD_REQUEST),
+
+    // post error
+    NOT_ALLOWED_WRITER("게시글 작성 권한이 없습니다", HttpStatus.FORBIDDEN);
 
     private final String message;
 
