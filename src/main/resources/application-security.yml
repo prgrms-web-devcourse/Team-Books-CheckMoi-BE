@@ -25,3 +25,38 @@ jwt:
     expire-length: 3600000
   refresh-token:
     expire-length: 7200000
+
+cors:
+  allowed:
+    api: /**
+    method: '*'
+    origin:
+      - http://localhost:3000
+      - https://checkmoi.vercel.app
+      - http://localhost:6006
+
+security:
+  patterns:
+    ignoring:
+      ALL:
+        - /static/**
+        - /favicon.ico
+      GET:
+        - /
+      POST: [ ]
+      PATCH: [ ]
+      PUT: [ ]
+      DELETE: [ ]
+    permit-all:
+      ALL: [ ]
+      GET:
+        - /
+        - /docs/**
+        - /api/tokens/**
+        - /api/books/**
+        - /api/studies
+      POST: [ ]
+      PATCH: [ ]
+      PUT: [ ]
+      DELETE: [ ]
+      OPTIONS: /**
