@@ -85,6 +85,7 @@ class CustomPostRepositoryImplTest extends RepositoryTest {
         }
 
         @Test
+        @DisplayName("S 게시글을 조건에 따라 검색할 수 있다")
         void findAllByCondition() {
             assertThat(postRepository.count()).isNotZero();
 
