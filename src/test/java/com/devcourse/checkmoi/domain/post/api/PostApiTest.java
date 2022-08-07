@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.post.api;
 
 import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
+import static com.devcourse.checkmoi.domain.post.model.PostCategory.NOTICE;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePostWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
@@ -20,6 +21,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest;
@@ -27,6 +30,7 @@ import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
+import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.service.PostCommandService;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
 import com.devcourse.checkmoi.domain.study.model.Study;
@@ -36,9 +40,8 @@ import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -48,6 +51,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 class PostApiTest extends IntegrationTest {
 
@@ -105,7 +110,6 @@ class PostApiTest extends IntegrationTest {
         }
     }
 
-
     @Nested
     @DisplayName("게시글을 단일 조회할 수 있다 #86")
     class FindPostTest {
@@ -120,11 +124,15 @@ class PostApiTest extends IntegrationTest {
                 .id(postId)
                 .title("샘플 제목")
                 .content("샘플 본문")
-                .category("NOTICE")
+                .category(NOTICE)
                 .studyId(1L)
-                .writerId(givenUser.userInfo().id())
-                .createdAt(LocalDate.now())
-                .updatedAt(LocalDate.now())
+
+                .writerName(givenUser.userInfo().name())
+                .writerProfileImg(givenUser.userInfo().profileImageUrl())
+                .commentCount(12)
+
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
             // TODO: IN_PROGRESS 중인 스터디에서만 포스트가 작성 가능하다
@@ -160,25 +168,41 @@ class PostApiTest extends IntegrationTest {
         void findAllPosts() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
 
-            Search request = Search.builder().build();
-
             Study study = makeStudyWithId(makeBook(), StudyStatus.IN_PROGRESS, 1L);
             User user = makeUserWithId(givenUser.userInfo().id());
-            List<PostInfo> postInfos = Stream.of(
-                makePostWithId(GENERAL, study, user, 1L),
-                makePostWithId(GENERAL, study, user, 2L),
-                makePostWithId(GENERAL, study, user, 3L)
-            ).map(postConverter::postToInfo).toList();
 
-            given(postQueryService.findAllPosts(anyLong(), any(Search.class)))
+            List<PostInfo> postInfos = List.of(
+                makePostInfos(makePostWithId(GENERAL, study, user, 1L)),
+                makePostInfos(makePostWithId(GENERAL, study, user, 2L)),
+                makePostInfos(makePostWithId(GENERAL, study, user, 3L))
+            );
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("studyId", String.valueOf(study.getId()));
+
+            given(postQueryService.findAllByCondition(anyLong(), any(Search.class)))
                 .willReturn(postInfos);
 
             mockMvc.perform(get("/api/posts")
-                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .content(toJson(request)))
+                    .params(params))
                 .andExpect(status().isOk())
                 .andDo(documentation());
+        }
+
+        private PostInfo makePostInfos(Post post) {
+            return PostInfo.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .category(post.getCategory())
+                .studyId(post.getStudy().getId())
+                .writerName(post.getWriter().getName())
+                .writerProfileImg(post.getWriter().getProfileImgUrl())
+                .commentCount(post.getCommentCount())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         }
 
         private RestDocumentationResultHandler documentation() {
@@ -190,6 +214,9 @@ class PostApiTest extends IntegrationTest {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
+                requestParameters(
+                    parameterWithName("studyId").description("스터디 아이디").optional()
+                ),
                 responseFields(
                     // post infos
                     fieldWithPath("data[].id").description("게시글 아이디"),
@@ -197,7 +224,9 @@ class PostApiTest extends IntegrationTest {
                     fieldWithPath("data[].content").description("게시글 본문"),
                     fieldWithPath("data[].category").description("게시글 카테고리"),
                     fieldWithPath("data[].studyId").description("게시글이 작성된 스터디"),
-                    fieldWithPath("data[].writerId").description("게시글을 작성한 유저"),
+                    fieldWithPath("data[].writerName").description("게시글을 작성한 유저 이름"),
+                    fieldWithPath("data[].writerProfileImg").description("게시글을 작성한 유저 프로필 사진"),
+                    fieldWithPath("data[].commentCount").description("게시글 댓글 수"),
                     fieldWithPath("data[].createdAt").description("게시글 작성 일자"),
                     fieldWithPath("data[].updatedAt").description("게시글 수정 일자")
                 )

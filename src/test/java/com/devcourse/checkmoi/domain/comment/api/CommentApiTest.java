@@ -2,12 +2,15 @@ package com.devcourse.checkmoi.domain.comment.api;
 
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeCommentWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePostWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -15,10 +18,13 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.model.Comment;
+import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
@@ -46,6 +52,9 @@ class CommentApiTest extends IntegrationTest {
 
     @MockBean
     private CommentQueryService commentQueryService;
+
+    @MockBean
+    private CommentCommandService commentCommandService;
 
     @Nested
     @DisplayName("댓글 목록 조회 #130")
@@ -117,6 +126,43 @@ class CommentApiTest extends IntegrationTest {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+        }
+    }
+
+    @Nested
+    @DisplayName("댓글 삭제 #136")
+    class DeleteComment {
+
+        @Test
+        @DisplayName("S 댓글 작성자는 댓글을 삭제할 수 있다.")
+        void deleteComment() throws Exception {
+
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+            User writer = makeUserWithId(1L);
+            Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
+            Post post = makePostWithId(PostCategory.GENERAL, study, writer, 1L);
+            Comment comment = makeCommentWithId(post, writer, 1L);
+            doNothing().when(commentCommandService).deleteById(anyLong(), anyLong());
+
+            mockMvc.perform(delete("/api/comments/{commentId}", comment.getId())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
+                .andExpect(status().isNoContent())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("delete-comments",
+                ResourceSnippetParameters.builder()
+                    .tag("Comment API")
+                    .summary("댓글 삭제")
+                    .description("댓글 삭제에 사용되는 API"),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
+                pathParameters(
+                    parameterWithName("commentId").description("댓글 Id")
+                )
+            );
         }
     }
 
