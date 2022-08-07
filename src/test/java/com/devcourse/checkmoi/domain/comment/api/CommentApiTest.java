@@ -1,5 +1,9 @@
 package com.devcourse.checkmoi.domain.comment.api;
 
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePostWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -15,6 +19,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
+import com.devcourse.checkmoi.domain.post.model.Post;
+import com.devcourse.checkmoi.domain.post.model.PostCategory;
+import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.template.IntegrationTest;
@@ -39,19 +46,20 @@ class CommentApiTest extends IntegrationTest {
     private CommentQueryService commentQueryService;
 
     @Nested
-    @DisplayName("작성된 글에 대한 댓글 목록 조회 #130")
+    @DisplayName("댓글 목록 조회 #130")
     class FindAllComments {
 
         @Test
-        @DisplayName("S 해당 포스트에 작성한 글을 조회할 수 있다")
+        @DisplayName("S 검색조건(ex- 포스트ID)에 따라 작성된 댓글을 조회할 수 있다")
         void findAllComments() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
             User writer = makeUserWithId(1L);
-
+            Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
+            Post post = makePostWithId(PostCategory.GENERAL, study, writer, 1L);
             List<CommentInfo> response = List.of(
-                makeCommentInfoWithId(writer, 1L),
-                makeCommentInfoWithId(writer, 2L),
-                makeCommentInfoWithId(writer, 3L)
+                makeCommentInfoWithId(writer, post, 1L),
+                makeCommentInfoWithId(writer, post, 2L),
+                makeCommentInfoWithId(writer, post, 3L)
             );
 
             Search request = Search.builder()
@@ -90,6 +98,8 @@ class CommentApiTest extends IntegrationTest {
                         .description("댓글 아이디"),
                     fieldWithPath("data[].userId").type(JsonFieldType.NUMBER)
                         .description("댓글 작성자 아이디"),
+                    fieldWithPath("data[].postId").type(JsonFieldType.NUMBER)
+                        .description("게시글 아이디"),
                     fieldWithPath("data[].content").type(JsonFieldType.STRING)
                         .description("댓글 본문"),
                     fieldWithPath("data[].createdAt").type(JsonFieldType.STRING)
@@ -100,10 +110,11 @@ class CommentApiTest extends IntegrationTest {
             );
         }
 
-        private CommentInfo makeCommentInfoWithId(User user, Long commentId) {
+        private CommentInfo makeCommentInfoWithId(User user, Post post, Long commentId) {
             return CommentInfo.builder()
                 .id(commentId)
                 .userId(user.getId())
+                .postId(post.getId())
                 .content("댓글 - " + UUID.randomUUID())
                 .createdAt(LocalDate.now())
                 .updatedAt(LocalDate.now())

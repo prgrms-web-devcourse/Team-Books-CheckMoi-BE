@@ -34,6 +34,7 @@ class CommentConverterTest {
         assertAll(
             () -> assertThat(commentInfo.id()).isEqualTo(comment.getId()),
             () -> assertThat(commentInfo.userId()).isEqualTo(comment.getUser().getId()),
+            () -> assertThat(commentInfo.postId()).isEqualTo(comment.getPost().getId()),
             () -> assertThat(commentInfo.content()).isEqualTo(comment.getContent()),
             () -> assertThat(commentInfo).hasFieldOrProperty("createdAt"),
             () -> assertThat(commentInfo).hasFieldOrProperty("updatedAt")

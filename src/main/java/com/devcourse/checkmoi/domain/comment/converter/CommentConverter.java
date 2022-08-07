@@ -13,6 +13,7 @@ public class CommentConverter {
         return CommentInfo.builder()
             .id(comment.getId())
             .userId(comment.getUser().getId())
+            .postId(comment.getPost().getId())
             .content(comment.getContent())
             .createdAt(convertLocalDate(comment.getCreatedAt()))
             .updatedAt(convertLocalDate(comment.getUpdatedAt()))

@@ -10,6 +10,7 @@ public sealed interface CommentResponse permits CommentInfo {
     record CommentInfo(
         Long id,
         Long userId,
+        Long postId,
         String content,
         @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate createdAt,
