@@ -12,4 +12,10 @@ public interface StudyQueryService {
     StudyDetailWithMembers getStudyInfoWithMembers(Long studyId);
 
     StudyAppliers getStudyAppliers(Long userId, Long studyId);
+
+    Studies getParticipationStudies(Long userId);
+
+    Studies getFinishedStudies(Long userId);
+
+    Studies getOwnedStudies(Long userId);
 }

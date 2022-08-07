@@ -3,7 +3,10 @@ package com.devcourse.checkmoi.domain.study.repository;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.PENDING;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
+import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeStudyInfo;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
@@ -12,12 +15,12 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
-import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.global.model.PageRequest;
@@ -31,7 +34,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,7 +112,7 @@ class StudyRepositoryTest extends RepositoryTest {
 
             int generatedStudyNumber = 4;
             for (int i = 0; i < generatedStudyNumber; i++) {
-                Study study = studyRepository.save(makeStudy(givenBook, StudyStatus.RECRUITING));
+                Study study = studyRepository.save(makeStudy(givenBook, RECRUITING));
                 studyMemberRepository.save(makeStudyMember(study, user, OWNED));
                 studies.add(study);
             }
@@ -121,10 +123,8 @@ class StudyRepositoryTest extends RepositoryTest {
         void findRecruitingStudyByBookId() {
             PageRequest pageRequest = new PageRequest();
 
-            Page<Study> pageResult =
+            List<Study> result =
                 studyRepository.findRecruitingStudyByBookId(givenBook.getId(), pageRequest.of());
-
-            List<Study> result = pageResult.getContent();
 
             assertThat(result)
                 .usingRecursiveFieldByFieldElementComparator()
@@ -144,7 +144,7 @@ class StudyRepositoryTest extends RepositoryTest {
             User notStudyMemberUser = userRepository.save(makeUser());
             User studyMemberUser = userRepository.save(makeUser());
             Book book = bookRepository.save(makeBook());
-            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUITING));
+            study = studyRepository.save(makeStudy(book, RECRUITING));
 
             studyMemberRepository.save(
                 makeStudyMember(study, user, OWNED));
@@ -160,7 +160,6 @@ class StudyRepositoryTest extends RepositoryTest {
         void getStudyInfoWithBookAndMembers() {
             StudyDetailWithMembers response =
                 studyRepository.getStudyInfoWithMembers(study.getId());
-
             validateStudyDetailInfo(response);
             validateMembers(response);
 
@@ -215,7 +214,7 @@ class StudyRepositoryTest extends RepositoryTest {
             user3Accepted = userRepository.save(makeUser());
             Book book = bookRepository.save(makeBook());
 
-            study = studyRepository.save(makeStudy(book, StudyStatus.RECRUITING));
+            study = studyRepository.save(makeStudy(book, RECRUITING));
 
             studyMemberRepository.save(
                 makeStudyMember(study, ownedUser, OWNED));
@@ -270,5 +269,102 @@ class StudyRepositoryTest extends RepositoryTest {
         }
     }
 
+    @Nested
+    @DisplayName("나와 관련된 스터디 목록 조회하기 #116")
+    class GetMyStudiesTest {
+
+        private User user;
+
+        private Study study1;
+
+        private Study study2;
+
+        private Study study3;
+
+        private Study study4;
+
+        private Study study5;
+
+        @BeforeEach
+        void setUp() {
+            user = userRepository.save(makeUser());
+            Book book = bookRepository.save(makeBook());
+
+            study1 = studyRepository.save(makeStudy(book, RECRUITING));
+            study2 = studyRepository.save(makeStudy(book, IN_PROGRESS));
+            study3 = studyRepository.save(makeStudy(book, IN_PROGRESS));
+            study4 = studyRepository.save(makeStudy(book, FINISHED));
+            study5 = studyRepository.save(makeStudy(book, FINISHED));
+
+            studyMemberRepository.save(
+                makeStudyMember(study1, user, OWNED));
+            studyMemberRepository.save(
+                makeStudyMember(study2, user, StudyMemberStatus.ACCEPTED));
+            studyMemberRepository.save(
+                makeStudyMember(study3, user, StudyMemberStatus.ACCEPTED));
+            studyMemberRepository.save(
+                makeStudyMember(study4, user, StudyMemberStatus.ACCEPTED));
+            studyMemberRepository.save(
+                makeStudyMember(study5, user, StudyMemberStatus.DENIED));
+
+            userRepository.flush();
+            bookRepository.flush();
+            studyMemberRepository.flush();
+            studyRepository.flush();
+        }
+
+        @AfterEach
+        void tearDown() {
+            studyMemberRepository.deleteAllInBatch();
+            studyRepository.deleteAllInBatch();
+            bookRepository.deleteAllInBatch();
+            userRepository.deleteAllInBatch();
+        }
+
+        @Test
+        @DisplayName("S 내가 현재 참가중인 스터디 목록을 가져온다.")
+        void getParticipationStudies() {
+            Studies got = studyRepository.getParticipationStudies(user.getId());
+            Studies want = new Studies(List.of(
+                makeStudyInfo(study1),
+                makeStudyInfo(study2),
+                makeStudyInfo(study3)
+            ));
+
+            assertThat(got.studies()).hasSize(want.studies().size());
+            assertThat(got)
+                .usingRecursiveComparison()
+                .isEqualTo(want);
+        }
+
+        @Test
+        @DisplayName("S 현재 종료된 참여한 스터디 목록을 가져온다.")
+        void getFinishedStudies() {
+            Studies got = studyRepository.getFinishedStudies(user.getId());
+            Studies want = new Studies(List.of(
+                makeStudyInfo(study4)
+
+            ));
+
+            assertThat(got.studies()).hasSize(want.studies().size());
+            assertThat(got)
+                .usingRecursiveComparison()
+                .isEqualTo(want);
+        }
+
+        @Test
+        @DisplayName("S 내가 스터디장인 스터디 목록을 가져온다.")
+        void getOwnedStudies() {
+            Studies got = studyRepository.getOwnedStudies(user.getId());
+            Studies want = new Studies(List.of(
+                makeStudyInfo(study1)
+            ));
+
+            assertThat(got.studies()).hasSize(want.studies().size());
+            assertThat(got)
+                .usingRecursiveComparison()
+                .isEqualTo(want);
+        }
+    }
 }
 
