@@ -6,8 +6,6 @@ import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.user.model.User;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,11 +16,13 @@ public class PostConverter {
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
-            .category(post.getCategory().toString())
+            .category(post.getCategory())
             .studyId(post.getStudy().getId())
-            .writerId(post.getWriter().getId())
-            .createdAt(convertLocalDate(post.getCreatedAt()))
-            .updatedAt(convertLocalDate(post.getUpdatedAt()))
+            .writerName(post.getWriter().getName())
+            .writerProfileImg(post.getWriter().getProfileImgUrl())
+            .commentCount(post.getCommentCount())
+            .createdAt(post.getCreatedAt())
+            .updatedAt(post.getUpdatedAt())
             .build();
     }
 
@@ -36,7 +36,4 @@ public class PostConverter {
             .build();
     }
 
-    private LocalDate convertLocalDate(LocalDateTime time) {
-        return time == null ? LocalDate.now() : time.toLocalDate();
-    }
 }

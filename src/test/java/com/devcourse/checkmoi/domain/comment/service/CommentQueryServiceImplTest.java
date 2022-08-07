@@ -27,6 +27,7 @@ import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -61,6 +62,15 @@ class CommentQueryServiceImplTest {
     @Autowired
     private CommentConverter commentConverter;
 
+    @AfterEach
+    void cleanUp() {
+        commentRepository.deleteAllInBatch();
+        postRepository.deleteAllInBatch();
+        studyMemberRepository.deleteAllInBatch();
+        studyRepository.deleteAllInBatch();
+        bookRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+    }
 
     @Nested
     @DisplayName("작성된 글에 대한 댓글 목록 조회 #130")
@@ -115,5 +125,4 @@ class CommentQueryServiceImplTest {
                 .hasSameElementsAs(commentInfos);
         }
     }
-
 }

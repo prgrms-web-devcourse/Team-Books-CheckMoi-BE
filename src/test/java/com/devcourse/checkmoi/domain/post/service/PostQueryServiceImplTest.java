@@ -21,9 +21,10 @@ import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.post.service.validator.PostServiceValidator;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.user.model.User;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,17 +58,19 @@ class PostQueryServiceImplTest {
             User user = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
 
-            List<Post> posts = List.of(
+            List<PostInfo> posts = Stream.of(
                 makePostWithId(GENERAL, study, user, 3L),
                 makePostWithId(GENERAL, study, user, 4L),
                 makePostWithId(GENERAL, study, user, 5L)
-            );
+            ).map(postConverter::postToInfo).toList();
 
-            Search request = Search.builder().id(3L).build(); // TODO: 얘로 검색
+            Search request = Search.builder().studyId(study.getId()).build();
 
-            when(postRepository.findAll()).thenReturn(posts);
-            postQueryService.findAllPosts(user.getId(), Search.builder().build());
-            then(postRepository).should(times(1)).findAll();
+            when(postRepository.findAllByCondition(anyLong(), any(Search.class))).thenReturn(posts);
+
+            postQueryService.findAllByCondition(user.getId(), request);
+
+            then(postRepository).should(times(1)).findAllByCondition(user.getId(), request);
         }
 
     }
@@ -90,11 +93,13 @@ class PostQueryServiceImplTest {
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .category(post.getCategory().toString())
+                .category(post.getCategory())
                 .studyId(post.getStudy().getId())
-                .writerId(post.getWriter().getId())
-                .createdAt(LocalDate.now())
-                .updatedAt(LocalDate.now())
+                .writerName(post.getWriter().getName())
+                .writerProfileImg(post.getWriter().getProfileImgUrl())
+                .commentCount(post.getCommentCount())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
             when(postConverter.postToInfo(any(Post.class))).thenReturn(postInfo);
