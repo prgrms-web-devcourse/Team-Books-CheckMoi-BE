@@ -36,7 +36,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
             .from(post)
             .innerJoin(post.writer)
             .where(
-                eqStudyId(userId)
+                eqStudyId(request.studyId())
             )
             .fetch();
     }
