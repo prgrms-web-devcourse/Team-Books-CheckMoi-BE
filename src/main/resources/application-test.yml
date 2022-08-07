@@ -52,3 +52,34 @@ cloud:
       secretKey: ${S3_SECRET_KEY}
       url: ${S3_URL}
       bucketName: ${S3_INTEGRATED_BUCKET_NAME}
+
+cors:
+  allowed:
+    api: /**
+    method: '*'
+    origin:
+      - http://localhost:8080
+
+security:
+  patterns:
+    ignoring:
+      ALL:
+        - /static/**
+        - /favicon.ico
+      GET: [ ]
+      POST: [ ]
+      PATCH: [ ]
+      PUT: [ ]
+      DELETE: [ ]
+    permit-all:
+      ALL: [ ]
+      GET:
+        - /docs/**
+        - /api/tokens/**
+        - /api/books/**
+        - /api/studies
+      POST: [ ]
+      PATCH: [ ]
+      PUT: [ ]
+      DELETE: [ ]
+      OPTIONS: /**
