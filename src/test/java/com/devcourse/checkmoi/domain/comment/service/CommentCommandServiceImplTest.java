@@ -10,12 +10,19 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.devcourse.checkmoi.domain.book.model.Book;
+import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
+import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
 import com.devcourse.checkmoi.domain.post.model.Post;
+import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
+import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.template.IntegrationTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,12 +32,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 class CommentCommandServiceImplTest extends IntegrationTest {
 
     @Autowired
+    protected CommentRepository commentRepository;
+
+    @Autowired
+    protected UserRepository userRepository;
+
+    @Autowired
+    protected StudyRepository studyRepository;
+
+    @Autowired
+    protected BookRepository bookRepository;
+
+    @Autowired
+    protected StudyMemberRepository studyMemberRepository;
+
+    @Autowired
+    protected PostRepository postRepository;
+
+    @Autowired
     private CommentCommandServiceImpl commentCommandService;
 
     private User givenUser;
 
     private Post givenPost;
 
+    @AfterEach
+    void cleanUp() {
+        commentRepository.deleteAllInBatch();
+        postRepository.deleteAllInBatch();
+        studyMemberRepository.deleteAllInBatch();
+        studyRepository.deleteAllInBatch();
+        bookRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+    }
 
     @BeforeEach
     void setBasicGiven() {
