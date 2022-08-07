@@ -30,6 +30,7 @@ import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
+import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.service.PostCommandService;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
 import com.devcourse.checkmoi.domain.study.model.Study;
@@ -41,7 +42,6 @@ import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -168,15 +168,14 @@ class PostApiTest extends IntegrationTest {
         void findAllPosts() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
 
-            Search request = Search.builder().build();
-
             Study study = makeStudyWithId(makeBook(), StudyStatus.IN_PROGRESS, 1L);
             User user = makeUserWithId(givenUser.userInfo().id());
-            List<PostInfo> postInfos = Stream.of(
-                makePostWithId(GENERAL, study, user, 1L),
-                makePostWithId(GENERAL, study, user, 2L),
-                makePostWithId(GENERAL, study, user, 3L)
-            ).map(postConverter::postToInfo).toList();
+
+            List<PostInfo> postInfos = List.of(
+                makePostInfos(makePostWithId(GENERAL, study, user, 1L)),
+                makePostInfos(makePostWithId(GENERAL, study, user, 2L)),
+                makePostInfos(makePostWithId(GENERAL, study, user, 3L))
+            );
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("studyId", String.valueOf(study.getId()));
@@ -189,6 +188,21 @@ class PostApiTest extends IntegrationTest {
                     .params(params))
                 .andExpect(status().isOk())
                 .andDo(documentation());
+        }
+
+        private PostInfo makePostInfos(Post post) {
+            return PostInfo.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .category(post.getCategory())
+                .studyId(post.getStudy().getId())
+                .writerName(post.getWriter().getName())
+                .writerProfileImg(post.getWriter().getProfileImgUrl())
+                .commentCount(post.getCommentCount())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         }
 
         private RestDocumentationResultHandler documentation() {
