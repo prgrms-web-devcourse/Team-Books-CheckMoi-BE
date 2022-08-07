@@ -6,21 +6,17 @@ import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.model.Post.PostBuilder;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.Study.StudyBuilder;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMember.StudyMemberBuilder;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.model.User.UserBuilder;
 import com.devcourse.checkmoi.domain.user.model.UserRole;
 import com.devcourse.checkmoi.domain.user.model.vo.Email;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 public abstract class EntityGeneratorUtil {
@@ -46,46 +42,6 @@ public abstract class EntityGeneratorUtil {
         return postBuilder(category, study, user).build();
     }
 
-    public static StudyInfo makeStudyInfo(Study study) {
-        return StudyInfo.builder()
-            .id(study.getId())
-            .name(study.getName())
-            .thumbnailUrl(study.getThumbnailUrl())
-            .description(study.getDescription())
-            .currentParticipant(1)
-            .maxParticipant(study.getMaxParticipant())
-            .gatherStartDate(study.getGatherStartDate())
-            .gatherEndDate(study.getGatherEndDate())
-            .studyStartDate(study.getStudyStartDate())
-            .studyEndDate(study.getStudyEndDate())
-            .build();
-
-    }
-
-    public static UserInfo makeUserInfo() {
-        User user = makeUserWithId(1L);
-        return UserInfo.builder()
-            .id(user.getId())
-            .name(user.getName())
-            .email(user.getEmail().getValue())
-            .profileImageUrl(user.getProfileImgUrl())
-            .temperature(user.getTemperature())
-            .build();
-    }
-
-    public static List<Studies> makeMyStudies() {
-        return List.of(
-            new Studies(
-                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.IN_PROGRESS, 1L)))
-            ),
-            new Studies(
-                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.FINISHED, 2L)))
-            ),
-            new Studies(
-                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.RECRUITING, 3L)))
-            )
-        );
-    }
 
     // with Id
     public static StudyMember makeStudyMemberWithId(

@@ -3,7 +3,6 @@ package com.devcourse.checkmoi.domain.study.service;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
-import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface StudyQueryService {
@@ -14,5 +13,9 @@ public interface StudyQueryService {
 
     StudyAppliers getStudyAppliers(Long userId, Long studyId);
 
-    List<Studies> getMyStudies(Long userId);
+    Studies getParticipationStudies(Long userId);
+
+    Studies getFinishedStudies(Long userId);
+
+    Studies getOwnedStudies(Long userId);
 }

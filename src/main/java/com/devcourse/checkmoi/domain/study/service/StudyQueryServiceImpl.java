@@ -54,16 +54,17 @@ public class StudyQueryServiceImpl implements StudyQueryService {
     }
 
     @Override
-    public List<Studies> getMyStudies(Long userId) {
-        Studies participation = studyRepository.getParticipationStudies(userId);
-        Studies finished = studyRepository.getFinishedStudies(userId);
-        Studies owned = studyRepository.getOwnedStudies(userId);
-
-        return List.of(
-            participation,
-            finished,
-            owned
-        );
+    public Studies getParticipationStudies(Long userId) {
+        return studyRepository.getParticipationStudies(userId);
     }
 
+    @Override
+    public Studies getFinishedStudies(Long userId) {
+        return studyRepository.getFinishedStudies(userId);
+    }
+
+    @Override
+    public Studies getOwnedStudies(Long userId) {
+        return studyRepository.getOwnedStudies(userId);
+    }
 }

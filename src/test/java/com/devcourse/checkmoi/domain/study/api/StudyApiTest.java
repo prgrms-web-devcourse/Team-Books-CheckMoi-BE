@@ -1,10 +1,10 @@
 package com.devcourse.checkmoi.domain.study.api;
 
+import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeMyStudies;
+import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeUserInfo;
 import static com.devcourse.checkmoi.util.DocumentUtil.getDateFormat;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeMyStudies;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserInfo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;

@@ -1,10 +1,8 @@
 package com.devcourse.checkmoi.domain.study.service;
 
+import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeStudyInfo;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyInfo;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -20,11 +18,9 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.model.Study;
-import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
-import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -199,29 +195,55 @@ class StudyQueryServiceImplTest {
 
         @Test
         @DisplayName("S 내가 참여한 스터디 목록을 조회한다.")
-        void getMyStudies() {
+        void getParticipationStudies() {
             Long userId = 1L;
             Studies participation = new Studies(
                 List.of(makeStudyInfo(study1))
             );
+
+
+            given(studyRepository.getParticipationStudies(anyLong()))
+                .willReturn(participation);
+
+
+
+            Studies got = studyQueryService.getParticipationStudies(userId);
+
+            assertThat(got).usingRecursiveComparison().isEqualTo(participation);
+
+        }
+
+        @Test
+        @DisplayName("S 내가 참여한 종료된 스터디 목록을 조회한다.")
+        void getFinishedStudies() {
+            Long userId = 1L;
             Studies finished = new Studies(
                 List.of(makeStudyInfo(study2))
             );
+
+            given(studyRepository.getFinishedStudies(anyLong()))
+                .willReturn(finished);
+
+            Studies got = studyQueryService.getFinishedStudies(userId);
+
+            assertThat(got).usingRecursiveComparison().isEqualTo(finished);
+
+        }
+
+        @Test
+        @DisplayName("S 내가 스터디장인 스터디 목록을 조회한다")
+        void getOwnedStudies() {
+            Long userId = 1L;
             Studies owned = new Studies(
                 List.of(makeStudyInfo(study3))
             );
-            given(studyRepository.getParticipationStudies(anyLong()))
-                .willReturn(participation);
-            given(studyRepository.getFinishedStudies(anyLong()))
-                .willReturn(finished);
+
             given(studyRepository.getOwnedStudies(anyLong()))
                 .willReturn(owned);
 
-            List<Studies> got = studyQueryService.getMyStudies(userId);
+            Studies got = studyQueryService.getOwnedStudies(userId);
 
-            assertThat(got.get(0)).usingRecursiveComparison().isEqualTo(participation);
-            assertThat(got.get(1)).usingRecursiveComparison().isEqualTo(finished);
-            assertThat(got.get(2)).usingRecursiveComparison().isEqualTo(owned);
+            assertThat(got).usingRecursiveComparison().isEqualTo(owned);
         }
     }
 }

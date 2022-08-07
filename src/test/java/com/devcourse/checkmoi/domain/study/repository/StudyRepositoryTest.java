@@ -6,9 +6,9 @@ import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.PENDIN
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
+import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeStudyInfo;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyInfo;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;

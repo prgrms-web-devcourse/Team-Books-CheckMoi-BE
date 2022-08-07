@@ -26,14 +26,11 @@ public class StudyUserFacadeImpl implements
 
     @Override
     public MyStudies getMyStudies(Long userId) {
-        UserInfo user = userQueryService.findUserInfo(userId);
-        List<Studies> studies = studyQueryService.getMyStudies(userId);
-
         return MyStudies.builder()
-            .user(user)
-            .participation(studies.get(PARTICIPATION))
-            .finished(studies.get(FINISHED))
-            .owned(studies.get(OWNED))
+            .user(userQueryService.findUserInfo(userId))
+            .participation(studyQueryService.getParticipationStudies(userId))
+            .finished(studyQueryService.getFinishedStudies(userId))
+            .owned(studyQueryService.getOwnedStudies(userId))
             .build();
     }
 }
