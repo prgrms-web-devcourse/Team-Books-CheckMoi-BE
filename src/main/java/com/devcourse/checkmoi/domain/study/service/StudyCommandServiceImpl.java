@@ -96,7 +96,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
             .orElseThrow(StudyNotFoundException::new);
         User user = userRepository.findById(userId)
             .orElseThrow(UserNotFoundException::new);
-        StudyMember request = studyMemberRepository.findByUser(user.getId())
+        StudyMember request = studyMemberRepository.findByUserId(user.getId())
             .map(studyMember -> {
                 studyValidator.validateDuplicateStudyMemberRequest(studyMember);
                 studyMember.changeStatus(StudyMemberStatus.PENDING);

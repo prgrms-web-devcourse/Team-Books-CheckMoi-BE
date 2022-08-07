@@ -32,7 +32,7 @@ public class PostCommandServiceImpl implements PostCommandService {
 
     @Override
     public Long createPost(Long userId, Create request) {
-        StudyMember studyMember = studyMemberRepository.findByUser(userId)
+        StudyMember studyMember = studyMemberRepository.findByUserId(userId)
             .orElseThrow(UserNotFoundException::new);
 
         PostCategory.valueOf(request.category())

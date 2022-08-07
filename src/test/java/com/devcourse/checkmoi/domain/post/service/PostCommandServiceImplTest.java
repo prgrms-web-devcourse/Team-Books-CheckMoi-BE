@@ -81,7 +81,7 @@ class PostCommandServiceImplTest {
                 .studyId(study.getId())
                 .build();
 
-            given(studyMemberRepository.findByUser(any()))
+            given(studyMemberRepository.findByUserId(any()))
                 .willReturn(Optional.of(studyMember));
             when(postConverter.createToPost(any(Create.class), anyLong())).thenReturn(post);
             when(postRepository.save(any(Post.class))).thenReturn(post);
@@ -108,7 +108,7 @@ class PostCommandServiceImplTest {
                 .studyId(study.getId())
                 .build();
 
-            given(studyMemberRepository.findByUser(any()))
+            given(studyMemberRepository.findByUserId(any()))
                 .willReturn(Optional.of(studyMember));
             when(postConverter.createToPost(any(Create.class), anyLong())).thenReturn(post);
             when(postRepository.save(any(Post.class))).thenReturn(post);
@@ -133,7 +133,7 @@ class PostCommandServiceImplTest {
                 .studyId(study.getId())
                 .build();
 
-            given(studyMemberRepository.findByUser(any()))
+            given(studyMemberRepository.findByUserId(any()))
                 .willReturn(Optional.of(studyMember));
             when(postConverter.createToPost(any(Create.class), anyLong())).thenReturn(post);
             when(postRepository.save(any(Post.class))).thenReturn(post);
@@ -158,7 +158,7 @@ class PostCommandServiceImplTest {
                 .studyId(study.getId())
                 .build();
 
-            given(studyMemberRepository.findByUser(any()))
+            given(studyMemberRepository.findByUserId(any()))
                 .willReturn(Optional.of(studyMember));
 
             Assertions.assertThatThrownBy(() ->

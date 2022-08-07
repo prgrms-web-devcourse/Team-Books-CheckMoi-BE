@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.Query;
 public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> {
 
     @Query("select sm from StudyMember sm where sm.user.id = :userId")
-    Optional<StudyMember> findByUser(Long userId);
+    Optional<StudyMember> findByUserId(Long userId);
 }
