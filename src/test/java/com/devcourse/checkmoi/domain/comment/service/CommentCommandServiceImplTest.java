@@ -29,8 +29,6 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
     private User givenUser;
 
-    private Study study;
-
     private Post givenPost;
 
 
@@ -42,26 +40,32 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         givenUser = userRepository.save(makeUser());
 
         // study
-        study = studyRepository.save(makeStudy(book, IN_PROGRESS));
+        Study givenStudy = studyRepository.save(makeStudy(book, IN_PROGRESS));
 
         // studyMember
-        studyMemberRepository.save(makeStudyMember(study, user, StudyMemberStatus.OWNED));
-        studyMemberRepository.save(makeStudyMember(study, givenUser, StudyMemberStatus.ACCEPTED));
+        studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
+        studyMemberRepository.save(
+            makeStudyMember(givenStudy, givenUser, StudyMemberStatus.ACCEPTED));
 
         // given post
-        givenPost = postRepository.save(makePost(GENERAL, study, givenUser));
+        givenPost = postRepository.save(makePost(GENERAL, givenStudy, givenUser));
     }
 
     @Nested
     @DisplayName("댓글 삭제 #136")
     class DeleteComment {
 
+        Comment comment;
+
+        @BeforeEach
+        void createComment() {
+            comment = commentRepository.save(makeComment(givenPost, givenUser));
+            assertThat(commentRepository.existsById(comment.getId())).isTrue();
+        }
+
         @Test
         @DisplayName("S 댓글 작성자는 댓글을 삭제할 수 있다.")
         void deleteComment() {
-            Comment comment = commentRepository.save(makeComment(givenPost, givenUser));
-            assertThat(commentRepository.existsById(comment.getId())).isTrue();
-
             commentCommandService.deleteById(givenUser.getId(), comment.getId());
             assertThat(commentRepository.existsById(comment.getId())).isFalse();
         }
