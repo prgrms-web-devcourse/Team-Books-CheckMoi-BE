@@ -3,6 +3,8 @@ package com.devcourse.checkmoi.util;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.Book.BookBuilder;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
+import com.devcourse.checkmoi.domain.comment.model.Comment;
+import com.devcourse.checkmoi.domain.comment.model.Comment.CommentBuilder;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.model.Post.PostBuilder;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
@@ -42,6 +44,10 @@ public abstract class EntityGeneratorUtil {
         return postBuilder(category, study, user).build();
     }
 
+    public static Comment makeComment(Post post, User user) {
+        return commentBuilder(post, user).build();
+    }
+
     // with Id
     public static StudyMember makeStudyMemberWithId(
         Study study, User user, StudyMemberStatus status, Long id
@@ -59,6 +65,10 @@ public abstract class EntityGeneratorUtil {
 
     public static Book makeBookWithId(Long id) {
         return bookBuilder().id(id).build();
+    }
+
+    public static Comment makeCommentWithId(Post post, User user, Long id) {
+        return commentBuilder(post, user).id(id).build();
     }
 
     public static Post makePostWithId(PostCategory category, Study study, User user, Long id) {
@@ -125,5 +135,13 @@ public abstract class EntityGeneratorUtil {
             .isbn(isbn)
             .thumbnail("https://example.com/abc/jebi.png")
             .publishedAt(new PublishedDate("20121111"));
+    }
+
+    private static CommentBuilder commentBuilder(Post post, User user) {
+        String comment = UUID.randomUUID().toString().substring(25);
+        return Comment.builder()
+            .post(post)
+            .user(user)
+            .content("댓글 - " + comment);
     }
 }
