@@ -25,7 +25,6 @@ import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.template.RepositoryTest;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -62,15 +61,6 @@ class CustomPostRepositoryImplTest extends RepositoryTest {
 
         private PostConverter postConverter = new PostConverter();
 
-        @AfterEach
-        void cleanUp() {
-            postRepository.deleteAllInBatch();
-            studyMemberRepository.deleteAllInBatch();
-            studyRepository.deleteAllInBatch();
-            bookRepository.deleteAllInBatch();
-            userRepository.deleteAllInBatch();
-        }
-
         @BeforeEach
         void setGiven() {
             Book book = bookRepository.save(makeBook());
@@ -92,20 +82,21 @@ class CustomPostRepositoryImplTest extends RepositoryTest {
             // illegal post
             postRepository.save(makePost(NOTICE, illegalStudy, user));
             postRepository.save(makePost(BOOK_REVIEW, illegalStudy, user));
-
         }
 
         @Test
         void findAllByCondition() {
+            assertThat(postRepository.count()).isNotZero();
+
             Search search = Search.builder()
                 .studyId(study.getId())
                 .build();
 
             List<PostInfo> got = postRepository.findAllByCondition(user.getId(), search);
-            assertThat(got).hasSize(1);
+
             assertThat(got)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
-                .isEqualTo(List.of(postConverter.postToInfo(post)));
+                .contains(postConverter.postToInfo(post));
         }
     }
 
