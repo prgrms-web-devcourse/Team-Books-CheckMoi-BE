@@ -14,12 +14,6 @@ import org.springframework.stereotype.Service;
 public class StudyUserFacadeImpl implements
     StudyUserFacade {
 
-    private static final int PARTICIPATION = 0;
-
-    private static final int FINISHED = 1;
-
-    private static final int OWNED = 2;
-
     private final StudyQueryService studyQueryService;
 
     private final UserQueryService userQueryService;
