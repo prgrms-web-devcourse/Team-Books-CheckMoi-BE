@@ -27,15 +27,15 @@ public class Comment extends BaseEntity {
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false, updatable = false)
+    @JoinColumn(nullable = false, updatable = false)
     private Post post;
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    @JoinColumn(nullable = false, updatable = false)
     private User user;
 
-    @Column(name = "content", nullable = false, length = 500)
+    @Column(nullable = false, length = 500)
     private String content;
 
     @Builder
@@ -56,5 +56,17 @@ public class Comment extends BaseEntity {
 
     public void editComment(String comment) {
         this.content = comment;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

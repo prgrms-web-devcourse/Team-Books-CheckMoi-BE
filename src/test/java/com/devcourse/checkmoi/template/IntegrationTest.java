@@ -34,7 +34,8 @@ public abstract class IntegrationTest {
     protected ObjectMapper objectMapper;
 
     @Autowired
-    private OAuthService oAuthService;
+    protected OAuthService oAuthService;
+
 
     private static UserProfile createUserProfile(String name) {
         return UserProfile.builder()
@@ -69,4 +70,5 @@ public abstract class IntegrationTest {
     protected TokenWithUserInfo getTokenWithUserInfo() {
         return oAuthService.register(createUserProfile(UUID.randomUUID().toString().substring(19)));
     }
+
 }
