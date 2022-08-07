@@ -67,7 +67,6 @@ class PostCommandServiceImplTest {
 
         @Test
         @DisplayName("S 일반 스터디원은 자유 게시글을 작성할 수 있다")
-            //TODO: validation -> ??
         void createPost() {
             User user = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
