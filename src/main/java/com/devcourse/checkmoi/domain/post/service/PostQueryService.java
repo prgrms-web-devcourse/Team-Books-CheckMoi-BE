@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface PostQueryService {
 
-    List<PostInfo> findAllPosts(Long userId, Search request);
+    List<PostInfo> findAllByCondition(Long userId, Search request);
 
     PostInfo findByPostId(Long userId, Long postId);
 }
