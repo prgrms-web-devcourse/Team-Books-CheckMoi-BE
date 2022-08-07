@@ -55,23 +55,31 @@ cloud:
 
 cors:
   allowed:
-    api: test
-    method: test
-    origin: test
+    api: /**
+    method: '*'
+    origin:
+      - http://localhost:8080
 
 security:
   patterns:
     ignoring:
-      ALL: [ ]
+      ALL:
+        - /static/**
+        - /favicon.ico
       GET: [ ]
       POST: [ ]
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]
     permit-all:
-      GET: [ ]
+      ALL: [ ]
+      GET:
+        - /docs/**
+        - /api/tokens/**
+        - /api/books/**
+        - /api/studies
       POST: [ ]
       PATCH: [ ]
       PUT: [ ]
       DELETE: [ ]
-      OPTIONS: [ ]
+      OPTIONS: /**
