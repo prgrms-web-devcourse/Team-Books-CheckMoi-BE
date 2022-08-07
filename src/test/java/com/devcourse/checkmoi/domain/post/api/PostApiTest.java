@@ -21,6 +21,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest;
@@ -49,6 +51,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 class PostApiTest extends IntegrationTest {
 
@@ -174,13 +178,15 @@ class PostApiTest extends IntegrationTest {
                 makePostWithId(GENERAL, study, user, 3L)
             ).map(postConverter::postToInfo).toList();
 
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("studyId", String.valueOf(study.getId()));
+
             given(postQueryService.findAllByCondition(anyLong(), any(Search.class)))
                 .willReturn(postInfos);
 
             mockMvc.perform(get("/api/posts")
-                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .content(toJson(request)))
+                    .params(params))
                 .andExpect(status().isOk())
                 .andDo(documentation());
         }
@@ -194,6 +200,9 @@ class PostApiTest extends IntegrationTest {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
+                requestParameters(
+                    parameterWithName("studyId").description("스터디 아이디").optional()
+                ),
                 responseFields(
                     // post infos
                     fieldWithPath("data[].id").description("게시글 아이디"),
