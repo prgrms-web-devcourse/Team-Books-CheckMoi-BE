@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.global.config;
+package com.devcourse.checkmoi.global.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

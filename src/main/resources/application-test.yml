@@ -52,3 +52,26 @@ cloud:
       secretKey: ${S3_SECRET_KEY}
       url: ${S3_URL}
       bucketName: ${S3_INTEGRATED_BUCKET_NAME}
+
+cors:
+  allowed:
+    api: test
+    method: test
+    origin: test
+
+security:
+  patterns:
+    ignoring:
+      ALL: [ ]
+      GET: [ ]
+      POST: [ ]
+      PATCH: [ ]
+      PUT: [ ]
+      DELETE: [ ]
+    permit-all:
+      GET: [ ]
+      POST: [ ]
+      PATCH: [ ]
+      PUT: [ ]
+      DELETE: [ ]
+      OPTIONS: [ ]
