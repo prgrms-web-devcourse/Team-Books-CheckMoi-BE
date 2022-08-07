@@ -40,9 +40,12 @@ class PostConverterTest {
             () -> assertThat(postInfo.id()).isEqualTo(post.getId()),
             () -> assertThat(postInfo.title()).isEqualTo(post.getTitle()),
             () -> assertThat(postInfo.content()).isEqualTo(post.getContent()),
-            () -> assertThat(postInfo.category()).isEqualTo(post.getCategory().toString()),
+            () -> assertThat(postInfo.category()).isEqualTo(post.getCategory()),
             () -> assertThat(postInfo.studyId()).isEqualTo(post.getStudy().getId()),
-            () -> assertThat(postInfo.writerId()).isEqualTo(post.getWriter().getId()),
+            () -> assertThat(postInfo.writerName()).isEqualTo(post.getWriter().getName()),
+            () -> assertThat(postInfo.writerProfileImg())
+                .isEqualTo(post.getWriter().getProfileImgUrl()),
+            () -> assertThat(postInfo.commentCount()).isEqualTo(post.getCommentCount()),
             () -> assertThat(postInfo).hasFieldOrProperty("createdAt"),
             () -> assertThat(postInfo).hasFieldOrProperty("updatedAt")
         );

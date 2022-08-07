@@ -34,10 +34,10 @@ public class PostApi {
     @GetMapping("/posts")
     public ResponseEntity<SuccessResponse<List<PostInfo>>> findAllPosts(
         @AuthenticationPrincipal JwtAuthentication user,
-        @RequestBody Search request
+        Search request
     ) {
         return ResponseEntity.ok()
-            .body(new SuccessResponse<>(postQueryService.findAllPosts(user.id(), request)));
+            .body(new SuccessResponse<>(postQueryService.findAllByCondition(user.id(), request)));
     }
 
     @GetMapping("/posts/{postId}")

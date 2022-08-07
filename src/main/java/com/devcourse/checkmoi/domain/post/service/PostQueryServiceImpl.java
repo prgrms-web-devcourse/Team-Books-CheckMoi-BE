@@ -21,11 +21,10 @@ public class PostQueryServiceImpl implements PostQueryService {
     private final PostConverter postConverter;
 
     // TODO: validation
-    // TODO: pageable & dynamic search
+    // TODO: pageable
     @Override
-    public List<PostInfo> findAllPosts(Long userId, Search request) {
-        return postRepository.findAll().stream()
-            .map(postConverter::postToInfo).toList();
+    public List<PostInfo> findAllByCondition(Long userId, Search request) {
+        return postRepository.findAllByCondition(userId, request);
     }
 
     @Override
