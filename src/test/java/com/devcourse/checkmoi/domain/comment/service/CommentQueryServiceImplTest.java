@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.comment.service;
 
 import static com.devcourse.checkmoi.domain.post.model.PostCategory.BOOK_REVIEW;
+import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
@@ -11,6 +12,7 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.Assertions.assertThat;
+import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.comment.converter.CommentConverter;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
@@ -18,6 +20,7 @@ import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
+import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.user.model.User;
@@ -73,8 +76,8 @@ class CommentQueryServiceImplTest {
 
         @BeforeEach
         void given() {
-            var book = bookRepository.save(makeBook());
-            var study = studyRepository.save(makeStudy(book, IN_PROGRESS));
+            Book book = bookRepository.save(makeBook());
+            Study study = studyRepository.save(makeStudy(book, IN_PROGRESS));
 
             user1 = userRepository.save(makeUser());
             user2 = userRepository.save(makeUser());
@@ -85,23 +88,30 @@ class CommentQueryServiceImplTest {
             studyMemberRepository.save(makeStudyMember(study, user3, ACCEPTED));
 
             givenPost = postRepository.save(makePost(BOOK_REVIEW, study, user1));
+            Post noGivenPost = postRepository.save(makePost(GENERAL, study, user2));
+            commentRepository.save(makeComment(noGivenPost, user2));
+
         }
 
         // TODO: 권한체크
         @Test
         @DisplayName("S 해당 포스트에 작성한 글을 조회할 수 있다")
         void findAllComments() {
+            commentRepository.save(makeComment(givenPost, user3));
             List<CommentInfo> commentInfos = Stream.of(
                 commentRepository.save(makeComment(givenPost, user2)),
-                commentRepository.save(makeComment(givenPost, user3)),
                 commentRepository.save(makeComment(givenPost, user2))
             ).map(commentConverter::commentToInfo).toList();
 
+            var search = Search.builder()
+                .postId(givenPost.getId())
+                .build();
+
             List<CommentInfo> comments =
-                commentQueryService.findAllComments(user2.getId(), Search.builder().build());
+                commentQueryService.findAllComments(user2.getId(), search);
 
             assertThat(comments)
-                .usingRecursiveFieldByFieldElementComparator()
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
                 .hasSameElementsAs(commentInfos);
         }
     }

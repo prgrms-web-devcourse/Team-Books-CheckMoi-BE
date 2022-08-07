@@ -18,7 +18,6 @@ public class CommentQueryServiceImpl implements CommentQueryService {
 
     @Override
     public List<CommentInfo> findAllComments(Long userId, Search request) {
-        return commentRepository.findAll()
-            .stream().map(commentConverter::commentToInfo).toList();
+        return commentRepository.findAllByCondition(userId, request);
     }
 }

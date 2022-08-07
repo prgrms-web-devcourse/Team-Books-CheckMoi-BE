@@ -2,7 +2,6 @@ package com.devcourse.checkmoi.domain.comment.converter;
 
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +14,12 @@ public class CommentConverter {
             .userId(comment.getUser().getId())
             .postId(comment.getPost().getId())
             .content(comment.getContent())
-            .createdAt(convertLocalDate(comment.getCreatedAt()))
-            .updatedAt(convertLocalDate(comment.getUpdatedAt()))
+            .createdAt(convertTime(comment.getCreatedAt()))
+            .updatedAt(convertTime(comment.getUpdatedAt()))
             .build();
     }
 
-    private LocalDate convertLocalDate(LocalDateTime time) {
-        return time == null ? LocalDate.now() : time.toLocalDate();
+    private LocalDateTime convertTime(LocalDateTime time) {
+        return time == null ? LocalDateTime.now() : time;
     }
 }

@@ -8,9 +8,9 @@ import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +24,7 @@ public class CommentApi {
     @GetMapping("/comments")
     public ResponseEntity<SuccessResponse<List<CommentInfo>>> findAllComments(
         @AuthenticationPrincipal JwtAuthentication user,
-        @RequestBody Search request
+        @Nullable Search request
     ) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(commentQueryService.findAllComments(user.id(), request)));

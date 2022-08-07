@@ -13,8 +13,9 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
@@ -28,7 +29,7 @@ import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -36,9 +37,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 class CommentApiTest extends IntegrationTest {
 
@@ -62,17 +64,15 @@ class CommentApiTest extends IntegrationTest {
                 makeCommentInfoWithId(writer, post, 3L)
             );
 
-            Search request = Search.builder()
-                .postId(1L)
-                .build();
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("postId", String.valueOf(1L));
 
             when(commentQueryService.findAllComments(anyLong(), any(Search.class)))
                 .thenReturn(response);
 
             mockMvc.perform(get("/api/comments")
-                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .content(toJson(request)))
+                    .params(params))
                 .andExpect(status().isOk())
                 .andDo(documentation());
         }
@@ -88,10 +88,8 @@ class CommentApiTest extends IntegrationTest {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
-
-                requestFields(
-                    fieldWithPath("postId").type(JsonFieldType.NUMBER)
-                        .description("게시글 아이디")
+                requestParameters(
+                    parameterWithName("postId").description("게시글 아이디").optional()
                 ),
                 responseFields(
                     fieldWithPath("data[].id").type(JsonFieldType.NUMBER)
@@ -116,8 +114,8 @@ class CommentApiTest extends IntegrationTest {
                 .userId(user.getId())
                 .postId(post.getId())
                 .content("댓글 - " + UUID.randomUUID())
-                .createdAt(LocalDate.now())
-                .updatedAt(LocalDate.now())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
         }
     }
