@@ -28,7 +28,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             .name(user.name())
             .email(user.email())
             .temperature(user.temperature())
-            .profileImageUrl(user.profileImageUrl())
+            .image(user.image())
             .studies(studyInfos)
             .build();
     }

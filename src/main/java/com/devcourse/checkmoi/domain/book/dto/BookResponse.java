@@ -17,12 +17,12 @@ public sealed interface BookResponse permits SimpleBook, BookSpecification, Late
         String author,
         String publisher,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate pubDate, // TODO : 날짜 포맷 결정
+        LocalDate pubDate,
         String isbn,
         String image,
         String description,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDateTime createdAt // TODO : 날짜 포맷
+        LocalDateTime createdAt
     ) implements BookResponse {
 
         @Builder
@@ -30,6 +30,7 @@ public sealed interface BookResponse permits SimpleBook, BookSpecification, Late
         }
     }
 
+    // TODO: SimpleBook과 무슨 차이인가?
     record BookSpecification(
         Long id,
         String title,
@@ -41,7 +42,7 @@ public sealed interface BookResponse permits SimpleBook, BookSpecification, Late
         String isbn,
         String description,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDateTime createdAt // TODO : 날짜 포맷
+        LocalDateTime createdAt
     ) implements BookResponse {
 
         @Builder

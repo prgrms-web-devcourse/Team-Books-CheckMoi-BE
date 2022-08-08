@@ -128,7 +128,7 @@ class PostApiTest extends IntegrationTest {
                 .studyId(1L)
 
                 .writerName(givenUser.userInfo().name())
-                .writerProfileImg(givenUser.userInfo().profileImageUrl())
+                .writerProfileImg(givenUser.userInfo().image())
                 .commentCount(12)
 
                 .createdAt(LocalDateTime.now())

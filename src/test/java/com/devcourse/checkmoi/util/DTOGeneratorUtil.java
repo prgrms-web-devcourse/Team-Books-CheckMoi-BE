@@ -12,11 +12,12 @@ import com.devcourse.checkmoi.domain.user.model.User;
 import java.util.List;
 
 public abstract class DTOGeneratorUtil {
+
     public static StudyInfo makeStudyInfo(Study study) {
         return StudyInfo.builder()
             .id(study.getId())
             .name(study.getName())
-            .thumbnailUrl(study.getThumbnailUrl())
+            .thumbnail(study.getThumbnailUrl())
             .description(study.getDescription())
             .currentParticipant(1)
             .maxParticipant(study.getMaxParticipant())
@@ -34,7 +35,7 @@ public abstract class DTOGeneratorUtil {
             .id(user.getId())
             .name(user.getName())
             .email(user.getEmail().getValue())
-            .profileImageUrl(user.getProfileImgUrl())
+            .image(user.getProfileImgUrl())
             .temperature(user.getTemperature())
             .build();
     }

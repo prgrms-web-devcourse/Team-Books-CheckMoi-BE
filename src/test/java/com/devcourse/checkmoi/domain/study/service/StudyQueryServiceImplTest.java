@@ -67,7 +67,7 @@ class StudyQueryServiceImplTest {
                 study -> StudyInfo.builder()
                     .id(study.getId())
                     .name(study.getName())
-                    .thumbnailUrl(study.getThumbnailUrl())
+                    .thumbnail(study.getThumbnailUrl())
                     .description(study.getDescription())
                     .currentParticipant(study.getCurrentParticipant())
                     .maxParticipant(study.getMaxParticipant())
@@ -153,21 +153,21 @@ class StudyQueryServiceImplTest {
                             .id(1L)
                             .email("abc@naver.com")
                             .name("abc")
-                            .profileImageUrl("https://south/dev/abc.png")
+                            .image("https://south/dev/abc.png")
                             .temperature(36.5f)
                             .build(),
                         StudyUserInfo.builder()
                             .id(2L)
                             .email("abcd@naver.com")
                             .name("abcd")
-                            .profileImageUrl("https://south/dev/abcd.png")
+                            .image("https://south/dev/abcd.png")
                             .temperature(36.5f)
                             .build(),
                         StudyUserInfo.builder()
                             .id(3L)
                             .email("abce@naver.com")
                             .name("abce")
-                            .profileImageUrl("https://south/dev/abce.png")
+                            .image("https://south/dev/abce.png")
                             .temperature(36.5f)
                             .build()
                     )
@@ -201,11 +201,8 @@ class StudyQueryServiceImplTest {
                 List.of(makeStudyInfo(study1))
             );
 
-
             given(studyRepository.getParticipationStudies(anyLong()))
                 .willReturn(participation);
-
-
 
             Studies got = studyQueryService.getParticipationStudies(userId);
 

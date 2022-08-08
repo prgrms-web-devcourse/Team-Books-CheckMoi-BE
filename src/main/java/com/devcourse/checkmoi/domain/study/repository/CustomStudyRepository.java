@@ -13,7 +13,7 @@ public interface CustomStudyRepository {
 
     List<Study> findRecruitingStudyByBookId(Long bookId, Pageable pageable);
 
-    StudyDetailWithMembers getStudyInfoWithMembers(Long studyId);
+    StudyDetailWithMembers getStudyDetailWithMembers(Long studyId);
 
     StudyAppliers getStudyAppliers(Long studyId);
 
