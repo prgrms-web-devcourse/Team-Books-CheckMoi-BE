@@ -127,8 +127,8 @@ class PostApiTest extends IntegrationTest {
                 .category(NOTICE)
                 .studyId(1L)
 
-                .writerName(givenUser.userInfo().name())
-                .writerProfileImg(givenUser.userInfo().image())
+                .writer(givenUser.userInfo().name())
+                .writerImage(givenUser.userInfo().image())
                 .commentCount(12)
 
                 .createdAt(LocalDateTime.now())
@@ -197,8 +197,8 @@ class PostApiTest extends IntegrationTest {
                 .content(post.getContent())
                 .category(post.getCategory())
                 .studyId(post.getStudy().getId())
-                .writerName(post.getWriter().getName())
-                .writerProfileImg(post.getWriter().getProfileImgUrl())
+                .writer(post.getWriter().getName())
+                .writerImage(post.getWriter().getProfileImgUrl())
                 .commentCount(post.getCommentCount())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -224,8 +224,8 @@ class PostApiTest extends IntegrationTest {
                     fieldWithPath("data[].content").description("게시글 본문"),
                     fieldWithPath("data[].category").description("게시글 카테고리"),
                     fieldWithPath("data[].studyId").description("게시글이 작성된 스터디"),
-                    fieldWithPath("data[].writerName").description("게시글을 작성한 유저 이름"),
-                    fieldWithPath("data[].writerProfileImg").description("게시글을 작성한 유저 프로필 사진"),
+                    fieldWithPath("data[].writer").description("게시글을 작성한 유저 이름"),
+                    fieldWithPath("data[].writerImage").description("게시글을 작성한 유저 프로필 사진"),
                     fieldWithPath("data[].commentCount").description("게시글 댓글 수"),
                     fieldWithPath("data[].createdAt").description("게시글 작성 일자"),
                     fieldWithPath("data[].updatedAt").description("게시글 수정 일자")
