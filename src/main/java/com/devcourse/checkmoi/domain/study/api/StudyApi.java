@@ -4,9 +4,11 @@ import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.global.model.PageRequest;
@@ -35,6 +37,8 @@ public class StudyApi {
     private final StudyCommandService studyCommandService;
 
     private final StudyQueryService studyQueryService;
+
+    private final StudyUserFacade studyUserFacade;
 
     @GetMapping("/{studyId}")
     public ResponseEntity<SuccessResponse<StudyDetailWithMembers>> getDetailInfo(
@@ -101,5 +105,16 @@ public class StudyApi {
 
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(studyQueryService.getStudyAppliers(user.id(), studyId)));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<SuccessResponse<MyStudies>> getMyStudies(
+        @AuthenticationPrincipal JwtAuthentication user
+    ) {
+        MyStudies response = studyUserFacade.getMyStudies(user.id());
+
+        return ResponseEntity.ok(
+            new SuccessResponse<>(response)
+        );
     }
 }

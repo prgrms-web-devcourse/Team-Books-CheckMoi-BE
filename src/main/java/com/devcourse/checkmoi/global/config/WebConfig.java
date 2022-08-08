@@ -7,26 +7,28 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.devcourse.checkmoi.domain.file.service.S3Upload;
+import com.devcourse.checkmoi.global.config.properties.CorsConfigProperties;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
+@EnableConfigurationProperties(CorsConfigProperties.class)
 public class WebConfig implements WebMvcConfigurer {
+
+    private final CorsConfigProperties corsConfigProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry
-            .addMapping("/**")
-            .allowedOrigins(
-                "http://localhost:3000",
-                "https://checkmoi.vercel.app",
-                "http://localhost:6006"
-            )
-            .allowedMethods("*")
-            .allowCredentials(true)
-            .allowedHeaders("*")
+            .addMapping(corsConfigProperties.api())
+            .allowedOrigins(corsConfigProperties.origin())
+            .allowedMethods(corsConfigProperties.method())
+            .allowCredentials(true).maxAge(3600)
             .exposedHeaders(LOCATION);
     }
 

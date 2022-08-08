@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.domain.study.service;
 
+import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeStudyInfo;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -9,6 +10,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -22,6 +24,7 @@ import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidat
 import com.devcourse.checkmoi.global.model.PageRequest;
 import java.util.List;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,8 +32,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,13 +59,11 @@ class StudyQueryServiceImplTest {
             Long bookId = 1L;
             PageRequest pageRequest = new PageRequest();
             Pageable pageable = pageRequest.of();
-            Page<Study> studies = new PageImpl<>(
-                List.of(
-                    makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
-                    makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
-                )
+            List<Study> studies = List.of(
+                makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
+                makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
             );
-            Page<StudyInfo> studyInfos = studies.map(
+            List<StudyInfo> studyInfos = studies.stream().map(
                 study -> StudyInfo.builder()
                     .id(study.getId())
                     .name(study.getName())
@@ -77,16 +76,17 @@ class StudyQueryServiceImplTest {
                     .studyStartDate(study.getStudyStartDate())
                     .studyEndDate(study.getStudyEndDate())
                     .build()
-            );
+            ).toList();
+
             Studies want = Studies.builder()
                 .studies(studyInfos)
                 .build();
             given(studyRepository.findRecruitingStudyByBookId(anyLong(), any(Pageable.class)))
                 .willReturn(studies);
-            given(studyConverter.studyToStudyInfo(studies.getContent().get(0))).willReturn(
-                studyInfos.getContent().get(0));
-            given(studyConverter.studyToStudyInfo(studies.getContent().get(1))).willReturn(
-                studyInfos.getContent().get(1));
+            given(studyConverter.studyToStudyInfo(studies.get(0))).willReturn(
+                studyInfos.get(0));
+            given(studyConverter.studyToStudyInfo(studies.get(1))).willReturn(
+                studyInfos.get(1));
 
             Studies got = studyQueryService.getStudies(bookId, pageable);
 
@@ -172,6 +172,78 @@ class StudyQueryServiceImplTest {
                             .build()
                     )
                 ).build();
+        }
+    }
+
+    @Nested
+    @DisplayName("내 스터디 참여 현황 조회 #116")
+    class MyStudiesTest {
+
+        Study study1;
+
+        Study study2;
+
+        Study study3;
+
+        @BeforeEach
+        void setUp() {
+            Book book = makeBookWithId(1L);
+            study1 = makeStudyWithId(book, StudyStatus.IN_PROGRESS, 1L);
+            study2 = makeStudyWithId(book, StudyStatus.FINISHED, 2L);
+            study3 = makeStudyWithId(book, StudyStatus.RECRUITING, 3L);
+        }
+
+        @Test
+        @DisplayName("S 내가 참여한 스터디 목록을 조회한다.")
+        void getParticipationStudies() {
+            Long userId = 1L;
+            Studies participation = new Studies(
+                List.of(makeStudyInfo(study1))
+            );
+
+
+            given(studyRepository.getParticipationStudies(anyLong()))
+                .willReturn(participation);
+
+
+
+            Studies got = studyQueryService.getParticipationStudies(userId);
+
+            assertThat(got).usingRecursiveComparison().isEqualTo(participation);
+
+        }
+
+        @Test
+        @DisplayName("S 내가 참여한 종료된 스터디 목록을 조회한다.")
+        void getFinishedStudies() {
+            Long userId = 1L;
+            Studies finished = new Studies(
+                List.of(makeStudyInfo(study2))
+            );
+
+            given(studyRepository.getFinishedStudies(anyLong()))
+                .willReturn(finished);
+
+            Studies got = studyQueryService.getFinishedStudies(userId);
+
+            assertThat(got).usingRecursiveComparison().isEqualTo(finished);
+
+        }
+
+        @Test
+        @DisplayName("S 내가 스터디장인 스터디 목록을 조회한다")
+        void getOwnedStudies() {
+            Long userId = 1L;
+            Studies owned = new Studies(
+                List.of(makeStudyInfo(study3))
+            );
+
+            given(studyRepository.getOwnedStudies(anyLong()))
+                .willReturn(owned);
+
+            Studies got = studyQueryService.getOwnedStudies(userId);
+
+            assertThat(got).usingRecursiveComparison().isEqualTo(owned);
         }
     }
 }
