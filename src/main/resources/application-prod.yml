@@ -14,10 +14,7 @@ spring:
         format_sql: true
         query.in_clause_parameter_padding: true
     hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
+      ddl-auto: update
   security:
     oauth2:
       client:
