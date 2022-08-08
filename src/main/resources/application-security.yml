@@ -51,7 +51,6 @@ security:
       DELETE: [ ]
     permit-all:
       ALL:
-        - /
         - /docs/**
       GET:
         - /api/tokens/**
