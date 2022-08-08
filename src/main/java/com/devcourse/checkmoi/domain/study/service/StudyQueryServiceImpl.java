@@ -7,7 +7,6 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMemb
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,7 +49,7 @@ public class StudyQueryServiceImpl implements StudyQueryService {
                 + studyOwnerId
         );
 
-        return studyRepository.getStudyAppliers(studyId);
+        return studyRepository.getStudyApplicants(studyId);
     }
 
     @Override

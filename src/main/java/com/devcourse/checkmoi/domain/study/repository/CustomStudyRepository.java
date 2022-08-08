@@ -15,9 +15,9 @@ public interface CustomStudyRepository {
 
     StudyDetailWithMembers getStudyInfoWithMembers(Long studyId);
 
-    StudyAppliers getStudyAppliers(Long studyId);
+    StudyAppliers getStudyApplicants(Long studyId);
 
-    void updateAllAppliersAsDenied(Long studyId);
+    void updateAllApplicantsAsDenied(Long studyId);
 
     Studies getParticipationStudies(Long userId);
 

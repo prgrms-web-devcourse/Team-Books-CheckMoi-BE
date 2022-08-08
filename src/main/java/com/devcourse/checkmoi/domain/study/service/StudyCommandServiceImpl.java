@@ -67,7 +67,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         study.changeStatus(StudyStatus.valueOf(request.status()));
 
         if (isNecessaryToDeny(beforeStatus, study.getStatus())) {
-            studyRepository.updateAllAppliersAsDenied(studyId);
+            studyRepository.updateAllApplicantsAsDenied(studyId);
         }
 
         return study.getId();

@@ -113,7 +113,7 @@ class StudyQueryServiceImplTest {
             given(studyRepository.findStudyOwner(studyId))
                 .willReturn(studyLeaderId);
 
-            given(studyRepository.getStudyAppliers(studyId))
+            given(studyRepository.getStudyApplicants(studyId))
                 .willReturn(expectedAppliers);
 
             doNothing()
@@ -201,11 +201,8 @@ class StudyQueryServiceImplTest {
                 List.of(makeStudyInfo(study1))
             );
 
-
             given(studyRepository.getParticipationStudies(anyLong()))
                 .willReturn(participation);
-
-
 
             Studies got = studyQueryService.getParticipationStudies(userId);
 

@@ -86,10 +86,10 @@ class StudyRepositoryTest extends RepositoryTest {
             studyMemberRepository.save(makeStudyMember(study, pendingUser, PENDING));
             studyMemberRepository.save(makeStudyMember(study, acceptedUser, ACCEPTED));
 
-            studyRepository.updateAllAppliersAsDenied(study.getId());
+            studyRepository.updateAllApplicantsAsDenied(study.getId());
 
             List<StudyUserInfo> appliers = studyRepository
-                .getStudyAppliers(study.getId())
+                .getStudyApplicants(study.getId())
                 .appliers();
 
             Assertions.assertThat(appliers)
@@ -241,7 +241,7 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("S 아직 수락, 거절 되지 않은 스터디 신청자 목록을 가져온다")
         void getAllAppliersSuccess() {
-            StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
+            StudyAppliers studyAppliers = studyRepository.getStudyApplicants(study.getId());
 
             Assertions.assertThat(studyAppliers.appliers())
                 .hasSize(2);
@@ -250,7 +250,7 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("S 아직 수락, 거절 되지 않은 스터디 신청자 목록을 오래된순으로 가져온다")
         void getAllAppliersAscSuccess() {
-            StudyAppliers studyAppliers = studyRepository.getStudyAppliers(study.getId());
+            StudyAppliers studyAppliers = studyRepository.getStudyApplicants(study.getId());
 
             StudyUserInfo firstUserInfo = studyAppliers.appliers().get(0);
 
