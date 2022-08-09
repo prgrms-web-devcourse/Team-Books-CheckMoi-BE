@@ -26,10 +26,8 @@ public sealed interface StudyResponse permits
         String name,
         String thumbnail,
         String description,
-
-        StudyStatus status, // TODO : status 추가
-
-        int currentParticipant,
+        StudyStatus status,
+        Integer currentParticipant,
         Integer maxParticipant,
         @JsonFormat(pattern = "yyyy/MM/dd")
         LocalDate gatherStartDate,

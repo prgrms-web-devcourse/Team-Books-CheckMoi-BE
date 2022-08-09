@@ -4,6 +4,7 @@ import static com.devcourse.checkmoi.domain.study.model.QStudy.study;
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
@@ -29,6 +30,37 @@ import org.springframework.stereotype.Repository;
 public class CustomStudyRepositoryImpl implements CustomStudyRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
+
+    // TODO: Total Page
+    @Override
+    public List<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable) {
+        return jpaQueryFactory.select(
+                Projections.constructor(
+                    StudyInfo.class,
+                    study.id,
+                    study.name,
+                    study.thumbnailUrl,
+                    study.description,
+                    study.status,
+                    study.currentParticipant, study.maxParticipant,
+                    study.gatherStartDate, study.gatherEndDate,
+                    study.studyStartDate, study.studyEndDate
+                )
+            )
+            .from(study)
+            .innerJoin(studyMember)
+            .on(study.id.eq(studyMember.study.id))
+            .where(
+                eqUserId(search.userId()),
+                eqStudyId(search.studyId()),
+                eqBookId(search.bookId()),
+                eqStudyMemberStatus(search.memberStatus()),
+                eqStudyStatus(search.studyStatus())
+            )
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+    }
 
     @Override
     public Long findStudyOwner(Long studyId) {
@@ -240,10 +272,38 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         return studyMember.status.eq(status);
     }
 
+    private BooleanExpression eqStudyMemberStatus(String status) {
+        if (status == null) {
+            return null;
+        }
+        return studyMember.status.eq(StudyMemberStatus.valueOf(status));
+    }
+
     private BooleanExpression eqStudyId(Long studyId) {
         if (studyId == null) {
             return null;
         }
         return studyMember.study.id.eq(studyId);
+    }
+
+    private BooleanExpression eqUserId(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        return studyMember.user.id.eq(userId);
+    }
+
+    private BooleanExpression eqStudyStatus(String status) {
+        if (status == null) {
+            return null;
+        }
+        return study.status.eq(StudyStatus.valueOf(status));
+    }
+
+    private BooleanExpression eqBookId(Long bookId) {
+        if (bookId == null) {
+            return null;
+        }
+        return study.book.id.eq(bookId);
     }
 }
