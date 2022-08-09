@@ -192,7 +192,7 @@ class CommentApiTest extends IntegrationTest {
             Long postId = 1L;
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, studyId);
             Post post = makePostWithId(PostCategory.GENERAL, study,
-                User.builder().id(givenUser.userInfo().id()).build(), postId);
+                makeUserWithId(givenUser.userInfo().id()), postId);
             Long response = 1L;
             given(commentCommandFacade.createComment(
                 post.getId(),
