@@ -755,7 +755,9 @@ class StudyApiTest extends IntegrationTest {
                     parameterWithName("studyId").description("스터디 아이디").optional(),
                     parameterWithName("bookId").description("책 아이디").optional(),
                     parameterWithName("memberStatus").description("스터디원 상태").optional(),
-                    parameterWithName("studyStatus").description("스터디 상태").optional()
+                    parameterWithName("studyStatus").description("스터디 상태").optional(),
+                    parameterWithName("page").description("페이지").optional(),
+                    parameterWithName("size").description("사이즈").optional()
                 ),
                 responseFields(
                     // searched study infos
@@ -786,5 +788,6 @@ class StudyApiTest extends IntegrationTest {
                 )
             );
         }
+
     }
 }
