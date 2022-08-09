@@ -1,13 +1,9 @@
 package com.devcourse.checkmoi.util;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePost;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
-import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
-import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
@@ -18,12 +14,14 @@ import com.devcourse.checkmoi.domain.user.model.User;
 import java.util.List;
 
 public abstract class DTOGeneratorUtil {
+
     public static StudyInfo makeStudyInfo(Study study) {
         return StudyInfo.builder()
             .id(study.getId())
             .name(study.getName())
-            .thumbnailUrl(study.getThumbnailUrl())
+            .thumbnail(study.getThumbnailUrl())
             .description(study.getDescription())
+            .status(study.getStatus())
             .currentParticipant(1)
             .maxParticipant(study.getMaxParticipant())
             .gatherStartDate(study.getGatherStartDate())
@@ -46,13 +44,14 @@ public abstract class DTOGeneratorUtil {
             .commentCount(0)
             .build();
     }
+
     public static UserInfo makeUserInfo() {
         User user = makeUserWithId(1L);
         return UserInfo.builder()
             .id(user.getId())
             .name(user.getName())
             .email(user.getEmail().getValue())
-            .profileImageUrl(user.getProfileImgUrl())
+            .image(user.getProfileImgUrl())
             .temperature(user.getTemperature())
             .build();
     }

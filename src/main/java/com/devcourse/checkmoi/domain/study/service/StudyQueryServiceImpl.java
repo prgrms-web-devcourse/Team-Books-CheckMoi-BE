@@ -42,7 +42,7 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
     @Override
     public StudyDetailWithMembers getStudyInfoWithMembers(Long studyId) {
-        return studyRepository.getStudyInfoWithMembers(studyId);
+        return studyRepository.getStudyDetailWithMembers(studyId);
     }
 
     @Override

@@ -14,7 +14,7 @@ public sealed interface UserResponse permits UserInfo, UserInfoWithStudy, Regist
         String name,
         String email,
         Float temperature,
-        String profileImageUrl
+        String image
     ) implements UserResponse {
 
         @Builder
@@ -27,7 +27,7 @@ public sealed interface UserResponse permits UserInfo, UserInfoWithStudy, Regist
         String name,
         String email,
         Float temperature,
-        String profileImageUrl,
+        String image,
         List<StudyInfo> studies
     ) implements UserResponse {
 

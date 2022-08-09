@@ -7,7 +7,7 @@ import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetail;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
@@ -53,20 +53,21 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     @Override
-    public StudyDetailWithMembers getStudyInfoWithMembers(Long studyId) {
-        StudyDetailInfo studyInfo = getStudyInfo(studyId);
-        List<StudyUserInfo> memberInfo = getStudyMembers(studyId, ACCEPTED,
-            StudyMemberStatus.OWNED);
+    public StudyDetailWithMembers getStudyDetailWithMembers(Long studyId) {
+        StudyDetail studyDetail = getStudyDetailInfo(studyId);
+
+        List<StudyUserInfo> members =
+            getStudyMembers(studyId, ACCEPTED, StudyMemberStatus.OWNED);
 
         return StudyDetailWithMembers.builder()
-            .study(studyInfo)
-            .members(memberInfo)
+            .study(studyDetail.study())
+            .book(studyDetail.book())
+            .members(members)
             .build();
     }
 
     @Override
-    public StudyAppliers getStudyAppliers(
-        Long studyId) {
+    public StudyAppliers getStudyAppliers(Long studyId) {
         List<StudyUserInfo> appliers = getStudyMembers(studyId, StudyMemberStatus.PENDING, null);
 
         return StudyAppliers.builder()
@@ -89,9 +90,10 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             jpaQueryFactory.select(
                     Projections.constructor(
                         StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description,
-                        study.currentParticipant, study.maxParticipant, study.gatherStartDate,
-                        study.gatherEndDate, study.studyStartDate, study.studyEndDate
+                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
+                        study.currentParticipant, study.maxParticipant,
+                        study.gatherStartDate, study.gatherEndDate,
+                        study.studyStartDate, study.studyEndDate
                     )
                 )
                 .from(study)
@@ -114,7 +116,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             jpaQueryFactory.select(
                     Projections.constructor(
                         StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description,
+                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
                         study.currentParticipant, study.maxParticipant, study.gatherStartDate,
                         study.gatherEndDate, study.studyStartDate, study.studyEndDate
                     )
@@ -138,7 +140,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             jpaQueryFactory.select(
                     Projections.constructor(
                         StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description,
+                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
                         study.currentParticipant, study.maxParticipant, study.gatherStartDate,
                         study.gatherEndDate, study.studyStartDate, study.studyEndDate
                     )
@@ -154,18 +156,21 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         );
     }
 
-    private StudyDetailInfo getStudyInfo(Long studyId) {
-        return jpaQueryFactory.select(
-                Projections.constructor(
-                    StudyDetailInfo.class,
-                    study.id, study.name, study.status.stringValue(),
-                    study.thumbnailUrl, study.description,
-                    study.currentParticipant, study.maxParticipant,
-                    study.gatherStartDate, study.gatherEndDate,
-                    study.studyStartDate, study.studyEndDate,
 
-                    Projections.constructor(
-                        StudyBookInfo.class,
+    private StudyDetail getStudyDetailInfo(Long studyId) {
+        return jpaQueryFactory.select(
+                Projections.constructor(StudyDetail.class,
+                    Projections.constructor(StudyInfo.class,
+                        study.id,
+                        study.name,
+                        study.thumbnailUrl,
+                        study.description,
+                        study.status,
+                        study.currentParticipant, study.maxParticipant,
+                        study.gatherStartDate, study.gatherEndDate,
+                        study.studyStartDate, study.studyEndDate
+                    ),
+                    Projections.constructor(StudyBookInfo.class,
                         study.book.id,
                         study.book.title,
                         study.book.thumbnail,
@@ -183,16 +188,16 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .fetchOne();
     }
 
-    private List<StudyUserInfo> getStudyMembers(Long studyId, StudyMemberStatus requiredStatus,
-        StudyMemberStatus optionalStatus) {
+    private List<StudyUserInfo> getStudyMembers(
+        Long studyId, StudyMemberStatus requiredStatus, StudyMemberStatus optionalStatus) {
         return jpaQueryFactory.select(
                 Projections.constructor(
                     StudyUserInfo.class,
                     studyMember.user.id,
                     studyMember.user.name,
                     studyMember.user.email.value.as("email"),
-                    studyMember.user.temperature,
-                    studyMember.user.profileImgUrl
+                    studyMember.user.profileImgUrl,
+                    studyMember.user.temperature
                 )
             )
             .from(studyMember)

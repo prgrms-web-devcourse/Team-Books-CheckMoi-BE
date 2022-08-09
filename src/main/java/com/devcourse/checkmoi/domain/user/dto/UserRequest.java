@@ -6,7 +6,7 @@ public sealed interface UserRequest permits UserRequest.Edit {
 
     record Edit(
         String name,
-        String profileImageUrl
+        String image
     ) implements UserRequest {
 
         @Builder

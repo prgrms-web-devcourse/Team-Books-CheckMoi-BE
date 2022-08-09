@@ -43,7 +43,7 @@ public class UserCommandServiceImpl implements UserCommandService {
             .orElseThrow(UserNotFoundException::new);
 
         user.editName(request.name());
-        user.editProfileImage(request.profileImageUrl());
+        user.editProfileImage(request.image());
     }
 
     private void validatePermission(Long userId, Long authId, String situation) {

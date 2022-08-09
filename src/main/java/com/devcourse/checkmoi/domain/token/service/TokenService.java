@@ -37,7 +37,7 @@ public class TokenService {
             .name(user.name())
             .email(user.email())
             .temperature(36.5f)
-            .profileImageUrl(user.profileImageUrl())
+            .image(user.profileImageUrl())
             .build();
 
         return new TokenWithUserInfo(accessToken, refreshToken, userinfo);
