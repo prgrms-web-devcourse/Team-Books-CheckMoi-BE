@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.post.model;
 
 import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.global.model.BaseEntity;
 import javax.persistence.Column;
@@ -58,6 +59,17 @@ public class Post extends BaseEntity {
         this.content = content;
         this.study = study;
         this.writer = writer;
+    }
+
+    public boolean isAllowedMember(StudyMember member) {
+        return this.category.isAllowedWriter(member);
+    }
+
+    public boolean isAllowedToBeWritten() {
+        if (this.study.isFinished()) {
+            return this.category == PostCategory.GENERAL;
+        }
+        return true;
     }
 
     public void editTitle(String title) {

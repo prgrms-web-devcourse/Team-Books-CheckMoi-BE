@@ -60,6 +60,7 @@ public class StudyMember extends BaseEntity {
     }
 
     public boolean isJoined() {
-        return this.status == StudyMemberStatus.ACCEPTED || this.status == StudyMemberStatus.OWNED;
+        return this.status == StudyMemberStatus.ACCEPTED ||
+            this.status == StudyMemberStatus.OWNED;
     }
 }
