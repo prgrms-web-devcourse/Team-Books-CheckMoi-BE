@@ -9,8 +9,4 @@ public class StudyJoinRequestNotFoundException extends EntityNotFoundException {
         ErrorMessage errorMessage) {
         super(errorMessage);
     }
-
-    public StudyJoinRequestNotFoundException() {
-        super(ErrorMessage.STUDY_JOIN_REQUEST_NOT_FOUND);
-    }
 }
