@@ -65,8 +65,8 @@ class UserIntegrationTest extends IntegrationTest {
                     .value(givenUser.userInfo().email()))
                 .andExpect(jsonPath("$.data.temperature")
                     .value(givenUser.userInfo().temperature()))
-                .andExpect(jsonPath("$.data.profileImageUrl")
-                    .value(givenUser.userInfo().profileImageUrl()))
+                .andExpect(jsonPath("$.data.image")
+                    .value(givenUser.userInfo().image()))
                 .andDo(documentation());
         }
 
@@ -124,7 +124,7 @@ class UserIntegrationTest extends IntegrationTest {
 
             UserRequest.Edit request = UserRequest.Edit.builder()
                 .name("수정된 유저 이름")
-                .profileImageUrl("수정된 유저 프로필 이미지")
+                .image("수정된 유저 프로필 이미지")
                 .build();
 
             mockMvc.perform(put("/api/users/{userId}", givenUser.userInfo().id())
@@ -153,7 +153,7 @@ class UserIntegrationTest extends IntegrationTest {
                 requestFields(
                     fieldWithPath("name").type(JsonFieldType.STRING)
                         .description("수정할 유저 이름"),
-                    fieldWithPath("profileImageUrl").type(JsonFieldType.STRING)
+                    fieldWithPath("image").type(JsonFieldType.STRING)
                         .description("수정할 유저 프로필 이미지 URL")
                 ),
                 tokenRequestHeader(),
@@ -185,8 +185,8 @@ class UserIntegrationTest extends IntegrationTest {
                     .value(givenUser.userInfo().email()))
                 .andExpect(jsonPath("$.data.temperature")
                     .value(givenUser.userInfo().temperature()))
-                .andExpect(jsonPath("$.data.profileImageUrl")
-                    .value(givenUser.userInfo().profileImageUrl()))
+                .andExpect(jsonPath("$.data.image")
+                    .value(givenUser.userInfo().image()))
                 .andDo(documentation());
         }
 

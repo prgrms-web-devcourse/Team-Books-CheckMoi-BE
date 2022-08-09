@@ -159,7 +159,7 @@ class StudyRepositoryTest extends RepositoryTest {
         @DisplayName("S 스터디와 관련된 책과 스터디멤버 정보를 같이 조회할 수 있다")
         void getStudyInfoWithBookAndMembers() {
             StudyDetailWithMembers response =
-                studyRepository.getStudyInfoWithMembers(study.getId());
+                studyRepository.getStudyDetailWithMembers(study.getId());
             validateStudyDetailInfo(response);
             validateMembers(response);
 
@@ -170,7 +170,7 @@ class StudyRepositoryTest extends RepositoryTest {
             assertAll(
                 () -> assertThat(response.study()).hasFieldOrProperty("id"),
                 () -> assertThat(response.study()).hasFieldOrProperty("name"),
-                () -> assertThat(response.study()).hasFieldOrProperty("thumbnailUrl"),
+                () -> assertThat(response.study()).hasFieldOrProperty("thumbnail"),
                 () -> assertThat(response.study()).hasFieldOrProperty("description"),
                 () -> assertThat(response.study()).hasFieldOrProperty("currentParticipant"),
                 () -> assertThat(response.study()).hasFieldOrProperty("maxParticipant"),
@@ -187,7 +187,7 @@ class StudyRepositoryTest extends RepositoryTest {
                 () -> assertThat(response.members().get(0)).hasFieldOrProperty("id"),
                 () -> assertThat(response.members().get(0)).hasFieldOrProperty("name"),
                 () -> assertThat(response.members().get(0)).hasFieldOrProperty("email"),
-                () -> assertThat(response.members().get(0)).hasFieldOrProperty("profileImageUrl")
+                () -> assertThat(response.members().get(0)).hasFieldOrProperty("image")
             );
         }
     }

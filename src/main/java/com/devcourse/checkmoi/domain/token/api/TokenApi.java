@@ -4,7 +4,7 @@ import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
 import com.devcourse.checkmoi.domain.token.service.TokenService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
-import com.devcourse.checkmoi.global.security.util.AuthorizationExtractor;
+import com.devcourse.checkmoi.global.security.jwt.util.AuthorizationExtractor;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

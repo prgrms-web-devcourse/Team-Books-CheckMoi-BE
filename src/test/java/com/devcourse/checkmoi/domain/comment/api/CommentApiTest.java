@@ -8,21 +8,26 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
@@ -41,10 +46,13 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -56,9 +64,12 @@ class CommentApiTest extends IntegrationTest {
     @MockBean
     private CommentCommandService commentCommandService;
 
+    @MockBean
+    private CommentCommandFacade commentCommandFacade;
+
     @Nested
     @DisplayName("댓글 목록 조회 #130")
-    class FindAllComments {
+    class FindAllCommentsTest {
 
         @Test
         @DisplayName("S 검색조건(ex- 포스트ID)에 따라 작성된 댓글을 조회할 수 있다")
@@ -131,7 +142,7 @@ class CommentApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("댓글 삭제 #136")
-    class DeleteComment {
+    class DeleteCommentTest {
 
         @Test
         @DisplayName("S 댓글 작성자는 댓글을 삭제할 수 있다.")
@@ -166,4 +177,62 @@ class CommentApiTest extends IntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("댓글 작성 #129")
+    class CreateCommentTest {
+
+        @Test
+        @DisplayName("작성된 글에 댓글을 작성할 수 있다.")
+        void createCommentTest() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+            Create request = Create.builder()
+                .content("댓글 내용")
+                .build();
+            Long studyId = 1L;
+            Long postId = 1L;
+            Study study = makeStudyWithId(makeBook(), IN_PROGRESS, studyId);
+            Post post = makePostWithId(PostCategory.GENERAL, study,
+                makeUserWithId(givenUser.userInfo().id()), postId);
+            Long response = 1L;
+            given(commentCommandFacade.createComment(
+                post.getId(),
+                givenUser.userInfo().id(),
+                request)
+            ).willReturn(response);
+
+            ResultActions result = mockMvc.perform(post("/api/comments")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                .param("postId", String.valueOf(postId))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+            );
+
+            result.andExpect(status().isCreated())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("create-comments",
+                ResourceSnippetParameters.builder()
+                    .tag("Comment API")
+                    .summary("댓글 생성")
+                    .description("댓글 생성에 사용되는 API")
+                    .requestSchema(Schema.schema("댓글 생성 요청"))
+                    .responseSchema(Schema.schema("댓글 생성 응답")),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
+                requestParameters(
+                    parameterWithName("postId").description("게시글 Id")
+                ),
+                requestFields(
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용")
+                ),
+                responseFields(
+                    fieldWithPath("data").type(JsonFieldType.NUMBER).description("댓글 ID")
+                )
+            );
+        }
+
+    }
 }

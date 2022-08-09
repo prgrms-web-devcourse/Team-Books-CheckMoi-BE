@@ -1,7 +1,7 @@
-package com.devcourse.checkmoi.global.security.handler;
+package com.devcourse.checkmoi.global.security.jwt;
 
-import com.devcourse.checkmoi.global.exception.ErrorMessage;
-import com.devcourse.checkmoi.global.exception.ErrorResponse;
+import com.devcourse.checkmoi.global.exception.error.ErrorMessage;
+import com.devcourse.checkmoi.global.exception.error.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;

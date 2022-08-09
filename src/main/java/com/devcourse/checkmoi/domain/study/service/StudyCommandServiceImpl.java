@@ -1,6 +1,6 @@
 package com.devcourse.checkmoi.domain.study.service;
 
-import static com.devcourse.checkmoi.global.exception.ErrorMessage.STUDY_JOIN_REQUEST_NOT_FOUND;
+import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.STUDY_JOIN_REQUEST_NOT_FOUND;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;

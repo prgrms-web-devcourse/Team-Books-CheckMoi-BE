@@ -2,8 +2,8 @@ package com.devcourse.checkmoi.domain.study.service;
 
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
-import static com.devcourse.checkmoi.global.exception.ErrorMessage.ACCESS_DENIED;
-import static com.devcourse.checkmoi.global.exception.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
+import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.ACCESS_DENIED;
+import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
@@ -36,7 +36,7 @@ import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidat
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
-import com.devcourse.checkmoi.global.exception.ErrorMessage;
+import com.devcourse.checkmoi.global.exception.error.ErrorMessage;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;

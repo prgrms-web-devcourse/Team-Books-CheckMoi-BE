@@ -28,8 +28,8 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
@@ -305,10 +305,12 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 ID"),
                     fieldWithPath(dataPath + ".name").type(JsonFieldType.STRING)
                         .description("스터디 이름"),
-                    fieldWithPath(dataPath + ".thumbnailUrl").type(JsonFieldType.STRING)
+                    fieldWithPath(dataPath + ".thumbnail").type(JsonFieldType.STRING)
                         .description("스터디 썸네일"),
                     fieldWithPath(dataPath + ".description").type(JsonFieldType.STRING)
                         .description("스터디 설명"),
+                    fieldWithPath(dataPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
                     fieldWithPath(dataPath + ".currentParticipant").type(
                         JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
                     fieldWithPath(dataPath + ".maxParticipant").type(JsonFieldType.NUMBER)
@@ -370,7 +372,7 @@ class StudyApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("스터디 상세 조회 #56")
-    class StudyDetailInfoTest {
+    class StudyDetailTest {
 
         private static Long userId = 1L;
 
@@ -378,12 +380,10 @@ class StudyApiTest extends IntegrationTest {
         @DisplayName("S 스터디와 관련된 책과 스터디멤버 정보를 같이 조회할 수 있다")
         void studyDetailInfoTest() throws Exception {
 
-            StudyDetailInfo givenStudyInfo = givenStudyDetailInfo(givenBookInfo());
-            List<StudyUserInfo> givenMembers = List.of(givenUserInfo(), givenUserInfo());
-
             StudyDetailWithMembers expected = StudyDetailWithMembers.builder()
-                .study(givenStudyInfo)
-                .members(givenMembers)
+                .study(givenStudyInfo())
+                .book(givenStudyBookInfo())
+                .members(List.of(givenUserInfo(), givenUserInfo()))
                 .build();
 
             given(studyQueryService.getStudyInfoWithMembers(anyLong())).willReturn(expected);
@@ -411,7 +411,7 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath("data.study.id").description("스터디 아이디"),
                     fieldWithPath("data.study.name").description("스터디 이름"),
                     fieldWithPath("data.study.status").description("스터디 진행 상태"),
-                    fieldWithPath("data.study.thumbnailUrl").description("스터디 썸네일"),
+                    fieldWithPath("data.study.thumbnail").description("스터디 썸네일"),
                     fieldWithPath("data.study.description").description("스터디 설명"),
                     fieldWithPath("data.study.currentParticipant").description("스터디 현재 참여 인원"),
                     fieldWithPath("data.study.maxParticipant").description("스터디 최대 참여 인원"),
@@ -421,15 +421,15 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath("data.study.studyEndDate").description("스터디 종료 일자"),
 
                     // study book info
-                    fieldWithPath("data.study.book.id").description("스터디 책 아이디"),
-                    fieldWithPath("data.study.book.title").description("스터디 책 제목"),
-                    fieldWithPath("data.study.book.image").description("스터디 책 썸네일"),
-                    fieldWithPath("data.study.book.author").description("스터디 책 저자"),
-                    fieldWithPath("data.study.book.publisher").description("스터디 책 출판사"),
-                    fieldWithPath("data.study.book.isbn").description("스터디 책 ISBN"),
-                    fieldWithPath("data.study.book.pubDate").description("스터디 책 출판일"),
-                    fieldWithPath("data.study.book.description").description("스터디 책 설명"),
-                    fieldWithPath("data.study.book.createdAt").description("스터디 책 썸네일"),
+                    fieldWithPath("data.book.id").description("스터디 책 아이디"),
+                    fieldWithPath("data.book.title").description("스터디 책 제목"),
+                    fieldWithPath("data.book.image").description("스터디 책 썸네일"),
+                    fieldWithPath("data.book.author").description("스터디 책 저자"),
+                    fieldWithPath("data.book.publisher").description("스터디 책 출판사"),
+                    fieldWithPath("data.book.isbn").description("스터디 책 ISBN"),
+                    fieldWithPath("data.book.pubDate").description("스터디 책 출판일"),
+                    fieldWithPath("data.book.description").description("스터디 책 설명"),
+                    fieldWithPath("data.book.createdAt").description("스터디 책 썸네일"),
 
                     // study member info
                     fieldWithPath("data.members[].id").
@@ -440,7 +440,7 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 멤버 이메일"),
                     fieldWithPath("data.members[].temperature")
                         .description("스터디 멤버 온도"),
-                    fieldWithPath("data.members[].profileImageUrl")
+                    fieldWithPath("data.members[].image")
                         .description("스터디 멤버 이미지 URL")
                 ));
         }
@@ -451,11 +451,11 @@ class StudyApiTest extends IntegrationTest {
                 .name(UUID.randomUUID().toString().substring(10))
                 .email("asdf@asdf.com")
                 .temperature(36.5f)
-                .profileImageUrl("url")
+                .image("url")
                 .build();
         }
 
-        private StudyBookInfo givenBookInfo() {
+        private StudyBookInfo givenStudyBookInfo() {
             return StudyBookInfo.builder()
                 .id(1L)
                 .title("책 제목")
@@ -469,11 +469,11 @@ class StudyApiTest extends IntegrationTest {
                 .build();
         }
 
-        private StudyDetailInfo givenStudyDetailInfo(StudyBookInfo bookInfo) {
-            return StudyDetailInfo.builder()
+        private StudyInfo givenStudyInfo() {
+            return StudyInfo.builder()
                 .id(1L)
                 .name("스터디 이름")
-                .thumbnailUrl("스터디 썸네일 URL")
+                .thumbnail("스터디 썸네일 URL")
                 .description("스터디 설명")
                 .currentParticipant(2)
                 .maxParticipant(5)
@@ -481,7 +481,6 @@ class StudyApiTest extends IntegrationTest {
                 .gatherEndDate(LocalDate.now())
                 .studyStartDate(LocalDate.now())
                 .studyEndDate(LocalDate.now())
-                .book(bookInfo)
                 .build();
         }
 
@@ -527,7 +526,7 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 신청 멤버 이메일"),
                     fieldWithPath("data.appliers[].temperature")
                         .description("스터디 신청 멤버 온도"),
-                    fieldWithPath("data.appliers[].profileImageUrl")
+                    fieldWithPath("data.appliers[].image")
                         .description("스터디 신청 멤버 이미지 URL")
                 ));
         }
@@ -543,7 +542,7 @@ class StudyApiTest extends IntegrationTest {
                 .temperature(36.5f)
                 .email("abc" + id + "@naver.com")
                 .name("abc" + id)
-                .profileImageUrl("https://north/foo.png")
+                .image("https://north/foo.png")
                 .build();
         }
     }
@@ -593,16 +592,19 @@ class StudyApiTest extends IntegrationTest {
                         .description("유저 이메일"),
                     fieldWithPath(userPath + ".temperature").type(JsonFieldType.NUMBER)
                         .description("유저 온도"),
-                    fieldWithPath(userPath + ".profileImageUrl").type(JsonFieldType.STRING)
+                    fieldWithPath(userPath + ".image").type(JsonFieldType.STRING)
                         .description("유저 프로필 이미지"),
+
                     fieldWithPath(participationPath + ".id").type(JsonFieldType.NUMBER)
                         .description("스터디 ID"),
                     fieldWithPath(participationPath + ".name").type(JsonFieldType.STRING)
                         .description("스터디 이름"),
-                    fieldWithPath(participationPath + ".thumbnailUrl").type(JsonFieldType.STRING)
+                    fieldWithPath(participationPath + ".thumbnail").type(JsonFieldType.STRING)
                         .description("스터디 썸네일"),
                     fieldWithPath(participationPath + ".description").type(JsonFieldType.STRING)
                         .description("스터디 설명"),
+                    fieldWithPath(participationPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
                     fieldWithPath(participationPath + ".currentParticipant").type(
                         JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
                     fieldWithPath(participationPath + ".maxParticipant").type(JsonFieldType.NUMBER)
@@ -615,14 +617,17 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(participationPath + ".studyEndDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 종료 일자"),
+
                     fieldWithPath(finishedPath + ".id").type(JsonFieldType.NUMBER)
                         .description("스터디 ID"),
                     fieldWithPath(finishedPath + ".name").type(JsonFieldType.STRING)
                         .description("스터디 이름"),
-                    fieldWithPath(finishedPath + ".thumbnailUrl").type(JsonFieldType.STRING)
+                    fieldWithPath(finishedPath + ".thumbnail").type(JsonFieldType.STRING)
                         .description("스터디 썸네일"),
                     fieldWithPath(finishedPath + ".description").type(JsonFieldType.STRING)
                         .description("스터디 설명"),
+                    fieldWithPath(finishedPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
                     fieldWithPath(finishedPath + ".currentParticipant").type(
                         JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
                     fieldWithPath(finishedPath + ".maxParticipant").type(JsonFieldType.NUMBER)
@@ -639,10 +644,12 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 ID"),
                     fieldWithPath(ownedPath + ".name").type(JsonFieldType.STRING)
                         .description("스터디 이름"),
-                    fieldWithPath(ownedPath + ".thumbnailUrl").type(JsonFieldType.STRING)
+                    fieldWithPath(ownedPath + ".thumbnail").type(JsonFieldType.STRING)
                         .description("스터디 썸네일"),
                     fieldWithPath(ownedPath + ".description").type(JsonFieldType.STRING)
                         .description("스터디 설명"),
+                    fieldWithPath(ownedPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
                     fieldWithPath(ownedPath + ".currentParticipant").type(
                         JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
                     fieldWithPath(ownedPath + ".maxParticipant").type(JsonFieldType.NUMBER)

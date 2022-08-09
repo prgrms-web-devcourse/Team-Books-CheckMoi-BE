@@ -1,13 +1,13 @@
-package com.devcourse.checkmoi.global.security.handler;
+package com.devcourse.checkmoi.global.security.oauth.handler;
 
 import com.devcourse.checkmoi.global.security.oauth.OAuthProvider;
 import com.devcourse.checkmoi.global.security.oauth.OAuthService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -21,15 +21,16 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
 
     private final OAuthService oauthService;
 
-    private final ObjectMapper objectMapper;
+    @Value("${front-url}")
+    private String frontUrl;
 
     @Override
     public void onAuthenticationSuccess(
         HttpServletRequest request, HttpServletResponse response, Authentication authentication
     ) throws IOException {
 
-        var providerName = parseProviderName(request);
-        var principal = authentication.getPrincipal();
+        String providerName = parseProviderName(request);
+        Object principal = authentication.getPrincipal();
 
         if (principal instanceof OAuth2User oauth) {
 
@@ -38,27 +39,16 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
                 .toUserProfile(oauth);
 
             var tokenResponse = oauthService.register(userProfile);
-            var frontUrl = request.getScheme() + "://" +
-                request.getServerName() + ":" + request.getServerPort();
 
-            log.info("oauth token request occurred! frontUrl : " + frontUrl);
-
-            String uri = UriComponentsBuilder.fromUriString("http://localhost:3000/login")
+            String uri = UriComponentsBuilder.fromUriString(frontUrl + "/login")
                 .queryParam("token", tokenResponse.accessToken())
                 .build()
                 .toUriString();
 
-//            response.setStatus(HttpStatus.OK.value());
-//            response.setContentType("application/json");
-//            response.setCharacterEncoding("UTF-8");
-//            response.getWriter()
-//                .write(objectMapper.writeValueAsString(new SuccessResponse<>(tokenResponse)));
-
             response.setHeader("Authorization", "Bearer " + tokenResponse.accessToken());
             response.sendRedirect(uri);
 
-            log.info("user : " + tokenResponse.userInfo());
-            log.info("a token : " + tokenResponse.accessToken());
+            log.info("login user : " + tokenResponse.userInfo());
         }
     }
 

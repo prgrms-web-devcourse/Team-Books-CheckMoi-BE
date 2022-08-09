@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.global.exception;
+package com.devcourse.checkmoi.global.exception.error;
 
 import java.util.List;
 import org.springframework.validation.BindingResult;
