@@ -148,7 +148,7 @@ sonarqube {
                 """
                 src/main/java/com/devcourse/checkmoi/global/**,
                 src/main/java/com/devcourse/checkmoi/domain/user/api/AuthApi.java,
-                src/main/java/com/devcourse/checkmoi/domain/token/**,
+                src/main/java/com/devcourse/checkmoi/domain/token/**
                 """
     }
 }

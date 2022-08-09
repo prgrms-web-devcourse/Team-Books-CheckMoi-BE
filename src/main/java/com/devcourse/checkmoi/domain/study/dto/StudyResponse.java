@@ -99,7 +99,8 @@ public sealed interface StudyResponse permits
 
 
     record Studies(
-        List<StudyInfo> studies
+        List<StudyInfo> studies,
+        long totalPage
     ) implements StudyResponse {
 
         @Builder

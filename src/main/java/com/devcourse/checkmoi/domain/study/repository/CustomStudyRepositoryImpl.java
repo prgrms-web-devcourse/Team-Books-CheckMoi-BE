@@ -12,14 +12,17 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetail;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
-import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -29,10 +32,9 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    // TODO: Total Page
     @Override
-    public List<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable) {
-        return jpaQueryFactory.select(
+    public Page<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable) {
+        JPQLQuery<StudyInfo> query = jpaQueryFactory.select(
                 Projections.constructor(
                     StudyInfo.class,
                     study.id,
@@ -54,10 +56,35 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 eqBookId(search.bookId()),
                 eqStudyMemberStatus(search.memberStatus()),
                 eqStudyStatus(search.studyStatus())
+            );
+        long totalCount = query.fetchCount();
+        List<StudyInfo> studies = jpaQueryFactory.select(
+                Projections.constructor(
+                    StudyInfo.class,
+                    study.id,
+                    study.name,
+                    study.thumbnailUrl,
+                    study.description,
+                    study.status,
+                    study.currentParticipant, study.maxParticipant,
+                    study.gatherStartDate, study.gatherEndDate,
+                    study.studyStartDate, study.studyEndDate
+                )
             )
+            .from(study)
+            .innerJoin(studyMember)
+            .on(study.id.eq(studyMember.study.id))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
+            .where(
+                eqUserId(search.userId()),
+                eqStudyId(search.studyId()),
+                eqBookId(search.bookId()),
+                eqStudyMemberStatus(search.memberStatus()),
+                eqStudyStatus(search.studyStatus())
+            )
             .fetch();
+        return new PageImpl<>(studies, pageable, totalCount);
     }
 
     @Override
@@ -72,16 +99,37 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     @Override
-    public List<Study> findRecruitingStudyByBookId(Long bookId, Pageable pageable) {
-        return jpaQueryFactory.select(study)
+    public Page<StudyInfo> findRecruitingStudyByBookId(Long bookId, Pageable pageable) {
+        JPQLQuery<StudyInfo> query = jpaQueryFactory.select(
+                Projections.constructor(
+                    StudyInfo.class,
+                    study.id, study.name, study.thumbnailUrl, study.description, study.status,
+                    study.currentParticipant, study.maxParticipant,
+                    study.gatherStartDate, study.gatherEndDate,
+                    study.studyStartDate, study.studyEndDate
+                ))
+            .from(study)
+            .where(
+                study.book.id.eq(bookId),
+                study.status.eq(StudyStatus.RECRUITING)
+            );
+        long totalCount = query.fetchCount();
+        List<StudyInfo> studies = jpaQueryFactory.select(
+                Projections.constructor(
+                    StudyInfo.class,
+                    study.id, study.name, study.thumbnailUrl, study.description, study.status,
+                    study.currentParticipant, study.maxParticipant,
+                    study.gatherStartDate, study.gatherEndDate,
+                    study.studyStartDate, study.studyEndDate
+                ))
             .from(study)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .where(
                 study.book.id.eq(bookId),
                 study.status.eq(StudyStatus.RECRUITING)
-            )
-            .fetch();
+            ).fetch();
+        return new PageImpl<>(studies, pageable, totalCount);
     }
 
     @Override
@@ -138,7 +186,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                     study.status.eq(StudyStatus.IN_PROGRESS)
                         .or(study.status.eq(StudyStatus.RECRUITING))
                 )
-                .fetch()
+                .fetch(), 0
         );
     }
 
@@ -162,7 +210,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                         .or(studyMember.status.eq(OWNED)),
                     study.status.eq(StudyStatus.FINISHED)
                 )
-                .fetch()
+                .fetch(), 0
         );
     }
 
@@ -184,7 +232,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                     studyMember.user.id.eq(userId),
                     studyMember.status.eq(OWNED)
                 )
-                .fetch()
+                .fetch(), 0
         );
     }
 

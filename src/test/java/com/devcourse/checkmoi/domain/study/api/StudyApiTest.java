@@ -277,7 +277,8 @@ class StudyApiTest extends IntegrationTest {
                         makeStudyWithId(makeBookWithId(1L), RECRUITING, 3L)
                     ).stream()
                     .map(studyConverter::studyToStudyInfo)
-                    .toList()
+                    .toList(),
+                0
             );
 
             given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
@@ -331,7 +332,9 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath(dataPath + ".studyStartDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(dataPath + ".studyEndDate").type(JsonFieldType.STRING)
-                        .description("스터디 진행 종료 일자")
+                        .description("스터디 진행 종료 일자"),
+                    fieldWithPath("data.totalPage").type(JsonFieldType.NUMBER)
+                        .description("총 페이지 수")
                 )
             );
         }
@@ -626,7 +629,8 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(participationPath + ".studyEndDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 종료 일자"),
-
+                    fieldWithPath("data.participation.totalPage").type(JsonFieldType.NUMBER)
+                        .description("진행중인 스터디 총 페이지 수"),
                     fieldWithPath(finishedPath + ".id").type(JsonFieldType.NUMBER)
                         .description("스터디 ID"),
                     fieldWithPath(finishedPath + ".name").type(JsonFieldType.STRING)
@@ -649,6 +653,8 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(finishedPath + ".studyEndDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 종료 일자"),
+                    fieldWithPath("data.finished.totalPage").type(JsonFieldType.NUMBER)
+                        .description("종료된 스터디 총 페이지 수"),
                     fieldWithPath(ownedPath + ".id").type(JsonFieldType.NUMBER)
                         .description("스터디 ID"),
                     fieldWithPath(ownedPath + ".name").type(JsonFieldType.STRING)
@@ -670,8 +676,9 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath(ownedPath + ".studyStartDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(ownedPath + ".studyEndDate").type(JsonFieldType.STRING)
-                        .description("스터디 진행 종료 일자")
-
+                        .description("스터디 진행 종료 일자"),
+                    fieldWithPath("data.owned.totalPage").type(JsonFieldType.NUMBER)
+                        .description("내가 스터디장인 스터디 총 페이지 수")
                 )
             );
         }
@@ -707,7 +714,9 @@ class StudyApiTest extends IntegrationTest {
             StudyInfo study4 = makeStudyInfo(makeStudyWithId(makeBook(), FINISHED, 4L));
 
             given(studyQueryService.findAllByCondition(anyLong(), any(Search.class), any()))
-                .willReturn(List.of(study3, study4));
+                .willReturn(
+                    new Studies(List.of(study3, study4), 1)
+                );
 
             Search search = Search.builder()
                 .studyStatus(FINISHED.toString())
@@ -730,6 +739,7 @@ class StudyApiTest extends IntegrationTest {
         }
 
         private RestDocumentationResultHandler documentation() {
+            String studiesPath = "data.studies[]";
             return MockMvcRestDocumentationWrapper.document("search-studies-by-condition",
                 ResourceSnippetParameters.builder()
                     .tag("Study API")
@@ -745,23 +755,39 @@ class StudyApiTest extends IntegrationTest {
                     parameterWithName("studyId").description("스터디 아이디").optional(),
                     parameterWithName("bookId").description("책 아이디").optional(),
                     parameterWithName("memberStatus").description("스터디원 상태").optional(),
-                    parameterWithName("studyStatus").description("스터디 상태").optional()
+                    parameterWithName("studyStatus").description("스터디 상태").optional(),
+                    parameterWithName("page").description("페이지").optional(),
+                    parameterWithName("size").description("사이즈").optional()
                 ),
                 responseFields(
                     // searched study infos
-                    fieldWithPath("data[].id").description("스터디 아이디"),
-                    fieldWithPath("data[].name").description("스터디 이름"),
-                    fieldWithPath("data[].thumbnail").description("스터디 썸네일 이미지"),
-                    fieldWithPath("data[].description").description("스터디 설명"),
-                    fieldWithPath("data[].status").description("스터디 상태"),
-                    fieldWithPath("data[].currentParticipant").description("스터디 현재 참여 인원"),
-                    fieldWithPath("data[].maxParticipant").description("스터디 최대 참여 인원"),
-                    fieldWithPath("data[].gatherStartDate").description("모집 시작 일자"),
-                    fieldWithPath("data[].gatherEndDate").description("모집 종료 일자"),
-                    fieldWithPath("data[].studyStartDate").description("스터디 시작 일자"),
-                    fieldWithPath("data[].studyEndDate").description("스터디 종료 일자")
+                    fieldWithPath(studiesPath + ".id").type(JsonFieldType.NUMBER)
+                        .description("스터디 아이디"),
+                    fieldWithPath(studiesPath + ".name").type(JsonFieldType.STRING)
+                        .description("스터디 이름"),
+                    fieldWithPath(studiesPath + ".thumbnail").type(JsonFieldType.STRING)
+                        .description("스터디 썸네일 이미지"),
+                    fieldWithPath(studiesPath + ".description").type(JsonFieldType.STRING)
+                        .description("스터디 설명"),
+                    fieldWithPath(studiesPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
+                    fieldWithPath(studiesPath + ".currentParticipant").type(JsonFieldType.NUMBER)
+                        .description("스터디 현재 참여 인원"),
+                    fieldWithPath(studiesPath + ".maxParticipant").type(JsonFieldType.NUMBER)
+                        .description("스터디 최대 참여 인원"),
+                    fieldWithPath(studiesPath + ".gatherStartDate").type(JsonFieldType.STRING)
+                        .description("모집 시작 일자"),
+                    fieldWithPath(studiesPath + ".gatherEndDate").type(JsonFieldType.STRING)
+                        .description("모집 종료 일자"),
+                    fieldWithPath(studiesPath + ".studyStartDate").type(JsonFieldType.STRING)
+                        .description("스터디 시작 일자"),
+                    fieldWithPath(studiesPath + ".studyEndDate").type(JsonFieldType.STRING)
+                        .description("스터디 종료 일자"),
+                    fieldWithPath("data.totalPage").type(JsonFieldType.NUMBER)
+                        .description("총 페이지 수")
                 )
             );
         }
+
     }
 }

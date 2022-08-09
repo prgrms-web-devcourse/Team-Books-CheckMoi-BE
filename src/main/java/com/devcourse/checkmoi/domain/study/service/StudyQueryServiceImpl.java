@@ -13,6 +13,7 @@ import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,17 +33,21 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
 
     @Override
-    public List<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable) {
-        return studyRepository.findAllByCondition(userId, search, pageable);
+    public Studies findAllByCondition(Long userId, Search search, Pageable pageable) {
+        Page<StudyInfo> studyInfos = studyRepository.findAllByCondition(userId, search,
+            pageable);
+        return new Studies(
+            studyInfos.getContent(),
+            studyInfos.getTotalPages()
+        );
     }
 
     @Override
     public Studies getStudies(Long bookId, Pageable pageable) {
+        Page<StudyInfo> studyInfos = studyRepository.findRecruitingStudyByBookId(bookId, pageable);
         return new Studies(
-            studyRepository.findRecruitingStudyByBookId(bookId, pageable)
-                .stream()
-                .map(studyConverter::studyToStudyInfo)
-                .toList()
+            studyInfos.getContent(),
+            studyInfos.getTotalPages()
         );
     }
 

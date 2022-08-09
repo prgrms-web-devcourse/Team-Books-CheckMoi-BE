@@ -37,6 +37,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,13 +126,13 @@ class StudyRepositoryTest extends RepositoryTest {
         @DisplayName("책 아이디를 기준으로 모집중인 스터디 정보를 조회한다.")
         void findRecruitingStudyByBookId() {
             PageRequest pageRequest = new PageRequest();
-
-            List<Study> result =
+            pageRequest.setSize(4);
+            int totalPage = 1;
+            Page<StudyInfo> result =
                 studyRepository.findRecruitingStudyByBookId(givenBook.getId(), pageRequest.of());
 
-            assertThat(result)
-                .usingRecursiveFieldByFieldElementComparator()
-                .hasSameElementsAs(studies);
+            assertThat(result.getContent()).hasSize(4);
+            assertThat(result.getTotalPages()).isEqualTo(totalPage);
         }
     }
 
@@ -332,7 +333,7 @@ class StudyRepositoryTest extends RepositoryTest {
                 makeStudyInfo(study1),
                 makeStudyInfo(study2),
                 makeStudyInfo(study3)
-            ));
+            ), 0);
 
             assertThat(got.studies()).hasSize(want.studies().size());
             assertThat(got)
@@ -346,8 +347,7 @@ class StudyRepositoryTest extends RepositoryTest {
             Studies got = studyRepository.getFinishedStudies(user.getId());
             Studies want = new Studies(List.of(
                 makeStudyInfo(study4)
-
-            ));
+            ), 0);
 
             assertThat(got.studies()).hasSize(want.studies().size());
             assertThat(got)
@@ -361,7 +361,7 @@ class StudyRepositoryTest extends RepositoryTest {
             Studies got = studyRepository.getOwnedStudies(user.getId());
             Studies want = new Studies(List.of(
                 makeStudyInfo(study1)
-            ));
+            ), 0);
 
             assertThat(got.studies()).hasSize(want.studies().size());
             assertThat(got)
@@ -426,9 +426,9 @@ class StudyRepositoryTest extends RepositoryTest {
                 .build();
             PageRequest page = PageRequest.builder().build();
 
-            List<StudyInfo> result =
+            Page<StudyInfo> result =
                 studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
-            assertThat(result).hasSize(3);
+            assertThat(result.getContent()).hasSize(3);
         }
     }
 }

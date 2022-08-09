@@ -5,15 +5,14 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
-import com.devcourse.checkmoi.domain.study.model.Study;
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CustomStudyRepository {
 
     Long findStudyOwner(Long studyId);
 
-    List<Study> findRecruitingStudyByBookId(Long bookId, Pageable pageable);
+    Page<StudyInfo> findRecruitingStudyByBookId(Long bookId, Pageable pageable);
 
     StudyDetailWithMembers getStudyDetailWithMembers(Long studyId);
 
@@ -27,5 +26,5 @@ public interface CustomStudyRepository {
 
     Studies getOwnedStudies(Long userId);
 
-    List<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable);
+    Page<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable);
 }

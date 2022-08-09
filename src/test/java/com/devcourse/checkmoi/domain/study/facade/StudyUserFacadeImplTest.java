@@ -54,13 +54,13 @@ class StudyUserFacadeImplTest {
             Long userId = 1L;
             UserInfo user = makeUserInfo();
             Studies participation = new Studies(
-                List.of(makeStudyInfo(study1))
+                List.of(makeStudyInfo(study1)), 1
             );
             Studies finished = new Studies(
-                List.of(makeStudyInfo(study2))
+                List.of(makeStudyInfo(study2)), 1
             );
             Studies owned = new Studies(
-                List.of(makeStudyInfo(study3))
+                List.of(makeStudyInfo(study3)), 1
             );
             given(userQueryService.findUserInfo(anyLong()))
                 .willReturn(user);
