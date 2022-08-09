@@ -1,8 +1,12 @@
 package com.devcourse.checkmoi.domain.study.api;
 
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeMyStudies;
 import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeUserInfo;
 import static com.devcourse.checkmoi.util.DocumentUtil.getDateFormat;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -32,7 +37,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMemb
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
-import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
@@ -57,6 +62,8 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 class StudyApiTest extends IntegrationTest {
 
@@ -68,6 +75,7 @@ class StudyApiTest extends IntegrationTest {
 
     @MockBean
     private StudyUserFacade studyUserFacade;
+
 
     @Nested
     @DisplayName("스터디 등록")
@@ -264,8 +272,8 @@ class StudyApiTest extends IntegrationTest {
 
             Studies response = new Studies(
                 List.of(
-                        makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
-                        makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
+                        makeStudyWithId(makeBookWithId(1L), RECRUITING, 1L),
+                        makeStudyWithId(makeBookWithId(1L), RECRUITING, 3L)
                     ).stream()
                     .map(studyConverter::studyToStudyInfo)
                     .toList()
@@ -663,6 +671,85 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath(ownedPath + ".studyEndDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 종료 일자")
 
+                )
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 조회 v2 #158")
+    class SearchStudies {
+
+        private StudyInfo makeStudyInfo(Study study) {
+            return StudyInfo.builder()
+                .id(study.getId())
+                .name(study.getName())
+                .thumbnail(study.getThumbnailUrl())
+                .description(study.getDescription())
+                .status(study.getStatus())
+                .currentParticipant(study.getCurrentParticipant())
+                .maxParticipant(study.getMaxParticipant())
+                .gatherStartDate(study.getStudyStartDate())
+                .gatherEndDate(study.getGatherEndDate())
+                .studyStartDate(study.getStudyStartDate())
+                .studyEndDate(study.getStudyEndDate())
+                .build();
+        }
+
+        @Test
+        @DisplayName("S 스터디를 조건에 따라 검색할 수 있다")
+        void searchStudies() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+            StudyInfo study1 = makeStudyInfo(makeStudyWithId(makeBook(), RECRUITING, 1L));
+            StudyInfo study2 = makeStudyInfo(makeStudyWithId(makeBook(), IN_PROGRESS, 2L));
+            StudyInfo study3 = makeStudyInfo(makeStudyWithId(makeBook(), FINISHED, 3L));
+            StudyInfo study4 = makeStudyInfo(makeStudyWithId(makeBook(), FINISHED, 4L));
+
+            given(studyQueryService.findAllByCondition(anyLong(), any(Search.class), any()))
+                .willReturn(List.of(study3, study4));
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("studyStatus", FINISHED.toString());
+
+            mockMvc.perform(get("/api/v2/studies").contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf-8")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                    .params(params))
+                .andExpect(status().isOk())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("search-studies-by-condition",
+                ResourceSnippetParameters.builder()
+                    .tag("Study API")
+                    .summary("스터디 검색 v2")
+                    .description("스터디 검색에 사용되는 API입니다.")
+                    .requestSchema(Schema.schema("스터디 검색 요청"))
+                    .responseSchema(Schema.schema("스터디 검색 응답")),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
+                requestParameters(
+                    parameterWithName("userId").description("유저 아이디").optional(),
+                    parameterWithName("studyId").description("스터디 아이디").optional(),
+                    parameterWithName("bookId").description("책 아이디").optional(),
+                    parameterWithName("memberStatus").description("스터디원 상태").optional(),
+                    parameterWithName("studyStatus").description("스터디 상태").optional()
+                ),
+                responseFields(
+                    // searched study infos
+                    fieldWithPath("data[].id").description("스터디 아이디"),
+                    fieldWithPath("data[].name").description("스터디 이름"),
+                    fieldWithPath("data[].thumbnail").description("스터디 썸네일 이미지"),
+                    fieldWithPath("data[].description").description("스터디 설명"),
+                    fieldWithPath("data[].status").description("스터디 상태"),
+                    fieldWithPath("data[].currentParticipant").description("스터디 현재 참여 인원"),
+                    fieldWithPath("data[].maxParticipant").description("스터디 최대 참여 인원"),
+                    fieldWithPath("data[].gatherStartDate").description("모집 시작 일자"),
+                    fieldWithPath("data[].gatherEndDate").description("모집 종료 일자"),
+                    fieldWithPath("data[].studyStartDate").description("스터디 시작 일자"),
+                    fieldWithPath("data[].studyEndDate").description("스터디 종료 일자")
                 )
             );
         }
