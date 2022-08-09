@@ -42,6 +42,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,36 +73,20 @@ class StudyQueryServiceImplTest {
         @DisplayName("현재 모집중인 특정 책에 대한 스터디 목록 조회")
         void getStudies() {
             Long bookId = 1L;
+            long totalPage = 1L;
             PageRequest pageRequest = new PageRequest();
             Pageable pageable = pageRequest.of();
-            List<Study> studies = List.of(
-                makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L),
-                makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
-            );
-            List<StudyInfo> studyInfos = studies.stream().map(
-                study -> StudyInfo.builder()
-                    .id(study.getId())
-                    .name(study.getName())
-                    .thumbnail(study.getThumbnailUrl())
-                    .description(study.getDescription())
-                    .currentParticipant(study.getCurrentParticipant())
-                    .maxParticipant(study.getMaxParticipant())
-                    .gatherStartDate(study.getGatherStartDate())
-                    .gatherEndDate(study.getGatherEndDate())
-                    .studyStartDate(study.getStudyStartDate())
-                    .studyEndDate(study.getStudyEndDate())
-                    .build()
-            ).toList();
+            Page<StudyInfo> studies = new PageImpl<>(List.of(
+                makeStudyInfo(makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L)),
+                makeStudyInfo(makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L))
+            ));
 
             Studies want = Studies.builder()
-                .studies(studyInfos)
+                .studies(studies.getContent())
+                .totalPage(totalPage)
                 .build();
             given(studyRepository.findRecruitingStudyByBookId(anyLong(), any(Pageable.class)))
                 .willReturn(studies);
-            given(studyConverter.studyToStudyInfo(studies.get(0))).willReturn(
-                studyInfos.get(0));
-            given(studyConverter.studyToStudyInfo(studies.get(1))).willReturn(
-                studyInfos.get(1));
 
             Studies got = studyQueryService.getStudies(bookId, pageable);
 
@@ -212,7 +198,8 @@ class StudyQueryServiceImplTest {
         void getParticipationStudies() {
             Long userId = 1L;
             Studies participation = new Studies(
-                List.of(makeStudyInfo(study1))
+                List.of(makeStudyInfo(study1)),
+                1
             );
 
             given(studyRepository.getParticipationStudies(anyLong()))
@@ -229,7 +216,8 @@ class StudyQueryServiceImplTest {
         void getFinishedStudies() {
             Long userId = 1L;
             Studies finished = new Studies(
-                List.of(makeStudyInfo(study2))
+                List.of(makeStudyInfo(study2)),
+                0
             );
 
             given(studyRepository.getFinishedStudies(anyLong()))
@@ -246,7 +234,8 @@ class StudyQueryServiceImplTest {
         void getOwnedStudies() {
             Long userId = 1L;
             Studies owned = new Studies(
-                List.of(makeStudyInfo(study3))
+                List.of(makeStudyInfo(study3)),
+                0
             );
 
             given(studyRepository.getOwnedStudies(anyLong()))

@@ -4,13 +4,16 @@ import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +35,10 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
     @Override
     public Studies getStudies(Long bookId, Pageable pageable) {
+        Page<StudyInfo> studyInfos = studyRepository.findRecruitingStudyByBookId(bookId, pageable);
         return new Studies(
-            studyRepository.findRecruitingStudyByBookId(bookId, pageable)
-                .stream()
-                .map(studyConverter::studyToStudyInfo)
-                .toList()
+            studyInfos.getContent(),
+            studyInfos.getTotalPages()
         );
     }
 

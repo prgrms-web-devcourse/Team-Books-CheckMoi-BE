@@ -59,13 +59,13 @@ public abstract class DTOGeneratorUtil {
     public static List<Studies> makeMyStudies() {
         return List.of(
             new Studies(
-                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.IN_PROGRESS, 1L)))
+                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.IN_PROGRESS, 1L))), 1
             ),
             new Studies(
-                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.FINISHED, 2L)))
+                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.FINISHED, 2L))), 1
             ),
             new Studies(
-                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.RECRUITING, 3L)))
+                List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.RECRUITING, 3L))), 1
             )
         );
     }

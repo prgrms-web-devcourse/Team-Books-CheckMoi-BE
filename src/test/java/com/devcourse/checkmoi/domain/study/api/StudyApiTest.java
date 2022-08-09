@@ -268,7 +268,8 @@ class StudyApiTest extends IntegrationTest {
                         makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L)
                     ).stream()
                     .map(studyConverter::studyToStudyInfo)
-                    .toList()
+                    .toList(),
+                0
             );
 
             given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
@@ -322,7 +323,9 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath(dataPath + ".studyStartDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(dataPath + ".studyEndDate").type(JsonFieldType.STRING)
-                        .description("스터디 진행 종료 일자")
+                        .description("스터디 진행 종료 일자"),
+                    fieldWithPath("data.totalPage").type(JsonFieldType.NUMBER)
+                        .description("총 페이지 수")
                 )
             );
         }
@@ -617,7 +620,8 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(participationPath + ".studyEndDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 종료 일자"),
-
+                    fieldWithPath("data.participation.totalPage").type(JsonFieldType.NUMBER)
+                        .description("진행중인 스터디 총 페이지 수"),
                     fieldWithPath(finishedPath + ".id").type(JsonFieldType.NUMBER)
                         .description("스터디 ID"),
                     fieldWithPath(finishedPath + ".name").type(JsonFieldType.STRING)
@@ -640,6 +644,8 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(finishedPath + ".studyEndDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 종료 일자"),
+                    fieldWithPath("data.finished.totalPage").type(JsonFieldType.NUMBER)
+                        .description("종료된 스터디 총 페이지 수"),
                     fieldWithPath(ownedPath + ".id").type(JsonFieldType.NUMBER)
                         .description("스터디 ID"),
                     fieldWithPath(ownedPath + ".name").type(JsonFieldType.STRING)
@@ -661,8 +667,9 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath(ownedPath + ".studyStartDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(ownedPath + ".studyEndDate").type(JsonFieldType.STRING)
-                        .description("스터디 진행 종료 일자")
-
+                        .description("스터디 진행 종료 일자"),
+                    fieldWithPath("data.owned.totalPage").type(JsonFieldType.NUMBER)
+                        .description("내가 스터디장인 스터디 총 페이지 수")
                 )
             );
         }
