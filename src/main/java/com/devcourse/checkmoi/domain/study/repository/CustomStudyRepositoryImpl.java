@@ -154,7 +154,6 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         );
     }
 
-
     private StudyDetailInfo getStudyInfo(Long studyId) {
         return jpaQueryFactory.select(
                 Projections.constructor(

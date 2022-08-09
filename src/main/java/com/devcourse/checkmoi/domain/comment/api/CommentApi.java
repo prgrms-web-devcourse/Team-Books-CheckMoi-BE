@@ -1,7 +1,10 @@
 package com.devcourse.checkmoi.domain.comment.api;
 
+import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
+import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
@@ -13,7 +16,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,6 +31,8 @@ public class CommentApi {
 
     private final CommentCommandService commentCommandService;
 
+    private final CommentCommandFacade commentCommandFacade;
+
     @GetMapping("/comments")
     public ResponseEntity<SuccessResponse<List<CommentInfo>>> findAllComments(
         @AuthenticationPrincipal JwtAuthentication user,
@@ -32,6 +40,16 @@ public class CommentApi {
     ) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(commentQueryService.findAllComments(user.id(), request)));
+    }
+
+    @PostMapping("/comments")
+    public ResponseEntity<SuccessResponse<Long>> createComment(
+        @RequestBody Create request,
+        @RequestParam Long postId,
+        @AuthenticationPrincipal JwtAuthentication user
+    ) {
+        Long id = commentCommandFacade.createComment(postId, user.id(), request);
+        return ResponseEntity.created(generatedUri(id)).body(new SuccessResponse<>(id));
     }
 
     @DeleteMapping("/comments/{commentId}")

@@ -5,6 +5,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 
 public interface CustomStudyRepository {
@@ -24,4 +25,5 @@ public interface CustomStudyRepository {
     Studies getFinishedStudies(Long userId);
 
     Studies getOwnedStudies(Long userId);
+
 }

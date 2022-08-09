@@ -18,4 +18,8 @@ public interface StudyQueryService {
     Studies getFinishedStudies(Long userId);
 
     Studies getOwnedStudies(Long userId);
+
+    void ongoingStudy(Long studyId);
+
+    void participateUser(Long aLong, Long userId);
 }

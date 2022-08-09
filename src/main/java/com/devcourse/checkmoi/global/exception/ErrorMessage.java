@@ -31,7 +31,8 @@ public enum ErrorMessage {
 
     // study error
     NOT_ALLOWED_STUDY_STATUS("스터디 상태 변경을 할 수 없습니다", HttpStatus.BAD_REQUEST),
-
+    FINISHED_STUDY("이미 종료된 스터디입니다.", HttpStatus.FORBIDDEN),
+    NOT_PARTICIPATE_STUDY_USER("해당 스터디에 참가하지 않은 유저입니다.", HttpStatus.FORBIDDEN),
     // post error
     NOT_ALLOWED_WRITER("게시글 작성 권한이 없습니다", HttpStatus.FORBIDDEN);
 
