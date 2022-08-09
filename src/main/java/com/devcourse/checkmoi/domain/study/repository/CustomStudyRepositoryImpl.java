@@ -90,9 +90,10 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             jpaQueryFactory.select(
                     Projections.constructor(
                         StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description,
-                        study.currentParticipant, study.maxParticipant, study.gatherStartDate,
-                        study.gatherEndDate, study.studyStartDate, study.studyEndDate
+                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
+                        study.currentParticipant, study.maxParticipant,
+                        study.gatherStartDate, study.gatherEndDate,
+                        study.studyStartDate, study.studyEndDate
                     )
                 )
                 .from(study)
@@ -115,7 +116,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             jpaQueryFactory.select(
                     Projections.constructor(
                         StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description,
+                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
                         study.currentParticipant, study.maxParticipant, study.gatherStartDate,
                         study.gatherEndDate, study.studyStartDate, study.studyEndDate
                     )
@@ -139,7 +140,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             jpaQueryFactory.select(
                     Projections.constructor(
                         StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description,
+                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
                         study.currentParticipant, study.maxParticipant, study.gatherStartDate,
                         study.gatherEndDate, study.studyStartDate, study.studyEndDate
                     )
@@ -164,6 +165,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                         study.name,
                         study.thumbnailUrl,
                         study.description,
+                        study.status,
                         study.currentParticipant, study.maxParticipant,
                         study.gatherStartDate, study.gatherEndDate,
                         study.studyStartDate, study.studyEndDate

@@ -1,13 +1,9 @@
 package com.devcourse.checkmoi.util;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePost;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
-import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
-import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
@@ -25,6 +21,7 @@ public abstract class DTOGeneratorUtil {
             .name(study.getName())
             .thumbnail(study.getThumbnailUrl())
             .description(study.getDescription())
+            .status(study.getStatus())
             .currentParticipant(1)
             .maxParticipant(study.getMaxParticipant())
             .gatherStartDate(study.getGatherStartDate())
@@ -47,6 +44,7 @@ public abstract class DTOGeneratorUtil {
             .commentCount(0)
             .build();
     }
+
     public static UserInfo makeUserInfo() {
         User user = makeUserWithId(1L);
         return UserInfo.builder()

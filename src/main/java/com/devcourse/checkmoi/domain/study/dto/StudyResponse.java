@@ -8,6 +8,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetail;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
@@ -25,6 +26,9 @@ public sealed interface StudyResponse permits
         String name,
         String thumbnail,
         String description,
+
+        StudyStatus status, // TODO : status 추가
+
         int currentParticipant,
         Integer maxParticipant,
         @JsonFormat(pattern = "yyyy/MM/dd")

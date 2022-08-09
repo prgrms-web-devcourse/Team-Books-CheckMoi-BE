@@ -34,6 +34,7 @@ public class StudyConverter {
             .id(study.getId())
             .name(study.getName())
             .thumbnail(study.getThumbnailUrl())
+            .status(study.getStatus())
             .description(study.getDescription())
             .currentParticipant(study.getCurrentParticipant())
             .maxParticipant(study.getMaxParticipant())

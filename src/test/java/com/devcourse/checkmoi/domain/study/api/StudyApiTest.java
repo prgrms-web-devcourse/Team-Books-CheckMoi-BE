@@ -309,6 +309,8 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 썸네일"),
                     fieldWithPath(dataPath + ".description").type(JsonFieldType.STRING)
                         .description("스터디 설명"),
+                    fieldWithPath(dataPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
                     fieldWithPath(dataPath + ".currentParticipant").type(
                         JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
                     fieldWithPath(dataPath + ".maxParticipant").type(JsonFieldType.NUMBER)
@@ -408,7 +410,7 @@ class StudyApiTest extends IntegrationTest {
                     // study info
                     fieldWithPath("data.study.id").description("스터디 아이디"),
                     fieldWithPath("data.study.name").description("스터디 이름"),
-                    // fieldWithPath("data.study.status").description("스터디 진행 상태"), //TODO: ?
+                    fieldWithPath("data.study.status").description("스터디 진행 상태"),
                     fieldWithPath("data.study.thumbnail").description("스터디 썸네일"),
                     fieldWithPath("data.study.description").description("스터디 설명"),
                     fieldWithPath("data.study.currentParticipant").description("스터디 현재 참여 인원"),
@@ -592,6 +594,7 @@ class StudyApiTest extends IntegrationTest {
                         .description("유저 온도"),
                     fieldWithPath(userPath + ".image").type(JsonFieldType.STRING)
                         .description("유저 프로필 이미지"),
+
                     fieldWithPath(participationPath + ".id").type(JsonFieldType.NUMBER)
                         .description("스터디 ID"),
                     fieldWithPath(participationPath + ".name").type(JsonFieldType.STRING)
@@ -600,6 +603,8 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 썸네일"),
                     fieldWithPath(participationPath + ".description").type(JsonFieldType.STRING)
                         .description("스터디 설명"),
+                    fieldWithPath(participationPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
                     fieldWithPath(participationPath + ".currentParticipant").type(
                         JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
                     fieldWithPath(participationPath + ".maxParticipant").type(JsonFieldType.NUMBER)
@@ -612,6 +617,7 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 진행 시작 일자"),
                     fieldWithPath(participationPath + ".studyEndDate").type(JsonFieldType.STRING)
                         .description("스터디 진행 종료 일자"),
+
                     fieldWithPath(finishedPath + ".id").type(JsonFieldType.NUMBER)
                         .description("스터디 ID"),
                     fieldWithPath(finishedPath + ".name").type(JsonFieldType.STRING)
@@ -620,6 +626,8 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 썸네일"),
                     fieldWithPath(finishedPath + ".description").type(JsonFieldType.STRING)
                         .description("스터디 설명"),
+                    fieldWithPath(finishedPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
                     fieldWithPath(finishedPath + ".currentParticipant").type(
                         JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
                     fieldWithPath(finishedPath + ".maxParticipant").type(JsonFieldType.NUMBER)
@@ -640,6 +648,8 @@ class StudyApiTest extends IntegrationTest {
                         .description("스터디 썸네일"),
                     fieldWithPath(ownedPath + ".description").type(JsonFieldType.STRING)
                         .description("스터디 설명"),
+                    fieldWithPath(ownedPath + ".status").type(JsonFieldType.STRING)
+                        .description("스터디 상태"),
                     fieldWithPath(ownedPath + ".currentParticipant").type(
                         JsonFieldType.NUMBER).description("현재 스터디 참가 인원"),
                     fieldWithPath(ownedPath + ".maxParticipant").type(JsonFieldType.NUMBER)
