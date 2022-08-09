@@ -26,5 +26,5 @@ public interface StudyQueryService {
 
     void participateUser(Long aLong, Long userId);
 
-    List<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable);
+    Studies findAllByCondition(Long userId, Search search, Pageable pageable);
 }

@@ -33,8 +33,13 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
 
     @Override
-    public List<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable) {
-        return studyRepository.findAllByCondition(userId, search, pageable);
+    public Studies findAllByCondition(Long userId, Search search, Pageable pageable) {
+        Page<StudyInfo> studyInfos = studyRepository.findAllByCondition(userId, search,
+            pageable);
+        return new Studies(
+            studyInfos.getContent(),
+            studyInfos.getTotalPages()
+        );
     }
 
     @Override

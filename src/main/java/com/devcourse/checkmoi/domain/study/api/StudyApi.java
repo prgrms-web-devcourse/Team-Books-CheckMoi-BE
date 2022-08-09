@@ -124,7 +124,7 @@ public class StudyApi {
     /********************************* API v2  ****************************************/
 
     @GetMapping("/v2/studies")
-    public ResponseEntity<SuccessResponse<List<StudyInfo>>> getDetailInfo(
+    public ResponseEntity<SuccessResponse<Studies>> getDetailInfo(
         @AuthenticationPrincipal JwtAuthentication user,
         Search search,
         PageRequest pageable

@@ -426,9 +426,9 @@ class StudyRepositoryTest extends RepositoryTest {
                 .build();
             PageRequest page = PageRequest.builder().build();
 
-            List<StudyInfo> result =
+            Page<StudyInfo> result =
                 studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
-            assertThat(result).hasSize(3);
+            assertThat(result.getContent()).hasSize(3);
         }
     }
 }
