@@ -56,7 +56,7 @@ security:
       GET:
         - /api/tokens/**
         - /api/books/**
-        - /api/studies
+        - /api/studies/**
       POST: [ ]
       PATCH: [ ]
       PUT: [ ]

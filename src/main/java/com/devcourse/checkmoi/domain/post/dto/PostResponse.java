@@ -14,8 +14,8 @@ public sealed interface PostResponse permits PostInfo {
         String content,
         PostCategory category,
         Long studyId,
-        String writerName,
-        String writerProfileImg,
+        String writer,
+        String writerImage,
         Integer commentCount,
 
         @JsonFormat(pattern = "yyyy/MM/dd")
