@@ -43,6 +43,7 @@ security:
       ALL:
         - /static/**
         - /favicon.ico
+        - /h2-console/**
       GET:
         - /
       POST: [ ]
@@ -57,6 +58,7 @@ security:
         - /api/tokens/**
         - /api/books/**
         - /api/studies/**
+        - /login
       POST: [ ]
       PATCH: [ ]
       PUT: [ ]

@@ -1,6 +1,6 @@
-package com.devcourse.checkmoi.global.security.handler;
+package com.devcourse.checkmoi.global.security.jwt.exception.handler;
 
-import com.devcourse.checkmoi.global.exception.ErrorResponse;
+import com.devcourse.checkmoi.global.exception.error.ErrorResponse;
 import com.devcourse.checkmoi.global.security.jwt.exception.TokenException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
-            log.info("exception handler token error : {}", e.getMessage(), e);
+            log.info("exception handler token error : {}", e.getMessage());
             generateErrorResponse(response, e);
         }
     }

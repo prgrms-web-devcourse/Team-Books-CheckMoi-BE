@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.global.security.util;
+package com.devcourse.checkmoi.global.security.jwt.util;
 
 import static org.springframework.http.HttpHeaders.*;
 

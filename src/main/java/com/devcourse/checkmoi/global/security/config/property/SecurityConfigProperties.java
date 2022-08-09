@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.global.config.properties;
+package com.devcourse.checkmoi.global.security.config.property;
 
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;

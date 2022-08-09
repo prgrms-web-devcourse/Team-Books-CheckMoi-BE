@@ -1,5 +1,7 @@
 package com.devcourse.checkmoi.global.exception;
 
+import com.devcourse.checkmoi.global.exception.error.ErrorMessage;
+
 public class BusinessException extends RuntimeException {
 
     private final ErrorMessage errorMessage;

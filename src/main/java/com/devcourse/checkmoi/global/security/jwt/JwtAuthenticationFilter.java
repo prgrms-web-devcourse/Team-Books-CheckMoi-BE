@@ -1,6 +1,6 @@
 package com.devcourse.checkmoi.global.security.jwt;
 
-import com.devcourse.checkmoi.global.security.util.AuthorizationExtractor;
+import com.devcourse.checkmoi.global.security.jwt.util.AuthorizationExtractor;
 import io.jsonwebtoken.Claims;
 import java.io.IOException;
 import java.util.List;

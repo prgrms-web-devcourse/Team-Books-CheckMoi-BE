@@ -83,3 +83,6 @@ security:
       PUT: [ ]
       DELETE: [ ]
       OPTIONS: /**
+
+front-url:
+  http://localhost:8080

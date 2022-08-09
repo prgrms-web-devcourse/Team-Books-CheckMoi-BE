@@ -69,9 +69,10 @@ public class TokenService {
     @Transactional
     public String createTemporaryAccessToken(Long userId) {
         String refreshToken = jwtTokenProvider.createRefreshToken();
-        Token token = tokenRepository.findTokenByUserId(7L)
-            .orElseGet(() -> tokenRepository.save(new Token(refreshToken, 7L)));
+        Token token = tokenRepository.findTokenByUserId(userId)
+            .orElseGet(() -> tokenRepository.save(new Token(refreshToken, userId)));
+
         token.refresh(refreshToken);
-        return jwtTokenProvider.createAccessToken(7L, "ROLE_LOGIN");
+        return jwtTokenProvider.createAccessToken(userId, "ROLE_ADMIN");
     }
 }
