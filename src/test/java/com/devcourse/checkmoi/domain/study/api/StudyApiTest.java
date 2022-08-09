@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.domain.study.api;
 
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
@@ -708,8 +709,17 @@ class StudyApiTest extends IntegrationTest {
             given(studyQueryService.findAllByCondition(anyLong(), any(Search.class), any()))
                 .willReturn(List.of(study3, study4));
 
+            Search search = Search.builder()
+                .studyStatus(FINISHED.toString())
+                // For Coverage
+                .memberStatus(OWNED.toString())
+                .userId(1L)
+                .studyId(1L)
+                .bookId(1L)
+                .build();
+
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("studyStatus", FINISHED.toString());
+            params.add("studyStatus", search.studyStatus());
 
             mockMvc.perform(get("/api/v2/studies").contentType(MediaType.APPLICATION_JSON)
                     .characterEncoding("utf-8")
