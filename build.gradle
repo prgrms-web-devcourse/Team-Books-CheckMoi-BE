@@ -114,11 +114,11 @@ jacocoTestCoverageVerification {
             }
             excludes = [
                     "com.devcourse.checkmoi.CheckmoiApplication",
-                    "com.devcourse.checkmoi.global.*",
                     "com.devcourse.checkmoi.domain.*.model.Q*",
                     "com.devcourse.checkmoi.domain.*.model.vo.Q*",
+                    "com.devcourse.checkmoi.domain.token.*",
                     "com.devcourse.checkmoi.domain.user.*",
-                    "com.devcourse.checkmoi.domain.token.*"
+                    "com.devcourse.checkmoi.global.*",
             ]
         }
     }
@@ -146,13 +146,7 @@ sonarqube {
         property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.exclusions",
                 """
-                src/main/java/com/devcourse/checkmoi/global/util/ApiUtil.java, 
-                src/main/java/com/devcourse/checkmoi/global/exception/EntityNotFoundException.java,
-                src/main/java/com/devcourse/checkmoi/global/exception/ErrorMessage.java,
-                src/main/java/com/devcourse/checkmoi/global/model/BaseEntity.java
-                src/main/java/com/devcourse/checkmoi/global/security/**,
-                src/main/java/com/devcourse/checkmoi/domain/user/**,
-                src/main/java/com/devcourse/checkmoi/domain/token/**
+                src/main/java/com/devcourse/checkmoi/global/**
                 """
     }
 }

@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.global.config.properties;
+package com.devcourse.checkmoi.global.config.property;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;

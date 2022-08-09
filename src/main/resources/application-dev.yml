@@ -41,3 +41,6 @@ jwt:
     expire-length: 3600000
   refresh-token:
     expire-length: 7200000
+
+front-url:
+  http://localhost:3000

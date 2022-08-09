@@ -1,5 +1,8 @@
-package com.devcourse.checkmoi.global.exception;
+package com.devcourse.checkmoi.global.exception.handler;
 
+import com.devcourse.checkmoi.global.exception.BusinessException;
+import com.devcourse.checkmoi.global.exception.error.ErrorMessage;
+import com.devcourse.checkmoi.global.exception.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
-        log.error(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage(), e);
+        log.error(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage());
 
         ErrorMessage errorMessage = ErrorMessage.ACCESS_DENIED;
 

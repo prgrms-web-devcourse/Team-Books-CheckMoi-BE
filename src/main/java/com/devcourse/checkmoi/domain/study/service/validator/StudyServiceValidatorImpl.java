@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.study.service.validator;
 
-import static com.devcourse.checkmoi.global.exception.ErrorMessage.ACCESS_DENIED;
-import static com.devcourse.checkmoi.global.exception.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
+import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.ACCESS_DENIED;
+import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
 import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotParticipateStudyUserException;

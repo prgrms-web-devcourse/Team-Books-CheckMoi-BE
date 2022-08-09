@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.global.config;
+package com.devcourse.checkmoi.global.security.config;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -6,11 +6,11 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
-import com.devcourse.checkmoi.global.config.properties.SecurityConfigProperties;
-import com.devcourse.checkmoi.global.security.handler.ExceptionHandlerFilter;
-import com.devcourse.checkmoi.global.security.handler.JwtAuthenticationEntryPoint;
-import com.devcourse.checkmoi.global.security.handler.OAuthAuthenticationSuccessHandler;
+import com.devcourse.checkmoi.global.security.config.property.SecurityConfigProperties;
+import com.devcourse.checkmoi.global.security.jwt.JwtAuthenticationEntryPoint;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthenticationFilter;
+import com.devcourse.checkmoi.global.security.jwt.exception.handler.ExceptionHandlerFilter;
+import com.devcourse.checkmoi.global.security.oauth.handler.OAuthAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
