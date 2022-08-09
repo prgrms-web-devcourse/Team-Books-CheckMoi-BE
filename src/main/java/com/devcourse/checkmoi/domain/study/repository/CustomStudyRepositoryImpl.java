@@ -202,7 +202,8 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .innerJoin(studyMember.user)
             .where(
                 eqStudyId(studyId),
-                eqStudyMemberStatus(requiredStatus).or(eqStudyMemberStatus(optionalStatus)))
+                eqStudyMemberStatus(requiredStatus)
+                    .or(eqStudyMemberStatus(optionalStatus)))
             .orderBy(studyMember.createdAt.asc())
             .fetch();
     }
