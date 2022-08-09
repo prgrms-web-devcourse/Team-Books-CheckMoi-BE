@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
@@ -45,6 +46,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -61,6 +63,9 @@ class CommentApiTest extends IntegrationTest {
 
     @MockBean
     private CommentCommandService commentCommandService;
+
+    @MockBean
+    private CommentCommandFacade commentCommandFacade;
 
     @Nested
     @DisplayName("댓글 목록 조회 #130")
@@ -189,8 +194,7 @@ class CommentApiTest extends IntegrationTest {
             Post post = makePostWithId(PostCategory.GENERAL, study,
                 User.builder().id(givenUser.userInfo().id()).build(), postId);
             Long response = 1L;
-            given(commentCommandService.createComment(
-                study.getId(),
+            given(commentCommandFacade.createComment(
                 post.getId(),
                 givenUser.userInfo().id(),
                 request)
@@ -198,7 +202,6 @@ class CommentApiTest extends IntegrationTest {
 
             ResultActions result = mockMvc.perform(post("/api/comments")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                .param("studyId", String.valueOf(studyId))
                 .param("postId", String.valueOf(postId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -209,7 +212,7 @@ class CommentApiTest extends IntegrationTest {
         }
 
         private RestDocumentationResultHandler documentation() {
-            return MockMvcRestDocumentationWrapper.document("delete-comments",
+            return MockMvcRestDocumentationWrapper.document("create-comments",
                 ResourceSnippetParameters.builder()
                     .tag("Comment API")
                     .summary("댓글 생성")
@@ -220,7 +223,6 @@ class CommentApiTest extends IntegrationTest {
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
                 requestParameters(
-                    parameterWithName("studyId").description("스터디 Id"),
                     parameterWithName("postId").description("게시글 Id")
                 ),
                 requestFields(

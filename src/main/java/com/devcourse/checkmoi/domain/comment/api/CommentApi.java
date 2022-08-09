@@ -4,6 +4,7 @@ import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
@@ -30,6 +31,8 @@ public class CommentApi {
 
     private final CommentCommandService commentCommandService;
 
+    private final CommentCommandFacade commentCommandFacade;
+
     @GetMapping("/comments")
     public ResponseEntity<SuccessResponse<List<CommentInfo>>> findAllComments(
         @AuthenticationPrincipal JwtAuthentication user,
@@ -42,11 +45,10 @@ public class CommentApi {
     @PostMapping("/comments")
     public ResponseEntity<SuccessResponse<Long>> createComment(
         @RequestBody Create request,
-        @RequestParam Long studyId,
         @RequestParam Long postId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
-        Long id = commentCommandService.createComment(studyId, postId, user.id(), request);
+        Long id = commentCommandFacade.createComment(postId, user.id(), request);
         return ResponseEntity.created(generatedUri(id)).body(new SuccessResponse<>(id));
     }
 

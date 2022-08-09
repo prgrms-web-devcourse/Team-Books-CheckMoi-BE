@@ -6,5 +6,5 @@ public interface CommentCommandService {
 
     void deleteById(Long userId, Long commentId);
 
-    Long createComment(Long studyId, Long postId, Long userId, Create request);
+    Long createComment(Long postId, Long userId, Create request);
 }

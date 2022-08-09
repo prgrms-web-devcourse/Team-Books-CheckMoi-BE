@@ -10,23 +10,17 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
-import com.devcourse.checkmoi.domain.post.exception.PostNotFoundException;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
-import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
-import com.devcourse.checkmoi.domain.study.exception.StudyJoinRequestNotFoundException;
-import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
-import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.template.IntegrationTest;
@@ -65,13 +59,6 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
     private Post givenPost;
 
-    private Post finishPost;
-
-    private Study givenStudy;
-
-    private User otherUser;
-
-    private Study finishStudy;
 
     @BeforeEach
     void setBasicGiven() {
@@ -79,10 +66,8 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         // user
         User user = userRepository.save(makeUser());
         givenUser = userRepository.save(makeUser());
-        otherUser = userRepository.save(makeUser());
         // study
-        givenStudy = studyRepository.save(makeStudy(book, IN_PROGRESS));
-        finishStudy = studyRepository.save(makeStudy(book, FINISHED));
+        Study givenStudy = studyRepository.save(makeStudy(book, IN_PROGRESS));
 
         // studyMember
         studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
@@ -92,7 +77,6 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
         // post
         givenPost = postRepository.save(makePost(GENERAL, givenStudy, givenUser));
-        finishPost = postRepository.save(makePost(GENERAL, finishStudy, givenUser));
 
     }
 
@@ -138,7 +122,6 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         @DisplayName("S 게시글에 댓글을 작성할 수 있다.")
         void createComment() {
             Long got = commentCommandService.createComment(
-                givenStudy.getId(),
                 givenPost.getId(),
                 givenUser.getId(),
                 request
@@ -147,70 +130,6 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
             assertThat(want).isPresent();
             assertThat(want.get().getContent()).isEqualTo(request.content());
-        }
-
-        @Test
-        @DisplayName("F 존재하지 않는 스터디의 경우 예외발생")
-        void studyNotFound() {
-            Long notExistStudyId = 0L;
-            assertThatExceptionOfType(StudyNotFoundException.class)
-                .isThrownBy(() -> commentCommandService.createComment(
-                    notExistStudyId,
-                    givenPost.getId(),
-                    givenUser.getId(),
-                    request
-                ));
-        }
-
-        @Test
-        @DisplayName("F 이미 종료된 스터디의 경우 예외발생")
-        void finishedStudy() {
-            assertThatExceptionOfType(FinishedStudyException.class)
-                .isThrownBy(() -> commentCommandService.createComment(
-                    finishStudy.getId(),
-                    finishPost.getId(),
-                    givenUser.getId(),
-                    request
-                ));
-        }
-
-        @Test
-        @DisplayName("F 포스트가 존재하지 않을 경우 예외 발생")
-        void notExistPost() {
-            Long notExistPostId = 0L;
-            assertThatExceptionOfType(PostNotFoundException.class)
-                .isThrownBy(() -> commentCommandService.createComment(
-                    givenStudy.getId(),
-                    notExistPostId,
-                    givenUser.getId(),
-                    request
-                ));
-
-        }
-
-        @Test
-        @DisplayName("F 유저가 실제로 존재하지 않을 경우 예외 발생")
-        void notExistUser() {
-            Long notExistUserId = 0L;
-            assertThatExceptionOfType(UserNotFoundException.class)
-                .isThrownBy(() -> commentCommandService.createComment(
-                    givenStudy.getId(),
-                    givenPost.getId(),
-                    notExistUserId,
-                    request
-                ));
-        }
-
-        @Test
-        @DisplayName("F 유저가 실제 스터디에 가입하지 않았을 경우 예외 발생")
-        void notJoinStudyUser() {
-            assertThatExceptionOfType(StudyJoinRequestNotFoundException.class)
-                .isThrownBy(() -> commentCommandService.createComment(
-                    givenStudy.getId(),
-                    givenPost.getId(),
-                    otherUser.getId(),
-                    request
-                ));
         }
     }
 }
