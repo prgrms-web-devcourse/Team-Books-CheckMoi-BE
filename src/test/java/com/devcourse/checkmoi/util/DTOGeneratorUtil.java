@@ -41,8 +41,8 @@ public abstract class DTOGeneratorUtil {
             .content("본문")
             .category(PostCategory.GENERAL)
             .studyId(1L)
-            .writerName("user1")
-            .writerProfileImg("https://localhost/img.png")
+            .writer("user1")
+            .writerImage("https://localhost/img.png")
             .commentCount(0)
             .build();
     }
