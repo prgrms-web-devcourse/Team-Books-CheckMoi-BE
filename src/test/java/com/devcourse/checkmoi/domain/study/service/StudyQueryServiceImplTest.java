@@ -3,26 +3,36 @@ package com.devcourse.checkmoi.domain.study.service;
 import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeStudyInfo;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
+import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
+import com.devcourse.checkmoi.domain.study.exception.NotParticipateStudyUserException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,8 +59,12 @@ class StudyQueryServiceImplTest {
     @Mock
     StudyServiceValidator studyValidator;
 
+    @Mock
+    StudyMemberRepository studyMemberRepository;
+
     @Nested
     @DisplayName("특정 책에 대한 스터디 목록 조회 #43")
+
     class GetStudiesTest {
 
         @Test
@@ -241,6 +255,84 @@ class StudyQueryServiceImplTest {
             Studies got = studyQueryService.getOwnedStudies(userId);
 
             assertThat(got).usingRecursiveComparison().isEqualTo(owned);
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디가 진행중인 확인 #129")
+    class OngoingStudyTest {
+
+        private final Book book = makeBookWithId(1L);
+
+
+        @Test
+        @DisplayName("S 스터디가 진행중이라면 아무것도 반환하지 않음")
+        void ongoingStudy() {
+            Study study = makeStudyWithId(book, StudyStatus.RECRUITING, 1L);
+
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.of(study));
+
+            studyQueryService.ongoingStudy(study.getId());
+
+            then(studyValidator)
+                .should(times(1))
+                .ongoingStudy(any(Study.class));
+        }
+
+        @Test
+        @DisplayName("F 스터디가 종료되었다면 예외 발생")
+        void finishedStudy() {
+            Study finishedStudy = makeStudyWithId(book, StudyStatus.FINISHED, 1L);
+
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.of(finishedStudy));
+            doThrow(FinishedStudyException.class)
+                .when(studyValidator).ongoingStudy(finishedStudy);
+
+            assertThatExceptionOfType(FinishedStudyException.class)
+                .isThrownBy(() -> studyQueryService.ongoingStudy(finishedStudy.getId()));
+        }
+    }
+
+    @Nested
+    @DisplayName("해당 유저가 스터디에 참여중인지 확인 #129")
+    class ParticipateUserTest {
+
+        private final Book book = makeBookWithId(1L);
+
+        private final Study study = makeStudyWithId(book, StudyStatus.RECRUITING, 1L);
+
+        private final User user = makeUserWithId(1L);
+
+        @Test
+        @DisplayName("현재 유저가 해당 스터디에 참여중일경우 아무 동작하지 않음")
+        void participateUser() {
+            Long memberId = 1L;
+
+            given(studyMemberRepository.participateUserInStudy(anyLong(), anyLong()))
+                .willReturn(memberId);
+
+            studyQueryService.participateUser(study.getId(), user.getId());
+
+            then(studyValidator)
+                .should(times(1))
+                .participateUser(anyLong());
+        }
+
+        @Test
+        @DisplayName("현재 유저가 해당 스터디에 참여하지 않을 경우 예외 발생")
+        void notParticipateUser() {
+            Long otherUserId = 2L;
+            Long notFoundMemberId = null;
+
+            given(studyMemberRepository.participateUserInStudy(anyLong(), anyLong()))
+                .willReturn(notFoundMemberId);
+            doThrow(NotParticipateStudyUserException.class)
+                .when(studyValidator).participateUser(notFoundMemberId);
+
+            assertThatExceptionOfType(NotParticipateStudyUserException.class)
+                .isThrownBy(() -> studyQueryService.participateUser(study.getId(), otherUserId));
         }
     }
 }

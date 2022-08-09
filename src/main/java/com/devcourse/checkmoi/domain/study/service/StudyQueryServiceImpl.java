@@ -4,6 +4,9 @@ import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
+import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
@@ -22,6 +25,8 @@ public class StudyQueryServiceImpl implements StudyQueryService {
     private final StudyRepository studyRepository;
 
     private final UserRepository userRepository;
+
+    private final StudyMemberRepository studyMemberRepository;
 
     private final StudyServiceValidator studyValidator;
 
@@ -65,5 +70,17 @@ public class StudyQueryServiceImpl implements StudyQueryService {
     @Override
     public Studies getOwnedStudies(Long userId) {
         return studyRepository.getOwnedStudies(userId);
+    }
+
+    @Override
+    public void ongoingStudy(Long studyId) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(StudyNotFoundException::new);
+        studyValidator.ongoingStudy(study);
+    }
+
+    @Override
+    public void participateUser(Long studyId, Long userId) {
+        studyValidator.participateUser(studyMemberRepository.participateUserInStudy(studyId, userId));
     }
 }

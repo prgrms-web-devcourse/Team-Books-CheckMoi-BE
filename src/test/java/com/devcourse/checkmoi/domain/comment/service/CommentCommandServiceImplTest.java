@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.comment.service;
 
 import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeComment;
@@ -11,6 +12,7 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
+import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
 import com.devcourse.checkmoi.domain.post.model.Post;
@@ -22,6 +24,7 @@ import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.template.IntegrationTest;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,6 +59,27 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
     private Post givenPost;
 
+
+    @BeforeEach
+    void setBasicGiven() {
+        Book book = bookRepository.save(makeBook());
+        // user
+        User user = userRepository.save(makeUser());
+        givenUser = userRepository.save(makeUser());
+        // study
+        Study givenStudy = studyRepository.save(makeStudy(book, IN_PROGRESS));
+
+        // studyMember
+        studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
+        studyMemberRepository.save(
+            makeStudyMember(givenStudy, givenUser, StudyMemberStatus.ACCEPTED));
+        studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
+
+        // post
+        givenPost = postRepository.save(makePost(GENERAL, givenStudy, givenUser));
+
+    }
+
     @AfterEach
     void cleanUp() {
         commentRepository.deleteAllInBatch();
@@ -64,25 +88,6 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         studyRepository.deleteAllInBatch();
         bookRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
-    }
-
-    @BeforeEach
-    void setBasicGiven() {
-        Book book = bookRepository.save(makeBook());
-        // user
-        User user = userRepository.save(makeUser());
-        givenUser = userRepository.save(makeUser());
-
-        // study
-        Study givenStudy = studyRepository.save(makeStudy(book, IN_PROGRESS));
-
-        // studyMember
-        studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
-        studyMemberRepository.save(
-            makeStudyMember(givenStudy, givenUser, StudyMemberStatus.ACCEPTED));
-
-        // given post
-        givenPost = postRepository.save(makePost(GENERAL, givenStudy, givenUser));
     }
 
     @Nested
@@ -102,6 +107,29 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         void deleteComment() {
             commentCommandService.deleteById(givenUser.getId(), comment.getId());
             assertThat(commentRepository.existsById(comment.getId())).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("댓글 작성 #129")
+    class CreateCommentTest {
+
+        Create request = Create.builder()
+            .content("댓글 작성 테스트입니다.")
+            .build();
+
+        @Test
+        @DisplayName("S 게시글에 댓글을 작성할 수 있다.")
+        void createComment() {
+            Long got = commentCommandService.createComment(
+                givenPost.getId(),
+                givenUser.getId(),
+                request
+            );
+            Optional<Comment> want = commentRepository.findById(got);
+
+            assertThat(want).isPresent();
+            assertThat(want.get().getContent()).isEqualTo(request.content());
         }
     }
 }
