@@ -17,7 +17,6 @@ import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -56,34 +55,15 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 eqBookId(search.bookId()),
                 eqStudyMemberStatus(search.memberStatus()),
                 eqStudyStatus(search.studyStatus())
-            );
-        long totalCount = query.fetchCount();
-        List<StudyInfo> studies = jpaQueryFactory.select(
-                Projections.constructor(
-                    StudyInfo.class,
-                    study.id,
-                    study.name,
-                    study.thumbnailUrl,
-                    study.description,
-                    study.status,
-                    study.currentParticipant, study.maxParticipant,
-                    study.gatherStartDate, study.gatherEndDate,
-                    study.studyStartDate, study.studyEndDate
-                )
             )
-            .from(study)
-            .innerJoin(studyMember)
-            .on(study.id.eq(studyMember.study.id))
+            .groupBy(study.id);
+
+        List<StudyInfo> studies = query
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
-            .where(
-                eqUserId(search.userId()),
-                eqStudyId(search.studyId()),
-                eqBookId(search.bookId()),
-                eqStudyMemberStatus(search.memberStatus()),
-                eqStudyStatus(search.studyStatus())
-            )
             .fetch();
+
+        long totalCount = query.fetchCount();
         return new PageImpl<>(studies, pageable, totalCount);
     }
 
@@ -113,22 +93,13 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 study.book.id.eq(bookId),
                 study.status.eq(StudyStatus.RECRUITING)
             );
-        long totalCount = query.fetchCount();
-        List<StudyInfo> studies = jpaQueryFactory.select(
-                Projections.constructor(
-                    StudyInfo.class,
-                    study.id, study.name, study.thumbnailUrl, study.description, study.status,
-                    study.currentParticipant, study.maxParticipant,
-                    study.gatherStartDate, study.gatherEndDate,
-                    study.studyStartDate, study.studyEndDate
-                ))
-            .from(study)
+        
+        List<StudyInfo> studies = query
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
-            .where(
-                study.book.id.eq(bookId),
-                study.status.eq(StudyStatus.RECRUITING)
-            ).fetch();
+            .fetch();
+
+        long totalCount = query.fetchCount();
         return new PageImpl<>(studies, pageable, totalCount);
     }
 
