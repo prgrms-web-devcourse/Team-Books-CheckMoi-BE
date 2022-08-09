@@ -4,16 +4,19 @@ import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Validated
 @RestController
-@RequestMapping("/api/studies")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class StudyApi {
 
@@ -40,7 +43,7 @@ public class StudyApi {
 
     private final StudyUserFacade studyUserFacade;
 
-    @GetMapping("/{studyId}")
+    @GetMapping("/studies/{studyId}")
     public ResponseEntity<SuccessResponse<StudyDetailWithMembers>> getDetailInfo(
         @PathVariable Long studyId
     ) {
@@ -49,7 +52,7 @@ public class StudyApi {
     }
 
 
-    @PostMapping
+    @PostMapping("/studies")
     public ResponseEntity<SuccessResponse<Long>> createStudy(
         @RequestBody Create request,
         @AuthenticationPrincipal JwtAuthentication user) {
@@ -59,7 +62,7 @@ public class StudyApi {
             .body(new SuccessResponse<>(studyId));
     }
 
-    @PutMapping("/{studyId}")
+    @PutMapping("/studies/{studyId}")
     public ResponseEntity<SuccessResponse<Long>> editStudyInfo(
         @PathVariable Long studyId, @RequestBody Edit request,
         @AuthenticationPrincipal JwtAuthentication user) {
@@ -67,7 +70,7 @@ public class StudyApi {
             new SuccessResponse<>(studyCommandService.editStudyInfo(studyId, user.id(), request)));
     }
 
-    @PutMapping("/{studyId}/members/{memberId}")
+    @PutMapping("/studies/{studyId}/members/{memberId}")
     public ResponseEntity<Void> auditStudyParticipation(
         @PathVariable Long studyId,
         @PathVariable Long memberId,
@@ -80,7 +83,7 @@ public class StudyApi {
             .build();
     }
 
-    @GetMapping
+    @GetMapping("/studies")
     public ResponseEntity<SuccessResponse<Studies>> getStudies(
         @RequestParam Long bookId,
         PageRequest pageRequest
@@ -90,7 +93,7 @@ public class StudyApi {
         return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 
-    @PutMapping("/{studyId}/members")
+    @PutMapping("/studies/{studyId}/members")
     public ResponseEntity<SuccessResponse<Long>> requestStudyJoin(@PathVariable Long studyId,
         @AuthenticationPrincipal JwtAuthentication user) {
         Long studyMemberId = studyCommandService.requestStudyJoin(studyId, user.id());
@@ -98,7 +101,7 @@ public class StudyApi {
             .body(new SuccessResponse<>(studyMemberId));
     }
 
-    @GetMapping("/{studyId}/members")
+    @GetMapping("/studies/{studyId}/members")
     public ResponseEntity<SuccessResponse<StudyAppliers>> getStudyAppliers(
         @PathVariable Long studyId,
         @AuthenticationPrincipal JwtAuthentication user) {
@@ -107,7 +110,7 @@ public class StudyApi {
             .body(new SuccessResponse<>(studyQueryService.getStudyAppliers(user.id(), studyId)));
     }
 
-    @GetMapping("/me")
+    @GetMapping("/studies/me")
     public ResponseEntity<SuccessResponse<MyStudies>> getMyStudies(
         @AuthenticationPrincipal JwtAuthentication user
     ) {
@@ -117,4 +120,18 @@ public class StudyApi {
             new SuccessResponse<>(response)
         );
     }
+
+    /********************************* API v2  ****************************************/
+
+    @GetMapping("/v2/studies")
+    public ResponseEntity<SuccessResponse<List<StudyInfo>>> getDetailInfo(
+        @AuthenticationPrincipal JwtAuthentication user,
+        Search search,
+        PageRequest pageable
+    ) {
+        return ResponseEntity.ok()
+            .body(new SuccessResponse<>(
+                studyQueryService.findAllByCondition(user.id(), search, pageable.of())));
+    }
+
 }
