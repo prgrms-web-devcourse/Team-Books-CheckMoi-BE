@@ -7,6 +7,8 @@ public interface PostServiceValidator {
 
     void checkPostOwner(Long userId, Long postId);
 
+    void checkPermissionToDelete(StudyMember member, Post post);
+
     void checkJoinedMember(StudyMember studyMember, Long studyId);
 
     void checkAllowedWriter(Post post, StudyMember member);

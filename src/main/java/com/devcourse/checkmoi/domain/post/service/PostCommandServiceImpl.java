@@ -3,13 +3,14 @@ package com.devcourse.checkmoi.domain.post.service;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
+import com.devcourse.checkmoi.domain.post.exception.PostNoPermissionException;
 import com.devcourse.checkmoi.domain.post.exception.PostNotFoundException;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.post.service.validator.PostServiceValidator;
+import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
-import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +32,9 @@ public class PostCommandServiceImpl implements PostCommandService {
 
     @Override
     public Long createPost(Long userId, Create request) {
-        StudyMember member = studyMemberRepository.findWithStudyByUserId(userId, request.studyId())
-            .orElseThrow(UserNotFoundException::new);
+        StudyMember member = studyMemberRepository.findWithStudyByUserAndStudy(userId,
+                request.studyId())
+            .orElseThrow(NotJoinedMemberException::new);
         Post createdPost = postConverter.createToPost(request, userId);
 
         postValidator.checkJoinedMember(member, request.studyId());
@@ -46,7 +48,9 @@ public class PostCommandServiceImpl implements PostCommandService {
     public void editPost(Long userId, Long postId, Edit request) {
         Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
+
         postValidator.checkPostOwner(userId, post.getWriter().getId());
+        postValidator.checkWritingAllowedPost(post, post.getStudy().getId());
 
         post.editTitle(request.title());
         post.editContent(request.content());
@@ -56,7 +60,13 @@ public class PostCommandServiceImpl implements PostCommandService {
     public void deletePost(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
-        postValidator.checkPostOwner(userId, post.getWriter().getId());
+
+        StudyMember member = studyMemberRepository.findByUserAndStudy(userId,
+                post.getStudy().getId())
+            .orElseThrow(PostNoPermissionException::new);
+
+        postValidator.checkPermissionToDelete(member, post);
+
         postRepository.deleteById(postId);
     }
 }

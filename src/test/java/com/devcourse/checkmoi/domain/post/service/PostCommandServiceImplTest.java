@@ -212,10 +212,12 @@ class PostCommandServiceImplTest {
         void deletePost() {
             User user = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
+            StudyMember member = makeStudyMember(study, user, StudyMemberStatus.ACCEPTED);
             Post post = makePostWithId(GENERAL, study, user, 3L);
 
-            when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
-            doNothing().when(postValidator).checkPostOwner(anyLong(), anyLong());
+            given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+            given(studyMemberRepository.findByUserAndStudy(anyLong(), anyLong()))
+                .willReturn(Optional.of(member));
 
             postCommandService.deletePost(user.getId(), post.getId());
 
@@ -230,11 +232,10 @@ class PostCommandServiceImplTest {
             Post post = makePostWithId(GENERAL, study, user, 3L);
 
             when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
-            doThrow(PostNoPermissionException.class).when(postValidator)
-                .checkPostOwner(anyLong(), anyLong());
 
-            assertThatExceptionOfType(PostNoPermissionException.class).isThrownBy(
-                () -> postCommandService.deletePost(user.getId(), post.getId()));
+            assertThatExceptionOfType(PostNoPermissionException.class)
+                .isThrownBy(() ->
+                    postCommandService.deletePost(user.getId(), post.getId()));
 
             then(postRepository).should(times(1)).findById(post.getId());
         }

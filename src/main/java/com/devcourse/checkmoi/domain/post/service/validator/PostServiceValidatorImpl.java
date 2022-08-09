@@ -19,6 +19,18 @@ public class PostServiceValidatorImpl implements PostServiceValidator {
     }
 
     @Override
+    public void checkPermissionToDelete(StudyMember member, Post post) {
+        if (!member.isOwner()) {
+            Long postWriterId = post.getWriter().getId();
+            Long memberId = member.getUser().getId();
+
+            if (!postWriterId.equals(memberId)) {
+                throw new PostNoPermissionException();
+            }
+        }
+    }
+
+    @Override
     public void checkJoinedMember(StudyMember studyMember, Long studyId) {
         if (!studyMember.isJoined()) {
             throw new NotJoinedMemberException(
