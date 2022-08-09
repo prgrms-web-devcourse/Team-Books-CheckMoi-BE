@@ -5,7 +5,6 @@ import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.exception.PostNotFoundException;
 import com.devcourse.checkmoi.domain.post.model.Post;
-import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.post.service.validator.PostServiceValidator;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
@@ -32,20 +31,22 @@ public class PostCommandServiceImpl implements PostCommandService {
 
     @Override
     public Long createPost(Long userId, Create request) {
-        StudyMember studyMember = studyMemberRepository.findByUserId(userId)
+        StudyMember member = studyMemberRepository.findWithStudyByUserId(userId, request.studyId())
             .orElseThrow(UserNotFoundException::new);
+        Post createdPost = postConverter.createToPost(request, userId);
 
-        PostCategory.valueOf(request.category())
-            .checkAllowedWriter(studyMember);
+        postValidator.checkJoinedMember(member, request.studyId());
+        postValidator.checkAllowedWriter(createdPost, member);
+        postValidator.checkWritingAllowedPost(createdPost, createdPost.getStudy().getId());
 
-        return postRepository.save(postConverter.createToPost(request, userId)).getId();
+        return postRepository.save(createdPost).getId();
     }
 
     @Override
     public void editPost(Long userId, Long postId, Edit request) {
         Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
-        postValidator.validatePostOwner(userId, post.getWriter().getId());
+        postValidator.checkPostOwner(userId, post.getWriter().getId());
 
         post.editTitle(request.title());
         post.editContent(request.content());
@@ -55,7 +56,7 @@ public class PostCommandServiceImpl implements PostCommandService {
     public void deletePost(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
-        postValidator.validatePostOwner(userId, post.getWriter().getId());
+        postValidator.checkPostOwner(userId, post.getWriter().getId());
         postRepository.deleteById(postId);
     }
 }
