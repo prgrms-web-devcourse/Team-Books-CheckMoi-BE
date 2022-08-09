@@ -9,8 +9,8 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long>,
     CustomStudyMemberRepository {
 
     @Query("select sm from StudyMember sm where sm.user.id = :userId")
-    Optional<StudyMember> findByUserId(Long userId);
+    Optional<StudyMember> findByUserAndStudy(Long userId, Long studyId);
 
     @Query("select sm from StudyMember sm join fetch Study where sm.user.id = :userId and sm.study.id = :studyId")
-    Optional<StudyMember> findWithStudyByUserId(Long userId, Long studyId);
+    Optional<StudyMember> findWithStudyByUserAndStudy(Long userId, Long studyId);
 }

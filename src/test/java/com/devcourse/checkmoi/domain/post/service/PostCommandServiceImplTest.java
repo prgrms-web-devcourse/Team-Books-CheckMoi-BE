@@ -78,7 +78,7 @@ class PostCommandServiceImplTest {
                 .content(post.getContent()).category(post.getCategory().toString())
                 .studyId(study.getId()).build();
 
-            given(studyMemberRepository.findWithStudyByUserId(any(), anyLong())).willReturn(
+            given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
                 Optional.of(studyMember));
             when(postConverter.createToPost(any(Create.class), anyLong())).thenReturn(post);
             when(postRepository.save(any(Post.class))).thenReturn(post);
@@ -102,7 +102,7 @@ class PostCommandServiceImplTest {
                 .content(post.getContent()).category(post.getCategory().toString())
                 .studyId(study.getId()).build();
 
-            given(studyMemberRepository.findWithStudyByUserId(any(), anyLong())).willReturn(
+            given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
                 Optional.of(studyMember));
             given(postConverter.createToPost(any(Create.class), anyLong())).willReturn(post);
             given(postRepository.save(any(Post.class))).willReturn(post);
@@ -124,7 +124,7 @@ class PostCommandServiceImplTest {
                 .content(post.getContent()).category(post.getCategory().toString())
                 .studyId(study.getId()).build();
 
-            given(studyMemberRepository.findWithStudyByUserId(any(), anyLong())).willReturn(
+            given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
                 Optional.of(studyMember));
             given(postConverter.createToPost(any(Create.class), anyLong())).willReturn(post);
             given(postRepository.save(any(Post.class))).willReturn(post);
@@ -146,7 +146,7 @@ class PostCommandServiceImplTest {
                 .content(post.getContent()).category(post.getCategory().toString())
                 .studyId(study.getId()).build();
 
-            given(studyMemberRepository.findWithStudyByUserId(any(), anyLong())).willReturn(
+            given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
                 Optional.of(studyMember));
             given(postConverter.createToPost(any(), anyLong())).willReturn(post);
             willThrow(new NotAllowedWriterException("Exception message")).given(postValidator)
