@@ -81,6 +81,7 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
     @Override
     public void participateUser(Long studyId, Long userId) {
-        studyValidator.participateUser(studyMemberRepository.participateUserInStudy(studyId, userId));
+        studyValidator.participateUser(
+            studyMemberRepository.participateUserInStudy(studyId, userId));
     }
 }
