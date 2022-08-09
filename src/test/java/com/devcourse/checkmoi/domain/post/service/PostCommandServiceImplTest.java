@@ -153,7 +153,7 @@ class PostCommandServiceImplTest {
                 .checkAllowedWriter(any(), any());
 
             Assertions.assertThatThrownBy(
-                    () -> postCommandService.createPost(user.getId(), request))
+                    () -> postCommandService.createPost(1L, request))
                 .isInstanceOf(NotAllowedWriterException.class);
         }
     }

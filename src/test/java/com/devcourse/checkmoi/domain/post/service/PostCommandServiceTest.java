@@ -109,8 +109,10 @@ public class PostCommandServiceTest {
         @Test
         @DisplayName("F 스터디 참여 유저가 아니면 게시글 작성이 불가하다")
         void createFail() {
+            Long nonMemberId = nonMember.getId();
+
             Assertions.assertThatThrownBy(
-                    () -> postService.createPost(nonMember.getId(), validCreateRequest))
+                    () -> postService.createPost(nonMemberId, validCreateRequest))
                 .isInstanceOf(NotJoinedMemberException.class);
 
         }
@@ -158,17 +160,22 @@ public class PostCommandServiceTest {
         @Test
         @DisplayName("F 스터디 상태가 FINISHED 이후에는 자유게시글 외에는 수정을 할 수 없다")
         void editFail() {
+            Long memberId = member.getId();
+            Long noticeId = notice.getId();
+
             Assertions.assertThatThrownBy(() ->
-                    postService.editPost(member.getId(), notice.getId(), editRequest))
+                    postService.editPost(memberId, noticeId, editRequest))
                 .isInstanceOf(ClosedStudyException.class);
         }
 
         @Test
         @DisplayName("S 스터디 상태가 FINISHED 이후에도 자유게시글은 수정할 수 있다")
         void edit() {
+            Long generalPostId = general.getId();
+
             postService.editPost(member.getId(), general.getId(), editRequest);
 
-            Post foundPost = postRepository.findById(general.getId()).get();
+            Post foundPost = postRepository.findById(generalPostId).get();
 
             Assertions.assertThat(foundPost.getContent())
                 .isEqualTo(editRequest.content());
@@ -206,9 +213,11 @@ public class PostCommandServiceTest {
         @DisplayName("F 스터디장이 아닌 일반 멤버는 자신의 게시글이 아닌글을 삭제 할 수 없다")
         void deleteFail() {
             Post memberPost = postRepository.save(makePost(PostCategory.GENERAL, study, member));
+            Long otherMemberId = otherMember.getId();
+            Long memberPostId = memberPost.getId();
 
             Assertions.assertThatThrownBy(() ->
-                    postService.deletePost(otherMember.getId(), memberPost.getId()))
+                    postService.deletePost(otherMemberId, memberPostId))
                 .isInstanceOf(PostNoPermissionException.class);
         }
     }
