@@ -15,9 +15,12 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
+import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
@@ -364,6 +367,68 @@ class StudyRepositoryTest extends RepositoryTest {
             assertThat(got)
                 .usingRecursiveComparison()
                 .isEqualTo(want);
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 조회 v2 #158")
+    class SearchStudies {
+
+        private List<User> users = new ArrayList<>();
+
+        private List<Study> studies = new ArrayList<>();
+
+        private StudyConverter studyConverter = new StudyConverter();
+
+        @BeforeEach
+        void setUp() {
+            Book book = bookRepository.save(makeBook());
+
+            users.add(userRepository.save(makeUser()));
+            users.add(userRepository.save(makeUser()));
+
+            studies.add(studyRepository.save(makeStudy(book, RECRUITING)));
+            studies.add(studyRepository.save(makeStudy(book, IN_PROGRESS)));
+            studies.add(studyRepository.save(makeStudy(book, IN_PROGRESS)));
+            studies.add(studyRepository.save(makeStudy(book, FINISHED)));
+            studies.add(studyRepository.save(makeStudy(book, FINISHED)));
+
+            // user 1 join
+            studyMemberRepository.save(
+                makeStudyMember(studies.get(0), users.get(0), OWNED));
+            studyMemberRepository.save(
+                makeStudyMember(studies.get(1), users.get(0), StudyMemberStatus.ACCEPTED));
+            studyMemberRepository.save(
+                makeStudyMember(studies.get(2), users.get(0), StudyMemberStatus.ACCEPTED));
+
+            // user 2 join
+            studyMemberRepository.save(
+                makeStudyMember(studies.get(3), users.get(1), StudyMemberStatus.ACCEPTED));
+            studyMemberRepository.save(
+                makeStudyMember(studies.get(4), users.get(1), StudyMemberStatus.DENIED));
+        }
+
+        @AfterEach
+        void tearDown() {
+            studyMemberRepository.deleteAllInBatch();
+            studyRepository.deleteAllInBatch();
+            bookRepository.deleteAllInBatch();
+            userRepository.deleteAllInBatch();
+        }
+
+        @Test
+        @DisplayName("S user 1번이 가입한 스터디를 찾을 수 있다")
+        void searchStudies() {
+            User givenUser = users.get(0);
+
+            Search search = Search.builder()
+                .userId(givenUser.getId())
+                .build();
+            PageRequest page = PageRequest.builder().build();
+
+            List<StudyInfo> result =
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+            assertThat(result).hasSize(3);
         }
     }
 }

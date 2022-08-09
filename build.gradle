@@ -146,9 +146,9 @@ sonarqube {
         property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.exclusions",
                 """
-                src/main/java/com/devcourse/checkmoi/global/**
-                src/main/java/com/devcourse/checkmoi/domain/user/api/AuthApi.java
-                src/main/java/com/devcourse/checkmoi/domain/token/**
+                src/main/java/com/devcourse/checkmoi/global/**,
+                src/main/java/com/devcourse/checkmoi/domain/user/api/AuthApi.java,
+                src/main/java/com/devcourse/checkmoi/domain/token/**,
                 """
     }
 }

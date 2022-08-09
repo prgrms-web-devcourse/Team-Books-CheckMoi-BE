@@ -1,15 +1,17 @@
 package com.devcourse.checkmoi.domain.study.service;
 
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
-import com.devcourse.checkmoi.domain.user.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,13 +24,17 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
     private final StudyConverter studyConverter;
 
-    private final StudyRepository studyRepository;
+    private final StudyServiceValidator studyValidator;
 
-    private final UserRepository userRepository;
+    private final StudyRepository studyRepository;
 
     private final StudyMemberRepository studyMemberRepository;
 
-    private final StudyServiceValidator studyValidator;
+
+    @Override
+    public List<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable) {
+        return studyRepository.findAllByCondition(userId, search, pageable);
+    }
 
     @Override
     public Studies getStudies(Long bookId, Pageable pageable) {
@@ -84,4 +90,6 @@ public class StudyQueryServiceImpl implements StudyQueryService {
         studyValidator.participateUser(
             studyMemberRepository.participateUserInStudy(studyId, userId));
     }
+
+
 }
