@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.global.model;
 
+import lombok.Builder;
 import org.springframework.data.domain.Sort.Direction;
 
 public class PageRequest {
@@ -9,6 +10,10 @@ public class PageRequest {
     private int size = 10;
 
     private Direction direction = Direction.DESC;
+
+    @Builder
+    public PageRequest() {
+    }
 
     public void setPage(int page) {
         this.page = page <= 0 ? 1 : page;
