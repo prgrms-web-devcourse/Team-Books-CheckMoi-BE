@@ -17,18 +17,17 @@ public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, St
         if (value == null) {
             return true;
         }
-        boolean result = false;
         Object[] enumValues = this.annotation.enumClass().getEnumConstants();
         if (enumValues != null) {
             for (Object enumValue : enumValues) {
                 if (value.equals(enumValue.toString())
-                    || (this.annotation.ignoreCase() && value.equalsIgnoreCase(enumValue.toString()))) {
-                    result = true;
-                    break;
+                    || (this.annotation.ignoreCase() && value.equalsIgnoreCase(
+                    enumValue.toString()))) {
+                    return true;
                 }
             }
         }
-        return result;
+        return false;
     }
 
 }

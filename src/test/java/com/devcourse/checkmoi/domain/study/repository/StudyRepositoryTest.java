@@ -24,6 +24,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.global.model.PageRequest;
@@ -103,7 +104,7 @@ class StudyRepositoryTest extends RepositoryTest {
 
     @Nested
     @DisplayName("특정 책에 대한 스터디 목록 조회 #43")
-    class GetStudies {
+    class GetStudiesTest {
 
         List<Study> studies = new ArrayList<>();
 
@@ -138,7 +139,7 @@ class StudyRepositoryTest extends RepositoryTest {
 
     @Nested
     @DisplayName("스터디 상세 조회 #56")
-    class GetDetail {
+    class GetDetailTest {
 
         Study study;
 
@@ -372,7 +373,7 @@ class StudyRepositoryTest extends RepositoryTest {
 
     @Nested
     @DisplayName("스터디 조회 v2 #158")
-    class SearchStudies {
+    class SearchStudiesTest {
 
         private List<User> users = new ArrayList<>();
 
@@ -429,6 +430,22 @@ class StudyRepositoryTest extends RepositoryTest {
             Page<StudyInfo> result =
                 studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
             assertThat(result.getContent()).hasSize(3);
+        }
+        @Test
+        @DisplayName("S user1이 스터디장이고 현재 모집중인 스터디를 조회한다.")
+        void acceptedAndInProgressStudies() {
+            User givenUser = users.get(0);
+
+            Search search = Search.builder()
+                .userId(givenUser.getId())
+                .studyStatus("recruiting")
+                .memberStatus("owned")
+                .build();
+            PageRequest page = PageRequest.builder().build();
+
+            Page<StudyInfo> result = studyRepository.findAllByCondition(givenUser.getId(),
+                search, page.of());
+            assertThat(result.getContent()).hasSize(1);
         }
     }
 }
