@@ -1,17 +1,18 @@
 package com.devcourse.checkmoi.domain.study.model;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 
 public enum StudyStatus {
     RECRUITING("RECRUITING",
-        Set.of(NextStatus.IN_PROGRESS, NextStatus.RECRUITING)),
+        Set.of(NextStatus.IN_PROGRESS, NextStatus.RECRUITING_FINISHED)),
     RECRUITING_FINISHED("RECRUITINGFINISHED",
         Set.of(NextStatus.IN_PROGRESS)),
     IN_PROGRESS("INPROGRESS",
-        Set.of(NextStatus.RECRUITING, NextStatus.IN_PROGRESS, NextStatus.FINISHED)),
+        Set.of(NextStatus.FINISHED)),
     FINISHED("FINISHED",
-        Set.of(NextStatus.FINISHED));
+        Collections.emptySet());
 
     private final String name;
 
