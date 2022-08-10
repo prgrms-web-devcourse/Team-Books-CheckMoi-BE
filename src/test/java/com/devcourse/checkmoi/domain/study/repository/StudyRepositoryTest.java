@@ -15,7 +15,6 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
-import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -378,8 +377,6 @@ class StudyRepositoryTest extends RepositoryTest {
 
         private List<Study> studies = new ArrayList<>();
 
-        private StudyConverter studyConverter = new StudyConverter();
-
         @BeforeEach
         void setUp() {
             Book book = bookRepository.save(makeBook());
@@ -429,6 +426,40 @@ class StudyRepositoryTest extends RepositoryTest {
             Page<StudyInfo> result =
                 studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
             assertThat(result.getContent()).hasSize(3);
+        }
+
+        @Test
+        @DisplayName("S 특정 책에 대해서 사람들이 참여하고 있는(그리고 스터디 장이 아닌) 스터디를 출력한다")
+        void isMemberStudies() {
+            User givenUser = users.get(0);
+
+            Search search = Search.builder()
+                .bookId(1L)
+                .isMember(true)
+                .studyStatus(IN_PROGRESS.toString())
+                .memberStatus(ACCEPTED.toString())
+                .build();
+            PageRequest page = PageRequest.builder().build();
+
+            Page<StudyInfo> result =
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+            assertThat(result.getContent()).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("S 특정 유저가 참여하고 있지 않은 스터디(종료되었거나, 거절당한 스터디)를 출력한다")
+        void isNotMemberStudies() {
+            User givenUser = users.get(0);
+
+            Search search = Search.builder()
+                .userId(2L)
+                .isMember(false)
+                .build();
+            PageRequest page = PageRequest.builder().build();
+
+            Page<StudyInfo> result =
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+            assertThat(result.getContent()).hasSize(2);
         }
     }
 }
