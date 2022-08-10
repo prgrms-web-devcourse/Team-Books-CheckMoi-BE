@@ -4,6 +4,7 @@ import static com.devcourse.checkmoi.domain.study.model.QStudy.study;
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -53,6 +54,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 eqUserId(search.userId()),
                 eqStudyId(search.studyId()),
                 eqBookId(search.bookId()),
+                isMember(search.isMember()),
                 eqStudyMemberStatus(search.memberStatus()),
                 eqStudyStatus(search.studyStatus())
             )
@@ -93,7 +95,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 study.book.id.eq(bookId),
                 study.status.eq(StudyStatus.RECRUITING)
             );
-        
+
         List<StudyInfo> studies = query
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -179,7 +181,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                     studyMember.user.id.eq(userId),
                     studyMember.status.eq(ACCEPTED)
                         .or(studyMember.status.eq(OWNED)),
-                    study.status.eq(StudyStatus.FINISHED)
+                    study.status.eq(FINISHED)
                 )
                 .fetch(), 0
         );
@@ -301,5 +303,17 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             return null;
         }
         return study.book.id.eq(bookId);
+    }
+
+    private BooleanExpression isMember(Boolean condition) {
+        if (condition == null) {
+            return null;
+        }
+
+        if (condition.equals(Boolean.FALSE)) {
+            return studyMember.status.notIn(OWNED, ACCEPTED).or(study.status.eq(FINISHED));
+        }
+
+        return studyMember.status.eq(ACCEPTED).and(study.status.notIn(FINISHED));
     }
 }
