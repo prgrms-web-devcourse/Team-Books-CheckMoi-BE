@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.domain.comment.api;
 
+import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeCommentWithId;
@@ -9,11 +10,14 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -23,16 +27,18 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
+import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.exception.CommentNotFoundException;
 import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.domain.post.model.Post;
-import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
@@ -43,10 +49,10 @@ import com.epages.restdocs.apispec.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -77,7 +83,7 @@ class CommentApiTest extends IntegrationTest {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
             User writer = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
-            Post post = makePostWithId(PostCategory.GENERAL, study, writer, 1L);
+            Post post = makePostWithId(GENERAL, study, writer, 1L);
             List<CommentInfo> response = List.of(
                 makeCommentInfoWithId(writer, post, 1L),
                 makeCommentInfoWithId(writer, post, 2L),
@@ -151,7 +157,7 @@ class CommentApiTest extends IntegrationTest {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
             User writer = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
-            Post post = makePostWithId(PostCategory.GENERAL, study, writer, 1L);
+            Post post = makePostWithId(GENERAL, study, writer, 1L);
             Comment comment = makeCommentWithId(post, writer, 1L);
             doNothing().when(commentCommandService).deleteById(anyLong(), anyLong());
 
@@ -191,7 +197,7 @@ class CommentApiTest extends IntegrationTest {
             Long studyId = 1L;
             Long postId = 1L;
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, studyId);
-            Post post = makePostWithId(PostCategory.GENERAL, study,
+            Post post = makePostWithId(GENERAL, study,
                 makeUserWithId(givenUser.userInfo().id()), postId);
             Long response = 1L;
             given(commentCommandFacade.createComment(
@@ -235,4 +241,106 @@ class CommentApiTest extends IntegrationTest {
         }
 
     }
+
+    @Nested
+    @DisplayName("댓글 수정 #137")
+    class EditCommentTest {
+
+        TokenWithUserInfo givenUser;
+
+        private Comment comment;
+
+        @BeforeEach
+        private void setGiven() {
+            givenUser = getTokenWithUserInfo();
+            Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 1L);
+            User user = makeUserWithId(givenUser.userInfo().id());
+            Post post = makePostWithId(GENERAL, study, user, 1L);
+
+            comment = makeCommentWithId(post, user, 1L);
+        }
+
+        @Test
+        @DisplayName("S 댓글을 수정할 수 있다")
+        void editComment() throws Exception {
+
+            Edit request = Edit.builder()
+                .content("댓글 수정 내용")
+                .build();
+
+            willDoNothing()
+                .given(commentCommandService)
+                .editComment(anyLong(), anyLong(), any(Edit.class));
+
+            mockMvc.perform(put("/api/comments/{commentId}", comment.getId())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNoContent())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("edit-comments",
+                ResourceSnippetParameters.builder()
+                    .tag("Comment API")
+                    .summary("댓글 수정")
+                    .description("댓글 수정에 사용되는 API")
+                    .requestSchema(Schema.schema("댓글 수정 요청"))
+                    .responseSchema(Schema.schema("댓글 수정 응답")),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
+                pathParameters(
+                    parameterWithName("commentId").description("댓글 Id")
+                ),
+                requestFields(
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용")
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("F 댓글 수정 내용이 500자를 넘어가면 수정할 수 없다")
+        void editCommentFailed1() throws Exception {
+
+            String editContent = "1234567890".repeat(51);
+            Edit request = Edit.builder()
+                .content(editContent)
+                .build();
+
+            willDoNothing()
+                .given(commentCommandService)
+                .editComment(anyLong(), anyLong(), any(Edit.class));
+
+            mockMvc.perform(put("/api/comments/{commentId}", comment.getId())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+        }
+
+        @Test
+        @DisplayName("F 댓글이 없으면 댓글을 수정할 수 없다")
+        void editCommentFailed2() throws Exception {
+
+            Edit request = Edit.builder()
+                .content("댓글 수정 내용")
+                .build();
+
+            willThrow(new CommentNotFoundException())
+                .given(commentCommandService)
+                .editComment(anyLong(), anyLong(), any(Edit.class));
+
+            mockMvc.perform(put("/api/comments/{commentId}", comment.getId())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+        }
+
+    }
+
 }
