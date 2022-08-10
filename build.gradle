@@ -1,0 +1,198 @@
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+plugins {
+    id 'org.springframework.boot' version '2.7.2'
+    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+    id 'org.asciidoctor.convert' version '1.5.8'
+    id 'jacoco'
+    id 'org.sonarqube' version '3.4.0.2513'
+    id 'com.google.cloud.tools.jib' version '3.2.1'
+    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+    id 'com.epages.restdocs-api-spec' version '0.16.0'
+    id 'java'
+}
+
+group = 'com.devcourse'
+version = '2.0.0'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
+dependencies {
+
+    // web & security
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation group: 'org.json', name: 'json', version: '20201115'
+
+    // db
+    runtimeOnly 'com.h2database:h2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    implementation 'org.flywaydb:flyway-core'
+//    implementation 'org.flywaydb:flyway-mysql'
+    runtimeOnly 'mysql:mysql-connector-java'
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+    // aws s3
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.267'
+
+    // apache commons-io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Restdocs -> Swagger
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.16.2'
+
+    // @ConfigurationProperties
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+}
+
+jacoco {
+    toolVersion = '0.8.8'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+    }
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'CLASS'
+            enabled = true
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.60
+            }
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.60
+            }
+            excludes = [
+                    "com.devcourse.checkmoi.CheckmoiApplication",
+                    "com.devcourse.checkmoi.domain.*.model.Q*",
+                    "com.devcourse.checkmoi.domain.*.model.vo.Q*",
+                    "com.devcourse.checkmoi.domain.token.*",
+                    "com.devcourse.checkmoi.domain.user.*",
+                    "com.devcourse.checkmoi.global.*",
+            ]
+        }
+    }
+    finalizedBy 'copyDocument'
+}
+
+openapi3 {
+    server = "$System.env.SERVER_NAME"
+    title = 'Checkmoi'
+    description = 'Checkmoi API 페이지'
+    version = project.version.toString().toUpperCase()
+    format = 'yaml'
+    oauth2SecuritySchemeDefinition = {
+        flows = ['authorizationCode']
+        tokenUrl = "https://kauth.kakao.com/oauth/token"
+        authorizationUrl = "https://kauth.kakao.com/oauth/authorize"
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "prgrms-web-devcourse_Team-Books-CheckMoi-BE"
+        property "sonar.organization", "prgrms-web-devcourse"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.exclusions",
+                """
+                src/main/java/com/devcourse/checkmoi/global/**,
+                src/main/java/com/devcourse/checkmoi/domain/user/api/AuthApi.java,
+                src/main/java/com/devcourse/checkmoi/domain/token/**
+                """
+    }
+}
+
+task copyDocument(type: Copy) {
+    dependsOn("openapi3")
+    from file("$buildDir/api-spec/openapi3.yaml")
+    into file("src/main/resources/static/docs/.")
+}
+
+
+jib {
+    from {
+        image = "amazoncorretto:17.0.4-al2"
+        platforms {
+            platform {
+                architecture = "arm64"
+                os = "linux"
+            }
+            platform {
+                architecture = "amd64"
+                os = "linux"
+            }
+        }
+    }
+    to {
+        image = "zxcv9203/${project.name}"
+        tags = ["${project.version.toString().toLowerCase()}"]
+    }
+    container {
+        environment = ["PROFILE": "local"]
+        jvmFlags = ['-Xms512m', '-Dspring.profiles.active=${PROFILE}']
+    }
+}
+//queryDSL
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+    main.java.srcDir querydslDir
+}
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
