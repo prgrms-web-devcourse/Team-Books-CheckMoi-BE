@@ -15,11 +15,11 @@ import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,7 +51,7 @@ public class StudyApi {
 
     @PostMapping("/studies")
     public ResponseEntity<SuccessResponse<Long>> createStudy(
-        @Validated @RequestBody Create request,
+        @Valid @RequestBody Create request,
         @AuthenticationPrincipal JwtAuthentication user) {
         Long studyId = studyCommandService.createStudy(request, user.id());
         return ResponseEntity
@@ -62,7 +62,7 @@ public class StudyApi {
     @PutMapping("/studies/{studyId}")
     public ResponseEntity<SuccessResponse<Long>> editStudyInfo(
         @PathVariable Long studyId,
-        @Validated @RequestBody Edit request,
+        @Valid @RequestBody Edit request,
         @AuthenticationPrincipal JwtAuthentication user) {
         return ResponseEntity.ok(
             new SuccessResponse<>(studyCommandService.editStudyInfo(studyId, user.id(), request)));
@@ -73,7 +73,7 @@ public class StudyApi {
         @PathVariable Long studyId,
         @PathVariable Long memberId,
         @AuthenticationPrincipal JwtAuthentication user,
-        @Validated @RequestBody Audit request
+        @Valid @RequestBody Audit request
     ) {
         studyCommandService.auditStudyParticipation(studyId, memberId, user.id(), request);
         return ResponseEntity

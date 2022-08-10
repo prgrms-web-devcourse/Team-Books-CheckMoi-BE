@@ -8,8 +8,8 @@ import com.devcourse.checkmoi.domain.book.dto.SimplePage;
 import com.devcourse.checkmoi.domain.book.service.BookCommandService;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
+import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +32,7 @@ public class BookApi {
 
     @PostMapping
     public ResponseEntity<SuccessResponse<Long>> register(
-        @Validated @RequestBody CreateBook createRequest
+        @Valid @RequestBody CreateBook createRequest
     ) {
         Long bookId = bookCommandService.save(createRequest).id();
 
