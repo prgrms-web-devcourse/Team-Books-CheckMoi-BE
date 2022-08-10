@@ -126,7 +126,7 @@ public class StudyApi {
     @GetMapping("/v2/studies")
     public ResponseEntity<SuccessResponse<Studies>> getDetailInfo(
         @AuthenticationPrincipal JwtAuthentication user,
-        Search search,
+        @Valid Search search,
         PageRequest pageable
     ) {
         return ResponseEntity.ok()

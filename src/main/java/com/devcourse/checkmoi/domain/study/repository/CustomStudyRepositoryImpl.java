@@ -59,13 +59,11 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 eqStudyStatus(search.studyStatus())
             )
             .groupBy(study.id);
-
+        long totalCount = query.fetchCount();
         List<StudyInfo> studies = query
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
-
-        long totalCount = query.fetchCount();
         return new PageImpl<>(studies, pageable, totalCount);
     }
 
@@ -274,7 +272,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         if (status == null) {
             return null;
         }
-        return studyMember.status.eq(StudyMemberStatus.valueOf(status));
+        return studyMember.status.eq(StudyMemberStatus.valueOf(status.toUpperCase()));
     }
 
     private BooleanExpression eqStudyId(Long studyId) {
@@ -295,7 +293,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         if (status == null) {
             return null;
         }
-        return study.status.eq(StudyStatus.valueOf(status));
+        return study.status.eq(StudyStatus.nameOf(status));
     }
 
     private BooleanExpression eqBookId(Long bookId) {
