@@ -9,7 +9,6 @@ import org.hibernate.validator.constraints.URL;
 
 public sealed interface BookRequest permits CreateBook {
 
-    // TODO : api 로 받아온 데이터들에 대해서는 어떤 검증조건이 있어야 할지 아직 미정상태
     record CreateBook(
         @NotBlank(message = "책 제목은 비어있을 수 없습니다.")
         @Size(max = 150, message = "타이틀 길이는 150자를 넘을 수 없습니다")
