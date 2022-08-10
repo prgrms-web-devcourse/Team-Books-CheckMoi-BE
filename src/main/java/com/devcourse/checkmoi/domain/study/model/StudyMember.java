@@ -64,7 +64,7 @@ public class StudyMember extends BaseEntity {
             this.status == StudyMemberStatus.OWNED;
     }
 
-    public boolean isOwner() {
+    public boolean isStudyOwner() {
         return this.status == StudyMemberStatus.OWNED;
     }
 }
