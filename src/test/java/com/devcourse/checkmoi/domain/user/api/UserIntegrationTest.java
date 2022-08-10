@@ -124,7 +124,7 @@ class UserIntegrationTest extends IntegrationTest {
 
             UserRequest.Edit request = UserRequest.Edit.builder()
                 .name("수정된 유저 이름")
-                .image("수정된 유저 프로필 이미지")
+                .image("https://adventure.co.kr/no-image-placeholder/")
                 .build();
 
             mockMvc.perform(put("/api/users/{userId}", givenUser.userInfo().id())
