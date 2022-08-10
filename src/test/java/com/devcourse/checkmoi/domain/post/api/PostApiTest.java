@@ -92,7 +92,7 @@ class PostApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("post-create",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 생성 API (준비중)")
+                    .summary("게시글 생성 API")
                     .description("게시글을 생성하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -148,7 +148,7 @@ class PostApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("post-detail",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 단일 조회 API (준비중)")
+                    .summary("게시글 단일 조회 API")
                     .description("게시글을 단일 조회하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -264,7 +264,7 @@ class PostApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("post-edit",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 수정 API (준비중)")
+                    .summary("게시글 수정 API")
                     .description("게시글을 수정하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -293,7 +293,7 @@ class PostApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("post-delete",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 삭제 API (준비중)")
+                    .summary("게시글 삭제 API")
                     .description("게시글을 삭제하는 API 입니다."),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),

@@ -1,7 +1,6 @@
 package com.devcourse.checkmoi.domain.comment.service;
 
 import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
-import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeComment;
@@ -13,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
+import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
 import com.devcourse.checkmoi.domain.post.model.Post;
@@ -118,6 +118,7 @@ class CommentCommandServiceImplTest extends IntegrationTest {
             .content("댓글 작성 테스트입니다.")
             .build();
 
+
         @Test
         @DisplayName("S 게시글에 댓글을 작성할 수 있다.")
         void createComment() {
@@ -132,4 +133,26 @@ class CommentCommandServiceImplTest extends IntegrationTest {
             assertThat(want.get().getContent()).isEqualTo(request.content());
         }
     }
+
+    @Nested
+    @DisplayName("댓글 수정 #137")
+    class EditCommentTest {
+
+        Comment givenComment;
+
+        Edit request = Edit.builder()
+            .content("댓글 수정 테스트입니다.")
+            .build();
+
+        @Test
+        @DisplayName("S 댓글을 수정할 수 있다")
+        void editComment() {
+            givenComment = commentRepository.save(makeComment(givenPost, givenUser));
+            commentCommandService.editComment(givenUser.getId(), givenComment.getId(), request);
+
+            Comment editedComment = commentRepository.findById(givenComment.getId()).get();
+            assertThat(editedComment.getContent()).isEqualTo(request.content());
+        }
+    }
+
 }

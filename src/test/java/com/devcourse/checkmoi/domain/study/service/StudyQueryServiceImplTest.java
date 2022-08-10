@@ -94,7 +94,7 @@ class StudyQueryServiceImplTest {
 
     @Nested
     @DisplayName("스터디 신청 내역 조회")
-    public class GetStudyAppliersTest {
+    class GetStudyAppliersTest {
 
         private Long studyLeaderId = 1L;
 

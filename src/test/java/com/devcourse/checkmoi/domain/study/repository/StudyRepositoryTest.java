@@ -167,7 +167,7 @@ class StudyRepositoryTest extends RepositoryTest {
             validateStudyDetailInfo(response);
             validateMembers(response);
 
-            assertThat(response.members().size()).isEqualTo(2);
+            assertThat(response.members()).hasSize(2);
         }
 
         private void validateStudyDetailInfo(StudyDetailWithMembers response) {
