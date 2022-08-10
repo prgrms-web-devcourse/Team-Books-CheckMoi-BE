@@ -90,7 +90,7 @@ class StudyApiTest extends IntegrationTest {
             StudyRequest.Create request = StudyRequest.Create.builder()
                 .bookId(1L)
                 .name("스터디 이름")
-                .thumbnail("스터디 썸네일 URL")
+                .thumbnail("https://adventure.co.kr/no-image-placeholder/")
                 .description("스터디입니다")
                 .maxParticipant(5)
                 .gatherStartDate(LocalDate.now())

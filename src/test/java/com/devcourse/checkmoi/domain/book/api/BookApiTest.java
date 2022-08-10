@@ -49,13 +49,15 @@ class BookApiTest extends IntegrationTest {
     BookQueryService bookQueryService;
 
     private PersistedDummyData createDummyBigWhale() {
-        return new PersistedDummyData("큰그림", "대왕고래", "abc/foo.png", 1L,
+        return new PersistedDummyData("큰그림", "대왕고래",
+            "https://adventure.co.kr/no-image-placeholder/", 1L,
             "대왕고래와 아기고래가 함께 살았어요",
             "1231231231231", "Hanbit", "20021010");
     }
 
     private PersistedDummyData createDummyWhaleTwo() {
-        return new PersistedDummyData("큰그림", "향고래", "abc/foo.png", 2L, "향고래를 닮았네요",
+        return new PersistedDummyData("큰그림", "향고래", "https://adventure.co.kr/no-image-placeholder/",
+            2L, "향고래를 닮았네요",
             "1231231231232", "Hanbit", "20021010");
     }
 

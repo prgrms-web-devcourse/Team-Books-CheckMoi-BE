@@ -10,6 +10,7 @@ import com.devcourse.checkmoi.domain.post.service.PostQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -52,7 +53,7 @@ public class PostApi {
     @PostMapping("/posts")
     public ResponseEntity<SuccessResponse<Long>> createPost(
         @AuthenticationPrincipal JwtAuthentication user,
-        @RequestBody Create request
+        @Valid @RequestBody Create request
     ) {
         Long postId = postCommandService.createPost(user.id(), request);
         return ResponseEntity
@@ -64,7 +65,7 @@ public class PostApi {
     public ResponseEntity<SuccessResponse<Void>> editPost(
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long postId,
-        @RequestBody Edit request
+        @Valid @RequestBody Edit request
     ) {
         postCommandService.editPost(user.id(), postId, request);
         return ResponseEntity.noContent().build();

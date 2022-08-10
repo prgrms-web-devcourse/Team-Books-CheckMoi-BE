@@ -10,6 +10,7 @@ import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,7 +45,7 @@ public class CommentApi {
 
     @PostMapping("/comments")
     public ResponseEntity<SuccessResponse<Long>> createComment(
-        @RequestBody Create request,
+        @Valid @RequestBody Create request,
         @RequestParam Long postId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
