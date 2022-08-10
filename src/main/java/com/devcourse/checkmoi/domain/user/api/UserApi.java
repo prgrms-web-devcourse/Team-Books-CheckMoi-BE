@@ -56,7 +56,7 @@ public class UserApi {
     ResponseEntity<SuccessResponse<Long>> editAccount(
         @PathVariable Long userId,
         @AuthenticationPrincipal JwtAuthentication user,
-        @RequestBody UserRequest.Edit request
+        @Validated @RequestBody UserRequest.Edit request
     ) {
         userCommandService.editAccount(userId, user.id(), request);
         return ResponseEntity.ok()
