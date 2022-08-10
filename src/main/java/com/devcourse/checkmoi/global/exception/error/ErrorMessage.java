@@ -21,6 +21,7 @@ public enum ErrorMessage {
     BOOK_NOT_FOUND("해당하는 책을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     STUDY_JOIN_REQUEST_NOT_FOUND("해당하는 스터디 가입 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     POST_NOT_FOUND("해당하는 포스트를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
+    COMMENT_NOT_FOUND("해당하는 댓글을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
 
     // no permission
     // duplicate error
