@@ -15,7 +15,6 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
-import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -24,7 +23,6 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
-import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.global.model.PageRequest;
@@ -375,15 +373,15 @@ class StudyRepositoryTest extends RepositoryTest {
     @DisplayName("스터디 조회 v2 #158")
     class SearchStudiesTest {
 
+        Book book;
+
         private List<User> users = new ArrayList<>();
 
         private List<Study> studies = new ArrayList<>();
 
-        private StudyConverter studyConverter = new StudyConverter();
-
         @BeforeEach
         void setUp() {
-            Book book = bookRepository.save(makeBook());
+            book = bookRepository.save(makeBook());
 
             users.add(userRepository.save(makeUser()));
             users.add(userRepository.save(makeUser()));
@@ -431,6 +429,41 @@ class StudyRepositoryTest extends RepositoryTest {
                 studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
             assertThat(result.getContent()).hasSize(3);
         }
+
+        @Test
+        @DisplayName("S 특정 책에 대해서 사람들이 참여하고 있는(그리고 스터디 장이 아닌) 스터디를 출력한다")
+        void isMemberStudies() {
+            User givenUser = users.get(0);
+
+            Search search = Search.builder()
+                .bookId(book.getId())
+                .isMember(true)
+                .studyStatus(IN_PROGRESS.toString())
+                .memberStatus(ACCEPTED.toString())
+                .build();
+            PageRequest page = PageRequest.builder().build();
+
+            Page<StudyInfo> result =
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+            assertThat(result.getContent()).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("S 특정 유저가 참여하고 있지 않은 스터디(종료되었거나, 거절당한 스터디)를 출력한다")
+        void isNotMemberStudies() {
+            User givenUser = users.get(1);
+
+            Search search = Search.builder()
+                .userId(givenUser.getId())
+                .isMember(false)
+                .build();
+            PageRequest page = PageRequest.builder().build();
+
+            Page<StudyInfo> result =
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+            assertThat(result.getContent()).hasSize(2);
+        }
+
         @Test
         @DisplayName("S user1이 스터디장이고 현재 모집중인 스터디를 조회한다.")
         void acceptedAndInProgressStudies() {

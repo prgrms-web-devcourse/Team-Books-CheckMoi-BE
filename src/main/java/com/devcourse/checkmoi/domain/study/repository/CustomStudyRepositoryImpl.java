@@ -311,7 +311,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         if (condition.equals(Boolean.FALSE)) {
             return studyMember.status.notIn(OWNED, ACCEPTED).or(study.status.eq(FINISHED));
         }
-
-        return studyMember.status.eq(ACCEPTED).and(study.status.notIn(FINISHED));
+        
+        return studyMember.status.in(OWNED, ACCEPTED).and(study.status.notIn(FINISHED));
     }
 }

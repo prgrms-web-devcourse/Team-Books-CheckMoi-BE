@@ -3,8 +3,8 @@ name: project ci
 on:
   pull_request:
     branches:
-      - "develop"
-      - "main"
+      - "develop**"
+      - "main**"
 jobs:
   build:
     runs-on: ubuntu-latest

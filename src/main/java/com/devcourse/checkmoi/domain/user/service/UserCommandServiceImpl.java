@@ -47,7 +47,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     private void validatePermission(Long userId, Long authId, String situation) {
-        if (userId != authId) {
+        if (!userId.equals(authId)) {
             throw new UserNoPermissionException(situation + " 작업에 대한 권한이 없습니다");
         }
     }
