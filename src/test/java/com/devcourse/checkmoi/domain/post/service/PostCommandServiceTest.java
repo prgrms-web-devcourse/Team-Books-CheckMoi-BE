@@ -126,6 +126,19 @@ public class PostCommandServiceTest {
                 .isThrownBy(() ->
                     postService.createPost(memberId, validCreateRequest));
         }
+
+        @Test
+        @DisplayName("S 스터디 두개에 가입한 멤버는 특정 스터디에 대한 자유게시글을 작성할 수 있다")
+        void createByMember() {
+            Study otherStudy = studyRepository.save(makeStudy(book, IN_PROGRESS));
+
+            studyMemberRepository.save(
+                makeStudyMember(otherStudy, member, StudyMemberStatus.ACCEPTED));
+
+            Assertions.assertThatNoException()
+                .isThrownBy(() ->
+                    postService.createPost(member.getId(), validCreateRequest));
+        }
     }
 
     @Nested
