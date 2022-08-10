@@ -14,7 +14,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
@@ -66,7 +65,6 @@ class StudyQueryServiceImplTest {
 
     @Nested
     @DisplayName("특정 책에 대한 스터디 목록 조회 #43")
-
     class GetStudiesTest {
 
         @Test
@@ -96,7 +94,7 @@ class StudyQueryServiceImplTest {
 
     @Nested
     @DisplayName("스터디 신청 내역 조회")
-    public class GetStudyAppliersTest {
+    class GetStudyAppliersTest {
 
         private Long studyLeaderId = 1L;
 
