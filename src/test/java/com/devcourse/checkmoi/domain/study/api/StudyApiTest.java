@@ -42,7 +42,7 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
-import com.devcourse.checkmoi.global.model.PageRequest;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -268,8 +268,8 @@ class StudyApiTest extends IntegrationTest {
         @DisplayName("현재 모집중인 특정 책에 대한 스터디 목록을 조회한다.")
         void getStudies() throws Exception {
             Long bookId = 1L;
-            PageRequest pageRequest = new PageRequest();
-            Pageable pageable = pageRequest.of();
+            SimplePage simplePage = new SimplePage();
+            Pageable pageable = simplePage.of();
 
             Studies response = new Studies(
                 List.of(

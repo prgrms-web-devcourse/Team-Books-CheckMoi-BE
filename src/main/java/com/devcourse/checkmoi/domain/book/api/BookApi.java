@@ -4,7 +4,7 @@ import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.domain.book.dto.SimplePage;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.service.BookCommandService;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
@@ -42,8 +42,11 @@ public class BookApi {
     }
 
     @GetMapping
-    public ResponseEntity<SuccessResponse<LatestAllBooks>> topBooks() {
-        LatestAllBooks topBooks = bookQueryService.getAllTop(SimplePage.defaultPage());
+    public ResponseEntity<SuccessResponse<LatestAllBooks>> topBooks(
+        SimplePage pageRequest
+    ) {
+        pageRequest.setSize(4);
+        LatestAllBooks topBooks = bookQueryService.getAllTop(pageRequest.of());
 
         return ResponseEntity.ok(
             new SuccessResponse<>(topBooks)

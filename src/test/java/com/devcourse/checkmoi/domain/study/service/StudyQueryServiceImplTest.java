@@ -29,7 +29,7 @@ import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import com.devcourse.checkmoi.domain.user.model.User;
-import com.devcourse.checkmoi.global.model.PageRequest;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -72,8 +72,8 @@ class StudyQueryServiceImplTest {
         void getStudies() {
             Long bookId = 1L;
             long totalPage = 1L;
-            PageRequest pageRequest = new PageRequest();
-            Pageable pageable = pageRequest.of();
+            SimplePage simplePage = new SimplePage();
+            Pageable pageable = simplePage.of();
             Page<StudyInfo> studies = new PageImpl<>(List.of(
                 makeStudyInfo(makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L)),
                 makeStudyInfo(makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L))

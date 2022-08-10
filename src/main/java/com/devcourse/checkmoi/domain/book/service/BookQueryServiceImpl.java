@@ -3,10 +3,11 @@ package com.devcourse.checkmoi.domain.book.service;
 import com.devcourse.checkmoi.domain.book.converter.BookConverter;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.domain.book.dto.SimplePage;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -27,22 +28,12 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     @Override
-    public LatestAllBooks getAllTop(SimplePage pageRequest) {
-        PageRequest registerLatest =
-            PageRequest.of(
-                pageRequest.getPage(),
-                pageRequest.getSize(),
-                Sort.by(Direction.DESC, "createdAt"));
-        PageRequest studyLatest =
-            PageRequest.of(
-                pageRequest.getPage(),
-                pageRequest.getSize()
-            );
+    public LatestAllBooks getAllTop(Pageable pageRequest) {
         return new LatestAllBooks(
-            bookRepository.findAllTop(registerLatest).stream()
+            bookRepository.findAllTop(pageRequest).stream()
                 .map(bookConverter::bookToSimple)
                 .toList(),
-            bookRepository.findBooksByLatestStudy(studyLatest).stream()
+            bookRepository.findBooksByLatestStudy(pageRequest).stream()
                 .map(bookConverter::bookToSimple)
                 .toList()
         );

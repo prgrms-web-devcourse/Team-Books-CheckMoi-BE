@@ -1,18 +1,25 @@
 package com.devcourse.checkmoi.global.model;
 
+
 import lombok.Builder;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 
-public class PageRequest {
+public class SimplePage {
 
-    private int page = 1;
+    private static final int DEFAULT_PAGE = 1;
 
-    private int size = 10;
+    private static final int DEFAULT_PAGE_SIZE = 10;
+
+    private int page = DEFAULT_PAGE;
+
+    private int size = DEFAULT_PAGE_SIZE;
 
     private Direction direction = Direction.DESC;
 
     @Builder
-    public PageRequest() {
+    public SimplePage() {
+
     }
 
     public void setPage(int page) {
@@ -29,8 +36,16 @@ public class PageRequest {
         this.direction = direction;
     }
 
-    public org.springframework.data.domain.PageRequest of() {
-        return org.springframework.data.domain.PageRequest.of(page - 1, size, direction,
-            "create_date");
+    public PageRequest of() {
+        return PageRequest.of(page - 1, size, direction, "createdAt");
     }
+
+    public int getPage() {
+        return page;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
 }
