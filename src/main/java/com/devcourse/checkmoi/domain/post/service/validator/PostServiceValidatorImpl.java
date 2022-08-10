@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class PostServiceValidatorImpl implements PostServiceValidator {
 
     @Override
-    public void checkPostOwner(Long userId, Long postedUserId) {
-        if (!userId.equals(postedUserId)) {
+    public void checkPostOwner(Long userId, Long writerId) {
+        if (!userId.equals(writerId)) {
             throw new PostNoPermissionException();
         }
     }
