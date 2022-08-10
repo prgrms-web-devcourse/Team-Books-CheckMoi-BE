@@ -9,6 +9,7 @@ import com.devcourse.checkmoi.domain.book.service.BookCommandService;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,15 +25,15 @@ public class BookApi {
 
     private final BookQueryService bookQueryService;
 
-    public BookApi(BookCommandService bookCommandService,
-        BookQueryService bookQueryService) {
+    public BookApi(BookCommandService bookCommandService, BookQueryService bookQueryService) {
         this.bookCommandService = bookCommandService;
         this.bookQueryService = bookQueryService;
     }
 
     @PostMapping
     public ResponseEntity<SuccessResponse<Long>> register(
-        @RequestBody CreateBook createRequest) {
+        @Validated @RequestBody CreateBook createRequest
+    ) {
         Long bookId = bookCommandService.save(createRequest).id();
 
         return ResponseEntity
@@ -51,7 +52,8 @@ public class BookApi {
 
     @GetMapping("/{bookId}")
     public ResponseEntity<SuccessResponse<BookSpecification>> getById(
-        @PathVariable Long bookId) {
+        @PathVariable Long bookId
+    ) {
         BookSpecification bookSpecification = bookQueryService.getById(bookId);
 
         return ResponseEntity.ok(

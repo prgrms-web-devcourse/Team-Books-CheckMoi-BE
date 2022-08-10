@@ -8,21 +8,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class BookCommandServiceImpl implements BookCommandService {
 
     private final BookRepository bookRepository;
 
     private final BookConverter bookConverter;
 
-    public BookCommandServiceImpl(BookRepository bookRepository,
-        BookConverter bookConverter) {
+    public BookCommandServiceImpl(BookRepository bookRepository, BookConverter bookConverter) {
         this.bookRepository = bookRepository;
         this.bookConverter = bookConverter;
     }
 
     @Override
-    @Transactional
     public SimpleBook save(CreateBook bookRequest) {
         return bookRepository.findByIsbn(bookRequest.isbn())
             .map(bookConverter::bookToSimple)
