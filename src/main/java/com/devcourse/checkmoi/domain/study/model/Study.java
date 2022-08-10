@@ -141,4 +141,8 @@ public class Study extends BaseEntity {
 
         this.status = status;
     }
+
+    public boolean isFinished() {
+        return this.status == StudyStatus.FINISHED;
+    }
 }

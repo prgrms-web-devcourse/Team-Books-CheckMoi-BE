@@ -14,7 +14,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
@@ -22,7 +21,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
-import com.devcourse.checkmoi.domain.study.exception.NotParticipateStudyUserException;
+import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
@@ -66,7 +65,6 @@ class StudyQueryServiceImplTest {
 
     @Nested
     @DisplayName("특정 책에 대한 스터디 목록 조회 #43")
-
     class GetStudiesTest {
 
         @Test
@@ -113,7 +111,7 @@ class StudyQueryServiceImplTest {
             given(studyRepository.findStudyOwner(studyId))
                 .willReturn(studyLeaderId);
 
-            given(studyRepository.getStudyAppliers(studyId))
+            given(studyRepository.getStudyApplicants(studyId))
                 .willReturn(expectedAppliers);
 
             doNothing()
@@ -317,10 +315,10 @@ class StudyQueryServiceImplTest {
 
             given(studyMemberRepository.participateUserInStudy(anyLong(), anyLong()))
                 .willReturn(notFoundMemberId);
-            doThrow(NotParticipateStudyUserException.class)
+            doThrow(NotJoinedMemberException.class)
                 .when(studyValidator).participateUser(notFoundMemberId);
 
-            assertThatExceptionOfType(NotParticipateStudyUserException.class)
+            assertThatExceptionOfType(NotJoinedMemberException.class)
                 .isThrownBy(() -> studyQueryService.participateUser(study.getId(), otherUserId));
         }
     }

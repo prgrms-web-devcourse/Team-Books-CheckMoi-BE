@@ -11,13 +11,12 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
-import com.devcourse.checkmoi.domain.study.exception.NotParticipateStudyUserException;
+import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
@@ -60,7 +59,7 @@ class StudyServiceValidatorImplTest {
 
     @Nested
     @DisplayName("스터디가 진행중인지 검사 #129")
-    class OngoingStudyTest{
+    class OngoingStudyTest {
 
         @Test
         @DisplayName("스터디가 종료되었다면 예외 발생")
@@ -81,7 +80,7 @@ class StudyServiceValidatorImplTest {
         @DisplayName("스터디 멤버 아이디가 null이라면 예외 발생")
         void participateUser() {
             Long notFoundMemberId = null;
-            assertThatExceptionOfType(NotParticipateStudyUserException.class)
+            assertThatExceptionOfType(NotJoinedMemberException.class)
                 .isThrownBy(() -> studyServiceValidator.participateUser(notFoundMemberId));
         }
     }

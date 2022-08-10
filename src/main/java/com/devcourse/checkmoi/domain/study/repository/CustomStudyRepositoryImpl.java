@@ -118,7 +118,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     @Override
-    public StudyAppliers getStudyAppliers(Long studyId) {
+    public StudyAppliers getStudyApplicants(Long studyId) {
         List<StudyUserInfo> appliers = getStudyMembers(studyId, StudyMemberStatus.PENDING, null);
 
         return StudyAppliers.builder()
@@ -127,7 +127,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     @Override
-    public void updateAllAppliersAsDenied(Long studyId) {
+    public void updateAllApplicantsAsDenied(Long studyId) {
         jpaQueryFactory.update(studyMember)
             .where(studyMember.study.id.eq(studyId),
                 studyMember.status.eq(StudyMemberStatus.PENDING))
