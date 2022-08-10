@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -73,15 +74,12 @@ class PostCommandServiceImplTest {
             StudyMember studyMember = makeStudyMember(study, user, StudyMemberStatus.ACCEPTED);
             Post post = makePostWithId(GENERAL, study, user, 3L);
 
-            PostRequest.Create request = Create.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .category(post.getCategory().toString())
-                .studyId(study.getId())
-                .build();
+            PostRequest.Create request = Create.builder().title(post.getTitle())
+                .content(post.getContent()).category(post.getCategory().toString())
+                .studyId(study.getId()).build();
 
-            given(studyMemberRepository.findByUserId(any()))
-                .willReturn(Optional.of(studyMember));
+            given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
+                Optional.of(studyMember));
             when(postConverter.createToPost(any(Create.class), anyLong())).thenReturn(post);
             when(postRepository.save(any(Post.class))).thenReturn(post);
 
@@ -100,17 +98,14 @@ class PostCommandServiceImplTest {
             StudyMember studyMember = makeStudyMember(study, user, StudyMemberStatus.OWNED);
             Post post = makePostWithId(PostCategory.GENERAL, study, user, 3L);
 
-            PostRequest.Create request = Create.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .category(post.getCategory().toString())
-                .studyId(study.getId())
-                .build();
+            PostRequest.Create request = Create.builder().title(post.getTitle())
+                .content(post.getContent()).category(post.getCategory().toString())
+                .studyId(study.getId()).build();
 
-            given(studyMemberRepository.findByUserId(any()))
-                .willReturn(Optional.of(studyMember));
-            when(postConverter.createToPost(any(Create.class), anyLong())).thenReturn(post);
-            when(postRepository.save(any(Post.class))).thenReturn(post);
+            given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
+                Optional.of(studyMember));
+            given(postConverter.createToPost(any(Create.class), anyLong())).willReturn(post);
+            given(postRepository.save(any(Post.class))).willReturn(post);
 
             Long result = postCommandService.createPost(user.getId(), request);
 
@@ -125,17 +120,14 @@ class PostCommandServiceImplTest {
             StudyMember studyMember = makeStudyMember(study, user, StudyMemberStatus.OWNED);
             Post post = makePostWithId(PostCategory.NOTICE, study, user, 3L);
 
-            PostRequest.Create request = Create.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .category(post.getCategory().toString())
-                .studyId(study.getId())
-                .build();
+            PostRequest.Create request = Create.builder().title(post.getTitle())
+                .content(post.getContent()).category(post.getCategory().toString())
+                .studyId(study.getId()).build();
 
-            given(studyMemberRepository.findByUserId(any()))
-                .willReturn(Optional.of(studyMember));
-            when(postConverter.createToPost(any(Create.class), anyLong())).thenReturn(post);
-            when(postRepository.save(any(Post.class))).thenReturn(post);
+            given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
+                Optional.of(studyMember));
+            given(postConverter.createToPost(any(Create.class), anyLong())).willReturn(post);
+            given(postRepository.save(any(Post.class))).willReturn(post);
 
             Long result = postCommandService.createPost(user.getId(), request);
 
@@ -150,19 +142,19 @@ class PostCommandServiceImplTest {
             StudyMember studyMember = makeStudyMember(study, user, StudyMemberStatus.ACCEPTED);
             Post post = makePostWithId(PostCategory.NOTICE, study, user, 3L);
 
-            PostRequest.Create request = Create.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .category(post.getCategory().toString())
-                .studyId(study.getId())
-                .build();
+            PostRequest.Create request = Create.builder().title(post.getTitle())
+                .content(post.getContent()).category(post.getCategory().toString())
+                .studyId(study.getId()).build();
 
-            given(studyMemberRepository.findByUserId(any()))
-                .willReturn(Optional.of(studyMember));
+            given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
+                Optional.of(studyMember));
+            given(postConverter.createToPost(any(), anyLong())).willReturn(post);
+            willThrow(new NotAllowedWriterException("Exception message")).given(postValidator)
+                .checkAllowedWriter(any(), any());
 
-            Assertions.assertThatThrownBy(() ->
-                postCommandService.createPost(user.getId(), request)
-            ).isInstanceOf(NotAllowedWriterException.class);
+            Assertions.assertThatThrownBy(
+                    () -> postCommandService.createPost(1L, request))
+                .isInstanceOf(NotAllowedWriterException.class);
         }
     }
 
@@ -177,13 +169,10 @@ class PostCommandServiceImplTest {
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
             Post post = makePostWithId(GENERAL, study, user, 3L);
 
-            PostRequest.Edit request = Edit.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .studyId(study.getId())
-                .build();
+            PostRequest.Edit request = Edit.builder().title(post.getTitle())
+                .content(post.getContent()).studyId(study.getId()).build();
 
-            doNothing().when(postValidator).validatePostOwner(anyLong(), anyLong());
+            doNothing().when(postValidator).checkPostOwner(anyLong(), anyLong());
             when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
             postCommandService.editPost(user.getId(), post.getId(), request);
@@ -198,20 +187,16 @@ class PostCommandServiceImplTest {
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
             Post post = makePostWithId(GENERAL, study, user, 3L);
 
-            PostRequest.Edit request = Edit.builder()
-                .title(post.getTitle())
-                .content(post.getContent())
-                .studyId(study.getId())
-                .build();
+            PostRequest.Edit request = Edit.builder().title(post.getTitle())
+                .content(post.getContent()).studyId(study.getId()).build();
 
-            doThrow(PostNoPermissionException.class)
-                .when(postValidator)
-                .validatePostOwner(anyLong(), anyLong());
+            doThrow(PostNoPermissionException.class).when(postValidator)
+                .checkPostOwner(anyLong(), anyLong());
 
             when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
 
-            assertThatExceptionOfType(PostNoPermissionException.class)
-                .isThrownBy(() -> postCommandService.editPost(user.getId(), post.getId(), request));
+            assertThatExceptionOfType(PostNoPermissionException.class).isThrownBy(
+                () -> postCommandService.editPost(user.getId(), post.getId(), request));
 
             then(postRepository).should(times(1)).findById(post.getId());
         }
@@ -227,10 +212,12 @@ class PostCommandServiceImplTest {
         void deletePost() {
             User user = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
+            StudyMember member = makeStudyMember(study, user, StudyMemberStatus.ACCEPTED);
             Post post = makePostWithId(GENERAL, study, user, 3L);
 
-            when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
-            doNothing().when(postValidator).validatePostOwner(anyLong(), anyLong());
+            given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+            given(studyMemberRepository.findByUserAndStudy(anyLong(), anyLong()))
+                .willReturn(Optional.of(member));
 
             postCommandService.deletePost(user.getId(), post.getId());
 
@@ -245,12 +232,10 @@ class PostCommandServiceImplTest {
             Post post = makePostWithId(GENERAL, study, user, 3L);
 
             when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
-            doThrow(PostNoPermissionException.class)
-                .when(postValidator)
-                .validatePostOwner(anyLong(), anyLong());
 
             assertThatExceptionOfType(PostNoPermissionException.class)
-                .isThrownBy(() -> postCommandService.deletePost(user.getId(), post.getId()));
+                .isThrownBy(() ->
+                    postCommandService.deletePost(user.getId(), post.getId()));
 
             then(postRepository).should(times(1)).findById(post.getId());
         }

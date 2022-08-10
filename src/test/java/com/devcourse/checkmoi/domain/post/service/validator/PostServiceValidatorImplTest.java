@@ -17,9 +17,9 @@ class PostServiceValidatorImplTest {
         User owner = makeUserWithId(1L);
         User illegalUser = makeUserWithId(2L);
 
-        postValidator.validatePostOwner(owner.getId(), 1L);
+        postValidator.checkPostOwner(owner.getId(), 1L);
         assertThrows(PostNoPermissionException.class,
-            () -> postValidator.validatePostOwner(owner.getId(), illegalUser.getId()));
+            () -> postValidator.checkPostOwner(owner.getId(), illegalUser.getId()));
     }
 
 }

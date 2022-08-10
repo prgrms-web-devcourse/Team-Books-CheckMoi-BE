@@ -64,7 +64,7 @@ public class StudyQueryServiceImpl implements StudyQueryService {
                 + studyOwnerId
         );
 
-        return studyRepository.getStudyAppliers(studyId);
+        return studyRepository.getStudyApplicants(studyId);
     }
 
     @Override

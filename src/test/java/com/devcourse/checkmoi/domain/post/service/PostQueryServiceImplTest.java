@@ -4,12 +4,15 @@ import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePostWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
@@ -20,6 +23,9 @@ import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.post.service.validator.PostServiceValidator;
 import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
+import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.user.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,12 +51,15 @@ class PostQueryServiceImplTest {
     @Mock
     private PostConverter postConverter;
 
+    @Mock
+    private StudyMemberRepository memberRepository;
+
+    @Mock
+    private PostServiceValidator postValidator;
 
     @Nested
     @DisplayName("게시글을 다중 조회할 수 있다 #86")
     class FindAllPostsTest {
-
-        private PostConverter postConverter = new PostConverter();
 
         @Test
         @DisplayName("S 게시글을 다중 조회할 수 있다")
@@ -79,15 +88,13 @@ class PostQueryServiceImplTest {
     @DisplayName("게시글을 단일 조회할 수 있다 #86")
     class FindPostTest {
 
-        @Mock
-        private PostServiceValidator postValidator;
-
         @Test
         @DisplayName("S 게시글을 단건 조회할 수 있다")
         void findPost() {
             User user = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
             Post post = makePostWithId(GENERAL, study, user, 3L);
+            StudyMember member = makeStudyMember(study, user, StudyMemberStatus.ACCEPTED);
 
             PostInfo postInfo = PostInfo.builder()
                 .id(post.getId())
@@ -102,8 +109,14 @@ class PostQueryServiceImplTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-            when(postConverter.postToInfo(any(Post.class))).thenReturn(postInfo);
-            when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+            given(memberRepository.findByUserAndStudy(anyLong(), anyLong()))
+                .willReturn(Optional.of(member));
+            willDoNothing()
+                .given(postValidator)
+                .checkJoinedMember(any(), anyLong());
+            given(postConverter.postToInfo(any(Post.class)))
+                .willReturn(postInfo);
+            given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
 
             postQueryService.findByPostId(user.getId(), post.getId());
 
@@ -119,7 +132,8 @@ class PostQueryServiceImplTest {
             Post post = makePostWithId(GENERAL, study, user, 3L);
             Long illegalPostId = 5L;
 
-            when(postRepository.findById(anyLong())).thenThrow(new PostNotFoundException());
+            given(postRepository.findById(anyLong()))
+                .willThrow(new PostNotFoundException());
 
             assertThatExceptionOfType(PostNotFoundException.class)
                 .isThrownBy(() -> postQueryService.findByPostId(user.getId(), illegalPostId));

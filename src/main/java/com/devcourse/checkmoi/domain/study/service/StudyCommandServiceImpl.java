@@ -67,7 +67,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         study.changeStatus(StudyStatus.valueOf(request.status()));
 
         if (isNecessaryToDeny(beforeStatus, study.getStatus())) {
-            studyRepository.updateAllAppliersAsDenied(studyId);
+            studyRepository.updateAllApplicantsAsDenied(studyId);
         }
 
         return study.getId();
@@ -96,7 +96,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
             .orElseThrow(StudyNotFoundException::new);
         User user = userRepository.findById(userId)
             .orElseThrow(UserNotFoundException::new);
-        StudyMember request = studyMemberRepository.findByUserId(user.getId())
+        StudyMember request = studyMemberRepository.findByUserAndStudy(user.getId(), studyId)
             .map(studyMember -> {
                 studyValidator.validateDuplicateStudyMemberRequest(studyMember);
                 studyMember.changeStatus(StudyMemberStatus.PENDING);

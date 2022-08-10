@@ -70,7 +70,7 @@ class StudyCommandServiceImplTest {
 
     @Nested
     @DisplayName("스터디 등록 #5")
-    class Create {
+    class CreateTest {
 
         @Test
         @DisplayName("S 스터디를 등록할 수 있다")
@@ -321,7 +321,7 @@ class StudyCommandServiceImplTest {
                 .willReturn(Optional.of(study));
             given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
-            given(studyMemberRepository.findByUserId(anyLong()))
+            given(studyMemberRepository.findByUserAndStudy(anyLong(), anyLong()))
                 .willReturn(Optional.empty());
             given(studyMemberRepository.save(any(StudyMember.class)))
                 .willReturn(studyMember);
@@ -344,7 +344,7 @@ class StudyCommandServiceImplTest {
                 .willReturn(Optional.of(study));
             given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
-            given(studyMemberRepository.findByUserId(anyLong()))
+            given(studyMemberRepository.findByUserAndStudy(anyLong(), anyLong()))
                 .willReturn(Optional.of(studyMember));
             given(studyMemberRepository.save(any(StudyMember.class)))
                 .willReturn(studyMember);
@@ -402,7 +402,7 @@ class StudyCommandServiceImplTest {
                 .willReturn(Optional.of(study));
             given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
-            given(studyMemberRepository.findByUserId(anyLong()))
+            given(studyMemberRepository.findByUserAndStudy(anyLong(), anyLong()))
                 .willReturn(Optional.of(studyMember));
 
             doThrow(new DuplicateStudyJoinRequestException(STUDY_JOIN_REQUEST_DUPLICATE))

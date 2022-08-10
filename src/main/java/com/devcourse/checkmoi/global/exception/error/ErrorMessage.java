@@ -21,6 +21,7 @@ public enum ErrorMessage {
     BOOK_NOT_FOUND("해당하는 책을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
     STUDY_JOIN_REQUEST_NOT_FOUND("해당하는 스터디 가입 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     POST_NOT_FOUND("해당하는 포스트를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
+    USER_NOT_FOUND("존재하지 않는 사용자입니다", HttpStatus.NOT_FOUND),
     COMMENT_NOT_FOUND("해당하는 댓글을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
 
     // no permission
@@ -33,9 +34,10 @@ public enum ErrorMessage {
     // study error
     NOT_ALLOWED_STUDY_STATUS("스터디 상태 변경을 할 수 없습니다", HttpStatus.BAD_REQUEST),
     FINISHED_STUDY("이미 종료된 스터디입니다.", HttpStatus.FORBIDDEN),
-    NOT_PARTICIPATE_STUDY_USER("해당 스터디에 참가하지 않은 유저입니다.", HttpStatus.FORBIDDEN),
+    NOT_JOINED_USER("해당 스터디에 참가하지 않은 유저입니다.", HttpStatus.FORBIDDEN),
     // post error
-    NOT_ALLOWED_WRITER("게시글 작성 권한이 없습니다", HttpStatus.FORBIDDEN);
+    NOT_ALLOWED_WRITER("게시글 작성 권한이 없습니다", HttpStatus.FORBIDDEN),
+    CLOSED_STUDY("종료된 스터디입니다. 자유게시판만 사용가능합니다", HttpStatus.BAD_REQUEST);
 
     private final String message;
 

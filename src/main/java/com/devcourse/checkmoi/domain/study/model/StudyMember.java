@@ -58,4 +58,13 @@ public class StudyMember extends BaseEntity {
     public Study getStudy() {
         return study;
     }
+
+    public boolean isJoined() {
+        return this.status == StudyMemberStatus.ACCEPTED ||
+            this.status == StudyMemberStatus.OWNED;
+    }
+
+    public boolean isStudyOwner() {
+        return this.status == StudyMemberStatus.OWNED;
+    }
 }
