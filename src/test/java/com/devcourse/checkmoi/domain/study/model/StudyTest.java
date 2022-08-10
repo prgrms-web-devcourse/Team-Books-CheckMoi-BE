@@ -34,5 +34,17 @@ class StudyTest {
                 study.changeStatus(StudyStatus.FINISHED)
             ).isInstanceOf(NotAllowedStudyStatusException.class);
         }
+
+        @Test
+        @DisplayName("S 모집 중 상태를 진행 완료 상태로 변경할 수 있다 ")
+        void changeStatusToInProgress() {
+            Study study = Study.builder()
+                .status(StudyStatus.RECRUITING)
+                .build();
+
+            Assertions.assertThatNoException()
+                .isThrownBy(() ->
+                    study.changeStatus(StudyStatus.IN_PROGRESS));
+        }
     }
 }

@@ -135,7 +135,7 @@ public class Study extends BaseEntity {
     }
 
     public void changeStatus(StudyStatus status) {
-        if (!this.status.isAllowedNextStatus(status)) {
+        if (!this.status.isAllowedToChangeStatus(status)) {
             throw new NotAllowedStudyStatusException();
         }
 
