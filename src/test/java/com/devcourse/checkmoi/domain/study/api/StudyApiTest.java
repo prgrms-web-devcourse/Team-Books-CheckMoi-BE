@@ -725,6 +725,7 @@ class StudyApiTest extends IntegrationTest {
                 .userId(1L)
                 .studyId(1L)
                 .bookId(1L)
+                .isMember(true)
                 .build();
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();

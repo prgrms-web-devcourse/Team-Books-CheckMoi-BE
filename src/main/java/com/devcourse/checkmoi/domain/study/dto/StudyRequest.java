@@ -20,7 +20,8 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
         @Nullable Long studyId,
         @Nullable Long bookId,
         @Nullable String memberStatus,
-        @Nullable String studyStatus
+        @Nullable String studyStatus,
+        @Nullable Boolean isMember
     ) implements StudyRequest {
 
         @Builder
