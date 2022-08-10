@@ -373,13 +373,15 @@ class StudyRepositoryTest extends RepositoryTest {
     @DisplayName("스터디 조회 v2 #158")
     class SearchStudies {
 
+        Book book;
+
         private List<User> users = new ArrayList<>();
 
         private List<Study> studies = new ArrayList<>();
 
         @BeforeEach
         void setUp() {
-            Book book = bookRepository.save(makeBook());
+            book = bookRepository.save(makeBook());
 
             users.add(userRepository.save(makeUser()));
             users.add(userRepository.save(makeUser()));
@@ -434,7 +436,7 @@ class StudyRepositoryTest extends RepositoryTest {
             User givenUser = users.get(0);
 
             Search search = Search.builder()
-                .bookId(1L)
+                .bookId(book.getId())
                 .isMember(true)
                 .studyStatus(IN_PROGRESS.toString())
                 .memberStatus(ACCEPTED.toString())
@@ -449,10 +451,10 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("S 특정 유저가 참여하고 있지 않은 스터디(종료되었거나, 거절당한 스터디)를 출력한다")
         void isNotMemberStudies() {
-            User givenUser = users.get(0);
+            User givenUser = users.get(1);
 
             Search search = Search.builder()
-                .userId(2L)
+                .userId(givenUser.getId())
                 .isMember(false)
                 .build();
             PageRequest page = PageRequest.builder().build();
