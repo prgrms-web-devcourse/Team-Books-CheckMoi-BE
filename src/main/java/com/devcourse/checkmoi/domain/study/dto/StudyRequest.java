@@ -4,6 +4,9 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
+import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.global.annotation.ValueOfEnum;
 import java.time.LocalDate;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Max;
@@ -19,9 +22,9 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
         @Nullable Long userId,
         @Nullable Long studyId,
         @Nullable Long bookId,
-        @Nullable String memberStatus,
-        @Nullable String studyStatus,
-        @Nullable Boolean isMember
+        @Nullable Boolean isMember,
+        @Nullable @ValueOfEnum(enumClass = StudyMemberStatus.class) String memberStatus,
+        @Nullable @ValueOfEnum(enumClass = StudyStatus.class) String studyStatus
     ) implements StudyRequest {
 
         @Builder
@@ -71,7 +74,7 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
     }
 
     record Audit(
-        String status
+        @ValueOfEnum(enumClass = StudyMemberStatus.class) String status
     ) implements StudyRequest {
 
         @Builder

@@ -5,4 +5,5 @@ public enum StudyMemberStatus {
     ACCEPTED,
     DENIED,
     OWNED
+
 }
