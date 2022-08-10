@@ -306,9 +306,14 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     private BooleanExpression isMember(Boolean condition) {
-        if (condition == null || condition.equals(Boolean.FALSE)) {
+        if (condition == null) {
             return null;
         }
+
+        if (condition.equals(Boolean.FALSE)) {
+            return studyMember.status.notIn(OWNED, ACCEPTED).or(study.status.eq(FINISHED));
+        }
+
         return studyMember.status.eq(ACCEPTED).and(study.status.notIn(FINISHED));
     }
 }
