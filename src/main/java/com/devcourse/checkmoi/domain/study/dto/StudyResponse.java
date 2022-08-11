@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.domain.study.dto;
 
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.ExpiredStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -19,7 +20,8 @@ import lombok.Builder;
 public sealed interface StudyResponse permits
     StudyInfo, StudyDetail, StudyDetailWithMembers,
     Studies, StudyBookInfo, StudyUserInfo,
-    StudyAppliers, MyStudies {
+    StudyAppliers, MyStudies,
+    ExpiredStudies {
 
     record StudyInfo(
         Long id,
@@ -129,5 +131,11 @@ public sealed interface StudyResponse permits
         public MyStudies {
 
         }
+    }
+
+    record ExpiredStudies(
+        List<Long> studies
+    ) implements StudyResponse {
+
     }
 }
