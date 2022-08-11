@@ -59,6 +59,12 @@ public abstract class EntityGeneratorUtil {
         return studyBuilder(book, status).id(id).build();
     }
 
+    public static Study makeStudyWithStudyDate(Book book, StudyStatus status, LocalDate startDate,
+        LocalDate endDate) {
+
+        return studyBuilderWithCustomDate(book, status, startDate, endDate).build();
+    }
+
     public static User makeUserWithId(Long id) {
         return userBuilder().id(id).build();
     }
@@ -110,6 +116,15 @@ public abstract class EntityGeneratorUtil {
             .gatherEndDate(LocalDate.now())
             .studyStartDate(LocalDate.now())
             .studyEndDate(LocalDate.now());
+    }
+
+    private static StudyBuilder studyBuilderWithCustomDate(Book book, StudyStatus status,
+        LocalDate studyStartDate, LocalDate studyEndDate) {
+        return studyBuilder(book, status)
+            .gatherStartDate(LocalDate.of(2022, 7, 10))
+            .gatherEndDate(LocalDate.of(2022, 8, 1))
+            .studyEndDate(studyEndDate)
+            .studyStartDate(studyStartDate);
     }
 
     private static PostBuilder postBuilder(PostCategory category, Study study, User user) {

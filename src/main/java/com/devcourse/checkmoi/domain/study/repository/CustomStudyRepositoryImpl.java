@@ -5,6 +5,8 @@ import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING_FINISHED;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -15,10 +17,13 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -207,6 +212,38 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         );
     }
 
+    @Override
+    public ExpiredStudies getAllToBeProcessed(LocalDate current, StudyStatus toStatus) {
+        return switch (toStatus) {
+            case IN_PROGRESS -> findAllToBeProgressed(current);
+            default -> new ExpiredStudies(Collections.emptyList());
+        };
+    }
+
+    @Override
+    public void updateStudyStatus(Long studyId, StudyStatus studyStatus) {
+        jpaQueryFactory.update(study)
+            .set(study.status, studyStatus)
+            .where(study.id.eq(studyId))
+            .execute();
+    }
+
+    private ExpiredStudies findAllToBeProgressed(LocalDate current) {
+        return new ExpiredStudies(
+            jpaQueryFactory.select(
+                    Projections.constructor(
+                        Long.class,
+                        study.id
+                    )
+                ).from(study)
+                .where(
+                    study.studyStartDate.between(null, current),
+                    study.status.eq(RECRUITING)
+                        .or(study.status.eq(RECRUITING_FINISHED))
+                ).fetch()
+        );
+    }
+
 
     private StudyDetail getStudyDetailInfo(Long studyId) {
         return jpaQueryFactory.select(
@@ -311,7 +348,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
         if (condition.equals(Boolean.FALSE)) {
             return studyMember.status.notIn(OWNED, ACCEPTED).or(study.status.eq(FINISHED));
         }
-        
+
         return studyMember.status.in(OWNED, ACCEPTED).and(study.status.notIn(FINISHED));
     }
 }

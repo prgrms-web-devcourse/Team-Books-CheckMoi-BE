@@ -12,6 +12,9 @@ spring:
     console:
       enabled: true
       path: /h2-console
-
+  task:
+    scheduling:
+      pool:
+        size: 2
 front-url:
   http://localhost:8080
