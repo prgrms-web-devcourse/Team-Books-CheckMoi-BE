@@ -13,6 +13,7 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
@@ -25,7 +26,6 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
-import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.template.RepositoryTest;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,11 +124,13 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("책 아이디를 기준으로 모집중인 스터디 정보를 조회한다.")
         void findRecruitingStudyByBookId() {
-            PageRequest pageRequest = new PageRequest();
-            pageRequest.setSize(4);
             int totalPage = 1;
+            SimplePage simplePage = SimplePage.builder()
+                .page(totalPage)
+                .size(4)
+                .build();
             Page<StudyInfo> result =
-                studyRepository.findRecruitingStudyByBookId(givenBook.getId(), pageRequest.of());
+                studyRepository.findRecruitingStudyByBookId(givenBook.getId(), simplePage.pageRequest());
 
             assertThat(result.getContent()).hasSize(4);
             assertThat(result.getTotalPages()).isEqualTo(totalPage);
@@ -423,10 +425,10 @@ class StudyRepositoryTest extends RepositoryTest {
             Search search = Search.builder()
                 .userId(givenUser.getId())
                 .build();
-            PageRequest page = PageRequest.builder().build();
+            SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
             assertThat(result.getContent()).hasSize(3);
         }
 
@@ -441,10 +443,10 @@ class StudyRepositoryTest extends RepositoryTest {
                 .studyStatus(IN_PROGRESS.toString())
                 .memberStatus(ACCEPTED.toString())
                 .build();
-            PageRequest page = PageRequest.builder().build();
+            SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
             assertThat(result.getContent()).hasSize(2);
         }
 
@@ -457,10 +459,10 @@ class StudyRepositoryTest extends RepositoryTest {
                 .userId(givenUser.getId())
                 .isMember(false)
                 .build();
-            PageRequest page = PageRequest.builder().build();
+            SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
             assertThat(result.getContent()).hasSize(2);
         }
 
@@ -474,10 +476,10 @@ class StudyRepositoryTest extends RepositoryTest {
                 .studyStatus("recruiting")
                 .memberStatus("owned")
                 .build();
-            PageRequest page = PageRequest.builder().build();
+            SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result = studyRepository.findAllByCondition(givenUser.getId(),
-                search, page.of());
+                search, page.pageRequest());
             assertThat(result.getContent()).hasSize(1);
         }
     }

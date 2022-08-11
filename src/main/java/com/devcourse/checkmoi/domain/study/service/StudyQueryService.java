@@ -4,8 +4,6 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
-import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface StudyQueryService {
@@ -24,7 +22,7 @@ public interface StudyQueryService {
 
     void ongoingStudy(Long studyId);
 
-    void participateUser(Long aLong, Long userId);
+    void participateUser(Long studyId, Long userId);
 
     Studies findAllByCondition(Long userId, Search search, Pageable pageable);
 }
