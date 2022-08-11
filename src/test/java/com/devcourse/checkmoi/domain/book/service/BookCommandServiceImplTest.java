@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.book.service;
 
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
@@ -74,7 +74,7 @@ class BookCommandServiceImplTest {
                 birdBook.getDescription()
             );
 
-            SimpleBook response = bookCommandService.save(createRequest);
+            BookInfo response = bookCommandService.save(createRequest);
 
             Assertions.assertThat(response.id())
                 .isEqualTo(birdBook.getId());
@@ -93,7 +93,7 @@ class BookCommandServiceImplTest {
                 "고양이의 귀여움을 설명한다"
             );
 
-            SimpleBook response = bookCommandService.save(createRequest);
+            BookInfo response = bookCommandService.save(createRequest);
 
             Assertions.assertThat(response.id())
                 .isNotNull();

@@ -40,6 +40,7 @@ import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.epages.restdocs.apispec.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -93,7 +94,9 @@ class PostApiTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
                     .summary("게시글 생성 API")
-                    .description("게시글을 생성하는 API 입니다."),
+                    .description("게시글을 생성하는 API 입니다.")
+                    .requestSchema(Schema.schema("게시글 생성 요청"))
+                    .responseSchema(Schema.schema("게시글 생성 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
@@ -149,7 +152,9 @@ class PostApiTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
                     .summary("게시글 단일 조회 API")
-                    .description("게시글을 단일 조회하는 API 입니다."),
+                    .description("게시글을 단일 조회하는 API 입니다.")
+                    .requestSchema(Schema.schema("게시글 단일 조회 요청"))
+                    .responseSchema(Schema.schema("게시글 단일 조회 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader()
@@ -210,7 +215,9 @@ class PostApiTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
                     .summary("게시글 검색 API (준비중)")
-                    .description("게시글을 검색하는 API 입니다."),
+                    .description("게시글을 검색하는 API 입니다.")
+                    .requestSchema(Schema.schema("게시글 검색 요청"))
+                    .responseSchema(Schema.schema("게시글 검색 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
@@ -294,7 +301,9 @@ class PostApiTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
                     .summary("게시글 삭제 API")
-                    .description("게시글을 삭제하는 API 입니다."),
+                    .description("게시글을 삭제하는 API 입니다.")
+                    .requestSchema(Schema.schema("게시글 삭제 요청"))
+                    .responseSchema(Schema.schema("게시글 삭제 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader()

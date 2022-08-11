@@ -2,7 +2,7 @@ package com.devcourse.checkmoi.domain.book.service;
 
 import com.devcourse.checkmoi.domain.book.converter.BookConverter;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +21,11 @@ public class BookCommandServiceImpl implements BookCommandService {
     }
 
     @Override
-    public SimpleBook save(CreateBook bookRequest) {
+    public BookInfo save(CreateBook bookRequest) {
         return bookRepository.findByIsbn(bookRequest.isbn())
-            .map(bookConverter::bookToSimple)
+            .map(bookConverter::bookToInfo)
             .orElseGet(() ->
-                bookConverter.bookToSimple(
+                bookConverter.bookToInfo(
                     bookRepository.save(bookConverter.CreateToBook(bookRequest))));
     }
 }

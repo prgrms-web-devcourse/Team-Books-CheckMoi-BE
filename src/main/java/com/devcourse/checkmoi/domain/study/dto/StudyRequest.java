@@ -41,8 +41,8 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
         String thumbnail,
         @Size(max = 500, message = "스터디 설명은 500자를 넘길 수 없습니다.")
         String description,
-        @Min(value = 1, message = "최대 참여 인원은 1명 이상이어야 합니다.")
-        @Max(value = 10, message = "최대 참여 인원이 10명 이상일 수 없습니다.")
+        @Min(value = 1, message = "최소 참여 인원은 1명 이상이어야 합니다.")
+        @Max(value = 10, message = "최대 참여 인원은 10명을 초과할 수 없습니다.")
         Integer maxParticipant,
         LocalDate gatherStartDate,
         @FutureOrPresent(message = "모집 종료일자가 현재보다 과거일 수 없습니다.")
