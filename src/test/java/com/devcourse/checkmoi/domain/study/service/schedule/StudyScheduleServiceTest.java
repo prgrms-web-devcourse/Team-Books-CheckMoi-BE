@@ -22,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class StudyScheduleServiceTest {
 
     @Autowired
-    StudyScheduleService service;
+    private StudyScheduleService service;
 
     @Autowired
     private StudyRepository studyRepository;
