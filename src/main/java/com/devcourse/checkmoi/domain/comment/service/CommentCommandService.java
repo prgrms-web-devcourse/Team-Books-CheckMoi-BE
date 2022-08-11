@@ -2,6 +2,7 @@ package com.devcourse.checkmoi.domain.comment.service;
 
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
 
 public interface CommentCommandService {
 

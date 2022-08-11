@@ -2,10 +2,18 @@ package com.devcourse.checkmoi.domain.comment.facade;
 
 import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeCommentInfo;
 import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makePostInfo;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMemberWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
@@ -13,7 +21,12 @@ import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
+import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
+import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
+import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.global.model.SimplePage;
 import java.util.List;
 import org.assertj.core.api.Assertions;
@@ -99,4 +112,6 @@ class CommentFacadeTest {
             Assertions.assertThat(want.totalPage()).isEqualTo(want.totalPage());
         }
     }
+
+
 }
