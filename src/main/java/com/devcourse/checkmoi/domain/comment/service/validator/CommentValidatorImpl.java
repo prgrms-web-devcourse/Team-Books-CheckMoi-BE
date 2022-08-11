@@ -17,8 +17,6 @@ public class CommentValidatorImpl implements CommentValidator {
         if (!writer.getId().equals(userId)) {
             throw new CommentNoPermissionException();
         }
-        System.out.println(study.getStatus());
-        System.out.println(study.isFinished());
         if (study.isFinished()) {
             throw new FinishedStudyException();
         }
