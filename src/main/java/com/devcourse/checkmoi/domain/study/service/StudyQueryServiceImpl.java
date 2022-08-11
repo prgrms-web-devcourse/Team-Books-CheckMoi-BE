@@ -1,7 +1,6 @@
 package com.devcourse.checkmoi.domain.study.service;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.ExpiredStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
@@ -11,6 +10,7 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
+import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;

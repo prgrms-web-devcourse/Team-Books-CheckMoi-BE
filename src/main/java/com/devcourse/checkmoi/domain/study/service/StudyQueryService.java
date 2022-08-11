@@ -1,11 +1,11 @@
 package com.devcourse.checkmoi.domain.study.service;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.ExpiredStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
 import java.time.LocalDate;
 import org.springframework.data.domain.Pageable;
 

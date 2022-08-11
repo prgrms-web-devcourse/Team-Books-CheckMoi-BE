@@ -1,10 +1,10 @@
 package com.devcourse.checkmoi.domain.study.service.schedule;
 
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.ExpiredStudies;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
+import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
 import com.devcourse.checkmoi.global.scheduler.ScheduleManager;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
