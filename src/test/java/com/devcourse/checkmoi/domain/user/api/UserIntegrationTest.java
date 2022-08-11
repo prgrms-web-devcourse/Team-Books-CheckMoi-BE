@@ -104,7 +104,9 @@ class UserIntegrationTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("User API")
                     .summary("회원 탈퇴 API")
-                    .description("서비스 탈퇴를 요청하는 API 입니다."),
+                    .description("서비스 탈퇴를 요청하는 API 입니다.")
+                    .requestSchema(Schema.schema("회원 탈퇴 요청"))
+                    .responseSchema(Schema.schema("회원 탈퇴 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 pathParameters(

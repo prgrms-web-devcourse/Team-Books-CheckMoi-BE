@@ -3,9 +3,11 @@ package com.devcourse.checkmoi.domain.comment.service;
 import com.devcourse.checkmoi.domain.comment.converter.CommentConverter;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +21,12 @@ public class CommentQueryServiceImpl implements CommentQueryService {
     private final CommentConverter commentConverter;
 
     @Override
-    public List<CommentInfo> findAllComments(Long userId, Search request) {
-        return commentRepository.findAllByCondition(userId, request);
+    public Comments findAllComments(Search request, Pageable pageable) {
+        Page<CommentInfo> comments = commentRepository.findAllByCondition(request,
+            pageable);
+        return Comments.builder()
+            .comments(comments.getContent())
+            .totalPage(comments.getTotalPages())
+            .build();
     }
 }

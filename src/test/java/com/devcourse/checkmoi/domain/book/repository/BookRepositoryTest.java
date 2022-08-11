@@ -6,7 +6,7 @@ import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.model.Book;
@@ -14,11 +14,11 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.template.RepositoryTest;
 import java.util.ArrayList;
 import java.util.List;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.AssertionsForInterfaceTypes;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,7 +60,7 @@ class BookRepositoryTest extends RepositoryTest {
 
         List<Book> topBooks = bookRepository.findAllTop(pageable);
 
-        Assertions.assertThat(topBooks)
+        assertThat(topBooks)
             .hasSize(1);
     }
 
@@ -81,7 +81,8 @@ class BookRepositoryTest extends RepositoryTest {
 
             List<Book> got = bookRepository.findBooksByLatestStudy(pageable);
 
-            assertThat(got.get(0)).usingRecursiveComparison().isEqualTo(birdBook);
+            AssertionsForClassTypes.assertThat(got.get(0)).usingRecursiveComparison()
+                .isEqualTo(birdBook);
         }
     }
 
@@ -123,11 +124,11 @@ class BookRepositoryTest extends RepositoryTest {
                 .studyStatus(IN_PROGRESS.toString())
                 .build();
 
-            com.devcourse.checkmoi.global.model.PageRequest page = new com.devcourse.checkmoi.global.model.PageRequest();
+            SimplePage page = SimplePage.builder().build();
 
-            Page<BookInfo> result = bookRepository.findAllByCondition(search, page.of());
+            Page<BookInfo> result = bookRepository.findAllByCondition(search, page.pageRequest());
 
-            AssertionsForInterfaceTypes.assertThat(result.getContent()).hasSize(1);
+            assertThat(result.getContent()).hasSize(1);
         }
 
         @Test
@@ -135,11 +136,10 @@ class BookRepositoryTest extends RepositoryTest {
         void searchStudies2() {
             Search search = Search.builder().build();
 
-            com.devcourse.checkmoi.global.model.PageRequest page =
-                com.devcourse.checkmoi.global.model.PageRequest.builder().build();
+            SimplePage page = SimplePage.builder().build();
 
-            Page<BookInfo> result = bookRepository.findAllByCondition(search, page.of());
-            AssertionsForInterfaceTypes.assertThat(result.getContent()).hasSize(2);
+            Page<BookInfo> result = bookRepository.findAllByCondition(search, page.pageRequest());
+            assertThat(result.getContent()).hasSize(2);
         }
     }
 }

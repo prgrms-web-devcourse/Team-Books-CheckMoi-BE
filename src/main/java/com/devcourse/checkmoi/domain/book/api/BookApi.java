@@ -6,10 +6,9 @@ import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfos;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.domain.book.dto.SimplePage;
 import com.devcourse.checkmoi.domain.book.service.BookCommandService;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
-import com.devcourse.checkmoi.global.model.PageRequest;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +45,11 @@ public class BookApi {
 
     @GetMapping("/books")
     public ResponseEntity<SuccessResponse<LatestAllBooks>> topBooks() {
-        LatestAllBooks topBooks = bookQueryService.getAllTop(SimplePage.defaultPage());
+        SimplePage pageRequest = SimplePage.builder()
+            .page(1)
+            .size(4)
+            .build();
+        LatestAllBooks topBooks = bookQueryService.getAllTop(pageRequest.pageRequest());
 
         return ResponseEntity.ok(
             new SuccessResponse<>(topBooks)
@@ -78,9 +81,9 @@ public class BookApi {
     @GetMapping("/v2/books")
     public ResponseEntity<SuccessResponse<BookInfos>> findAllByCondition(
         Search request,
-        PageRequest simplePage
+        SimplePage simplePage
     ) {
-        BookInfos books = bookQueryService.findAllByCondition(request, simplePage.of());
+        BookInfos books = bookQueryService.findAllByCondition(request, simplePage.pageRequest());
 
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(books));

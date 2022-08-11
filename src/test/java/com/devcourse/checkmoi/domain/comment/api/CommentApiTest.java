@@ -33,8 +33,10 @@ import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
 import com.devcourse.checkmoi.domain.comment.exception.CommentNotFoundException;
 import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
+import com.devcourse.checkmoi.domain.comment.facade.CommentQueryFacade;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
@@ -54,6 +56,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
@@ -73,6 +76,9 @@ class CommentApiTest extends IntegrationTest {
     @MockBean
     private CommentCommandFacade commentCommandFacade;
 
+    @MockBean
+    private CommentQueryFacade commentQueryFacade;
+
     @Nested
     @DisplayName("댓글 목록 조회 #130")
     class FindAllCommentsTest {
@@ -84,16 +90,20 @@ class CommentApiTest extends IntegrationTest {
             User writer = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
             Post post = makePostWithId(GENERAL, study, writer, 1L);
-            List<CommentInfo> response = List.of(
-                makeCommentInfoWithId(writer, post, 1L),
-                makeCommentInfoWithId(writer, post, 2L),
-                makeCommentInfoWithId(writer, post, 3L)
-            );
+            Comments response = Comments.builder()
+                .comments(
+                    List.of(
+                        makeCommentInfoWithId(writer, post, 1L),
+                        makeCommentInfoWithId(writer, post, 2L),
+                        makeCommentInfoWithId(writer, post, 3L)))
+                .totalPage(1L)
+                .build();
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("postId", String.valueOf(1L));
 
-            when(commentQueryService.findAllComments(anyLong(), any(Search.class)))
+            when(commentQueryFacade.findAllComments(anyLong(), any(Search.class),
+                any(Pageable.class)))
                 .thenReturn(response);
 
             mockMvc.perform(get("/api/comments")
@@ -104,6 +114,7 @@ class CommentApiTest extends IntegrationTest {
         }
 
         private RestDocumentationResultHandler documentation() {
+            String commentsPath = "data.comments[]";
             return MockMvcRestDocumentationWrapper.document("find-comments",
                 ResourceSnippetParameters.builder()
                     .tag("Comment API")
@@ -118,18 +129,20 @@ class CommentApiTest extends IntegrationTest {
                     parameterWithName("postId").description("게시글 아이디").optional()
                 ),
                 responseFields(
-                    fieldWithPath("data[].id").type(JsonFieldType.NUMBER)
+                    fieldWithPath(commentsPath + ".id").type(JsonFieldType.NUMBER)
                         .description("댓글 아이디"),
-                    fieldWithPath("data[].userId").type(JsonFieldType.NUMBER)
+                    fieldWithPath(commentsPath + ".userId").type(JsonFieldType.NUMBER)
                         .description("댓글 작성자 아이디"),
-                    fieldWithPath("data[].postId").type(JsonFieldType.NUMBER)
+                    fieldWithPath(commentsPath + ".postId").type(JsonFieldType.NUMBER)
                         .description("게시글 아이디"),
-                    fieldWithPath("data[].content").type(JsonFieldType.STRING)
+                    fieldWithPath(commentsPath + ".content").type(JsonFieldType.STRING)
                         .description("댓글 본문"),
-                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING)
+                    fieldWithPath(commentsPath + ".createdAt").type(JsonFieldType.STRING)
                         .description("댓글 작성일자"),
-                    fieldWithPath("data[].updatedAt").type(JsonFieldType.STRING)
-                        .description("댓글 수정일자")
+                    fieldWithPath(commentsPath + ".updatedAt").type(JsonFieldType.STRING)
+                        .description("댓글 수정일자"),
+                    fieldWithPath("data.totalPage").type(JsonFieldType.NUMBER)
+                        .description("페이지 총 개수")
                 )
             );
         }

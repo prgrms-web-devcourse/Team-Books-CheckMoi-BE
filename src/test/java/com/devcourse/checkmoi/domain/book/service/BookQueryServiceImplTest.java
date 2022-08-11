@@ -3,7 +3,7 @@ package com.devcourse.checkmoi.domain.book.service;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.domain.book.dto.SimplePage;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
@@ -45,9 +45,12 @@ class BookQueryServiceImplTest {
         @Test
         @DisplayName("최신순으로 책 목록을 가져온다")
         void getTopBooks() {
-            SimplePage simplePage = SimplePage.defaultPage();
+            SimplePage simplePage = SimplePage.builder()
+                .page(1)
+                .size(4)
+                .build();
 
-            LatestAllBooks allTopBooks = bookQueryService.getAllTop(simplePage);
+            LatestAllBooks allTopBooks = bookQueryService.getAllTop(simplePage.pageRequest());
 
             Assertions.assertThat(allTopBooks.latestBooks().get(0).id())
                 .isEqualTo(lastCatBook.getId());

@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.study.api;
 
 import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
@@ -12,7 +13,6 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMemb
 import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
-import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import javax.validation.Valid;
@@ -84,9 +84,9 @@ public class StudyApi {
     @GetMapping("/studies")
     public ResponseEntity<SuccessResponse<Studies>> getStudies(
         @RequestParam Long bookId,
-        PageRequest pageRequest
+        SimplePage simplePage
     ) {
-        Pageable pageable = pageRequest.of();
+        Pageable pageable = simplePage.pageRequest();
         Studies response = studyQueryService.getStudies(bookId, pageable);
         return ResponseEntity.ok(new SuccessResponse<>(response));
     }
@@ -127,11 +127,11 @@ public class StudyApi {
     public ResponseEntity<SuccessResponse<Studies>> getDetailInfo(
         @AuthenticationPrincipal JwtAuthentication user,
         @Valid Search search,
-        PageRequest pageable
+        SimplePage pageable
     ) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(
-                studyQueryService.findAllByCondition(user.id(), search, pageable.of())));
+                studyQueryService.findAllByCondition(user.id(), search, pageable.pageRequest())));
     }
 
 }
