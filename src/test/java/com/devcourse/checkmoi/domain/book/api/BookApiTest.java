@@ -1,23 +1,33 @@
 package com.devcourse.checkmoi.domain.book.api;
 
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
+import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfos;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.service.BookCommandService;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
 import com.devcourse.checkmoi.domain.book.stub.PersistedDummyData;
+import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.template.IntegrationTest;
@@ -25,6 +35,7 @@ import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +50,8 @@ import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 class BookApiTest extends IntegrationTest {
 
@@ -73,10 +86,10 @@ class BookApiTest extends IntegrationTest {
         void save() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
 
-            CreateBook createRequest = bookInfo.create();
-            SimpleBook simpleBook = bookInfo.simple();
+            CreateBook createRequest = this.bookInfo.create();
+            BookInfo bookInfo = this.bookInfo.simple();
 
-            given(bookCommandService.save(createRequest)).willReturn(simpleBook);
+            given(bookCommandService.save(createRequest)).willReturn(bookInfo);
 
             MvcResult mvcResult = mockMvc.perform(
                     RestDocumentationRequestBuilders.post("/api/books")
@@ -91,7 +104,7 @@ class BookApiTest extends IntegrationTest {
                 new TypeReference<>() {
                 });
 
-            Assertions.assertThat(result.data()).isEqualTo(bookInfo.bookId());
+            Assertions.assertThat(result.data()).isEqualTo(this.bookInfo.bookId());
         }
 
         private RestDocumentationResultHandler documentation() {
@@ -204,7 +217,7 @@ class BookApiTest extends IntegrationTest {
         void getByIdSuccess() throws Exception {
             PersistedDummyData bigWhaleBook = createDummyBigWhale();
 
-            BookSpecification specification = bigWhaleBook.specification();
+            BookInfo specification = bigWhaleBook.simple();
 
             given(bookQueryService.getById(anyLong())).willReturn(specification);
 
@@ -248,7 +261,7 @@ class BookApiTest extends IntegrationTest {
         void getByIsbn() throws Exception {
             PersistedDummyData bigWhaleBook = createDummyBigWhale();
 
-            BookSpecification book = bigWhaleBook.specification();
+            BookInfo book = bigWhaleBook.simple();
 
             given(bookQueryService.getByIsbn(anyString()))
                 .willReturn(book);
@@ -283,6 +296,103 @@ class BookApiTest extends IntegrationTest {
                         .description("책 등록 날자"))
             );
         }
+    }
+
+    @Nested
+    @DisplayName("책 검색 v2")
+    class SearchBooks {
+
+        private BookInfo makeBookInfo(Book book) {
+            return BookInfo.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .publisher(book.getPublisher())
+                .pubDate(book.getPublishedAt().getPublishedAt())
+                .isbn(book.getIsbn())
+                .image(book.getThumbnail())
+                .description(book.getDescription())
+                .createdAt(LocalDateTime.now())
+                .build();
+        }
+
+        @Test
+        @DisplayName("S 책을 조건에 따라 검색할 수 있다")
+        void searchStudies() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+
+            Book book = makeBookWithId(1L);
+            Study study = makeStudyWithId(book, IN_PROGRESS, 1L);
+
+            List<BookInfo> books = List.of(makeBookInfo(book));
+            BookInfos bookInfos = BookInfos.builder()
+                .books(books)
+                .totalPage(1L)
+                .build();
+            given(bookQueryService.findAllByCondition(any(Search.class), any()))
+                .willReturn(bookInfos);
+
+            Search search = Search.builder()
+                .studyId(study.getId())
+                .studyStatus(study.getStatus().toString())
+                .build();
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("studyId", String.valueOf(search.studyId()));
+            params.add("studyStatus", search.studyStatus());
+
+            mockMvc.perform(get("/api/v2/books").contentType(MediaType.APPLICATION_JSON)
+                    .characterEncoding("utf-8")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
+                    .params(params))
+                .andExpect(status().isOk())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            String bookPath = "data.books[]";
+            return MockMvcRestDocumentationWrapper.document("search-books-by-condition",
+                ResourceSnippetParameters.builder()
+                    .tag("Book API v2")
+                    .summary("책 검색 v2")
+                    .description("책 검색에 사용되는 API입니다.")
+                    .requestSchema(Schema.schema("책 검색 요청"))
+                    .responseSchema(Schema.schema("책 검색 응답")),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
+                requestParameters(
+                    parameterWithName("studyId").description("스터디 아이디").optional(),
+                    parameterWithName("studyStatus").description("스터디 상태").optional(),
+                    parameterWithName("page").description("페이지").optional(),
+                    parameterWithName("size").description("사이즈").optional()
+                ),
+                responseFields(
+                    // searched book infos
+                    fieldWithPath(bookPath + ".id").type(JsonFieldType.NUMBER)
+                        .description("책 아이디"),
+                    fieldWithPath(bookPath + ".title").type(JsonFieldType.STRING)
+                        .description("책 제목"),
+                    fieldWithPath(bookPath + ".author").type(JsonFieldType.STRING)
+                        .description("책 저자"),
+                    fieldWithPath(bookPath + ".publisher").type(JsonFieldType.STRING)
+                        .description("출판사"),
+                    fieldWithPath(bookPath + ".pubDate").type(JsonFieldType.STRING)
+                        .description("출판일자"),
+                    fieldWithPath(bookPath + ".isbn").type(JsonFieldType.STRING)
+                        .description("ISBN"),
+                    fieldWithPath(bookPath + ".image").type(JsonFieldType.STRING)
+                        .description("책 이미지"),
+                    fieldWithPath(bookPath + ".description").type(JsonFieldType.STRING)
+                        .description("책 설명"),
+                    fieldWithPath(bookPath + ".createdAt").type(JsonFieldType.STRING)
+                        .description("해당 책이 DB에 생성된 일자"),
+                    fieldWithPath("data.totalPage").type(JsonFieldType.NUMBER)
+                        .description("총 페이지 수")
+                )
+            );
+        }
+
     }
 
 }
