@@ -534,6 +534,7 @@ class StudyApiTest extends IntegrationTest {
                     .responseSchema(Schema.schema("스터디 신청자목록 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
+                tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("studyId").description("스터디 아이디")
                 ),

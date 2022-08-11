@@ -87,7 +87,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         );
         StudyMember studyMember = studyMemberRepository.findById(memberId)
             .orElseThrow(() -> new StudyJoinRequestNotFoundException(STUDY_JOIN_REQUEST_NOT_FOUND));
-        studyMember.changeStatus(StudyMemberStatus.valueOf(request.status()));
+        studyMember.changeStatus(StudyMemberStatus.valueOf(request.status().toUpperCase()));
     }
 
     @Override
