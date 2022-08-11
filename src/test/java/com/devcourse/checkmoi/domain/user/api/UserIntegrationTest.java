@@ -75,7 +75,9 @@ class UserIntegrationTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("User API")
                     .summary("회원 정보 조회 API")
-                    .description("회원 정보를 요청하는 API 입니다."),
+                    .description("회원 정보를 요청하는 API 입니다.")
+                    .requestSchema(Schema.schema("회원 정보 요청"))
+                    .responseSchema(Schema.schema("회원 정보 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader()
