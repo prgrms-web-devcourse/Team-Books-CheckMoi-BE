@@ -1,9 +1,9 @@
 package com.devcourse.checkmoi.domain.book.service;
 
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 
 public interface BookCommandService {
 
-    SimpleBook save(CreateBook bookRequest);
+    BookInfo save(CreateBook bookRequest);
 }

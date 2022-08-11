@@ -1,6 +1,5 @@
 package com.devcourse.checkmoi.domain.study.service;
 
-import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
@@ -21,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class StudyQueryServiceImpl implements StudyQueryService {
-
-    private final StudyConverter studyConverter;
 
     private final StudyServiceValidator studyValidator;
 

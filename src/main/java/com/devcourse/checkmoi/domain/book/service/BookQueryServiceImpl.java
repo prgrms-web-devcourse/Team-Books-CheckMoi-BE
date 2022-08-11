@@ -1,56 +1,61 @@
 package com.devcourse.checkmoi.domain.book.service;
 
 import com.devcourse.checkmoi.domain.book.converter.BookConverter;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfos;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
-import org.springframework.data.domain.PageRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookQueryServiceImpl implements BookQueryService {
 
     private final BookRepository bookRepository;
 
     private final BookConverter bookConverter;
 
-    public BookQueryServiceImpl(BookRepository bookRepository,
-        BookConverter bookConverter) {
-        this.bookRepository = bookRepository;
-        this.bookConverter = bookConverter;
+
+    @Override
+    public BookInfos findAllByCondition(Search search, Pageable pageable) {
+        Page<BookInfo> bookInfos = bookRepository.findAllByCondition(search, pageable);
+
+        return new BookInfos(
+            bookInfos.getContent(),
+            bookInfos.getTotalPages()
+        );
     }
 
     @Override
     public LatestAllBooks getAllTop(Pageable pageRequest) {
         return new LatestAllBooks(
             bookRepository.findAllTop(pageRequest).stream()
-                .map(bookConverter::bookToSimple)
+                .map(bookConverter::bookToInfo)
                 .toList(),
             bookRepository.findBooksByLatestStudy(pageRequest).stream()
-                .map(bookConverter::bookToSimple)
+                .map(bookConverter::bookToInfo)
                 .toList()
         );
-
     }
 
     @Override
-    public BookSpecification getById(Long bookId) {
+    public BookInfo getById(Long bookId) {
         return bookRepository.findById(bookId)
-            .map(bookConverter::bookToSpecification)
+            .map(bookConverter::bookToInfo)
             .orElseThrow(() -> new BookNotFoundException(bookId.toString()));
     }
 
     @Override
-    public BookSpecification getByIsbn(String isbn) {
+    public BookInfo getByIsbn(String isbn) {
         return bookRepository.findByIsbn(isbn)
-            .map(bookConverter::bookToSpecification)
+            .map(bookConverter::bookToInfo)
             .orElseThrow(() -> new BookNotFoundException(isbn));
     }
 }

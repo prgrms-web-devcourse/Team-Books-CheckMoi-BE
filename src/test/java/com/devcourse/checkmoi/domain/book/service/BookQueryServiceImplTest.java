@@ -1,7 +1,7 @@
 package com.devcourse.checkmoi.domain.book.service;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
@@ -75,10 +75,11 @@ class BookQueryServiceImplTest {
     @Nested
     @DisplayName("ISBN을 기준으로 책 단일 조회")
     class GetByIsbnTest {
+
         @Test
         @DisplayName("ISBN 기준으로 책을 조회한다.")
         void getByIsbn() {
-            BookSpecification book = bookQueryService.getByIsbn(lastCatBook.getIsbn());
+            BookInfo book = bookQueryService.getByIsbn(lastCatBook.getIsbn());
 
             Assertions.assertThat(book.id()).isEqualTo(lastCatBook.getId());
         }

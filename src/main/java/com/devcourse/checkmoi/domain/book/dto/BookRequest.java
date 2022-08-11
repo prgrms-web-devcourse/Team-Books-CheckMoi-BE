@@ -1,13 +1,26 @@
 package com.devcourse.checkmoi.domain.book.dto;
 
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.Builder;
 import org.hibernate.validator.constraints.URL;
+import org.springframework.lang.Nullable;
 
-public sealed interface BookRequest permits CreateBook {
+public sealed interface BookRequest permits CreateBook, Search {
+
+    record Search(
+        @Nullable Long bookId,
+        @Nullable Long studyId,
+        @Nullable String studyStatus
+    ) implements BookRequest {
+
+        @Builder
+        public Search {
+        }
+    }
 
     record CreateBook(
         @NotBlank(message = "책 제목은 비어있을 수 없습니다.")
