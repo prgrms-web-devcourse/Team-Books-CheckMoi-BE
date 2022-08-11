@@ -37,8 +37,10 @@ public enum ErrorMessage {
     NOT_JOINED_USER("해당 스터디에 참가하지 않은 유저입니다.", HttpStatus.FORBIDDEN),
     // post error
     NOT_ALLOWED_WRITER("게시글 작성 권한이 없습니다", HttpStatus.FORBIDDEN),
-    CLOSED_STUDY("종료된 스터디입니다. 자유게시판만 사용가능합니다", HttpStatus.BAD_REQUEST);
+    CLOSED_STUDY("종료된 스터디입니다. 자유게시판만 사용가능합니다", HttpStatus.BAD_REQUEST),
 
+    //comment error
+    COMMENT_NO_PERMISSION("해당 댓글에 대한 접근 권한이 없습니다", HttpStatus.FORBIDDEN);
     private final String message;
 
     private final HttpStatus status;

@@ -1,15 +1,13 @@
 package com.devcourse.checkmoi.domain.comment.api;
 
 import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
-import com.devcourse.checkmoi.domain.comment.facade.CommentQueryFacade;
-import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
-import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
+import com.devcourse.checkmoi.domain.comment.facade.CommentFacade;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
-import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import javax.validation.Valid;
@@ -33,9 +31,7 @@ public class CommentApi {
 
     private final CommentCommandService commentCommandService;
 
-    private final CommentCommandFacade commentCommandFacade;
-
-    private final CommentQueryFacade commentQueryFacade;
+    private final CommentFacade commentFacade;
 
     @GetMapping("/comments")
     public ResponseEntity<SuccessResponse<Comments>> findAllComments(
@@ -45,7 +41,7 @@ public class CommentApi {
     ) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(
-                commentQueryFacade.findAllComments(user.id(), request, simplePage.pageRequest()))
+                commentFacade.findAllComments(user.id(), request, simplePage.pageRequest()))
             );
     }
 
@@ -55,7 +51,7 @@ public class CommentApi {
         @RequestParam Long postId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
-        Long id = commentCommandFacade.createComment(postId, user.id(), request);
+        Long id = commentFacade.createComment(postId, user.id(), request);
         return ResponseEntity.created(generatedUri(id)).body(new SuccessResponse<>(id));
     }
 

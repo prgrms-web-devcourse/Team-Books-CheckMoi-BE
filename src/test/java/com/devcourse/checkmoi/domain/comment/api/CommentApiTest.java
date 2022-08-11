@@ -35,8 +35,7 @@ import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
 import com.devcourse.checkmoi.domain.comment.exception.CommentNotFoundException;
-import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
-import com.devcourse.checkmoi.domain.comment.facade.CommentQueryFacade;
+import com.devcourse.checkmoi.domain.comment.facade.CommentFacade;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
@@ -74,10 +73,7 @@ class CommentApiTest extends IntegrationTest {
     private CommentCommandService commentCommandService;
 
     @MockBean
-    private CommentCommandFacade commentCommandFacade;
-
-    @MockBean
-    private CommentQueryFacade commentQueryFacade;
+    private CommentFacade commentFacade;
 
     @Nested
     @DisplayName("댓글 목록 조회 #130")
@@ -90,46 +86,31 @@ class CommentApiTest extends IntegrationTest {
             User writer = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
             Post post = makePostWithId(GENERAL, study, writer, 1L);
-            Comments response = Comments.builder()
-                .comments(
-                    List.of(
-                        makeCommentInfoWithId(writer, post, 1L),
-                        makeCommentInfoWithId(writer, post, 2L),
-                        makeCommentInfoWithId(writer, post, 3L)))
-                .totalPage(1L)
-                .build();
+            Comments response = Comments.builder().comments(
+                List.of(makeCommentInfoWithId(writer, post, 1L),
+                    makeCommentInfoWithId(writer, post, 2L),
+                    makeCommentInfoWithId(writer, post, 3L))).totalPage(1L).build();
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("postId", String.valueOf(1L));
 
-            when(commentQueryFacade.findAllComments(anyLong(), any(Search.class),
-                any(Pageable.class)))
-                .thenReturn(response);
+            when(commentFacade.findAllComments(anyLong(), any(Search.class),
+                any(Pageable.class))).thenReturn(response);
 
-            mockMvc.perform(get("/api/comments")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .params(params))
-                .andExpect(status().isOk())
+            mockMvc.perform(get("/api/comments").header(HttpHeaders.AUTHORIZATION,
+                    "Bearer " + givenUser.accessToken()).params(params)).andExpect(status().isOk())
                 .andDo(documentation());
         }
 
         private RestDocumentationResultHandler documentation() {
             String commentsPath = "data.comments[]";
             return MockMvcRestDocumentationWrapper.document("find-comments",
-                ResourceSnippetParameters.builder()
-                    .tag("Comment API")
-                    .summary("댓글 검색")
-                    .description("댓글 검색에 사용되는 API")
-                    .requestSchema(Schema.schema("댓글 검색 요청"))
-                    .responseSchema(Schema.schema("댓글 검색 응답")),
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                tokenRequestHeader(),
-                requestParameters(
-                    parameterWithName("postId").description("게시글 아이디").optional()
-                ),
-                responseFields(
-                    fieldWithPath(commentsPath + ".id").type(JsonFieldType.NUMBER)
+                ResourceSnippetParameters.builder().tag("Comment API").summary("댓글 검색")
+                    .description("댓글 검색에 사용되는 API").requestSchema(Schema.schema("댓글 검색 요청"))
+                    .responseSchema(Schema.schema("댓글 검색 응답")), preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), tokenRequestHeader(),
+                requestParameters(parameterWithName("postId").description("게시글 아이디").optional()),
+                responseFields(fieldWithPath(commentsPath + ".id").type(JsonFieldType.NUMBER)
                         .description("댓글 아이디"),
                     fieldWithPath(commentsPath + ".userId").type(JsonFieldType.NUMBER)
                         .description("댓글 작성자 아이디"),
@@ -142,20 +123,13 @@ class CommentApiTest extends IntegrationTest {
                     fieldWithPath(commentsPath + ".updatedAt").type(JsonFieldType.STRING)
                         .description("댓글 수정일자"),
                     fieldWithPath("data.totalPage").type(JsonFieldType.NUMBER)
-                        .description("페이지 총 개수")
-                )
-            );
+                        .description("페이지 총 개수")));
         }
 
         private CommentInfo makeCommentInfoWithId(User user, Post post, Long commentId) {
-            return CommentInfo.builder()
-                .id(commentId)
-                .userId(user.getId())
-                .postId(post.getId())
-                .content("댓글 - " + UUID.randomUUID())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+            return CommentInfo.builder().id(commentId).userId(user.getId()).postId(post.getId())
+                .content("댓글 - " + UUID.randomUUID()).createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now()).build();
         }
     }
 
@@ -174,25 +148,17 @@ class CommentApiTest extends IntegrationTest {
             Comment comment = makeCommentWithId(post, writer, 1L);
             doNothing().when(commentCommandService).deleteById(anyLong(), anyLong());
 
-            mockMvc.perform(delete("/api/comments/{commentId}", comment.getId())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
-                .andExpect(status().isNoContent())
-                .andDo(documentation());
+            mockMvc.perform(delete("/api/comments/{commentId}", comment.getId()).header(
+                    HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
+                .andExpect(status().isNoContent()).andDo(documentation());
         }
 
         private RestDocumentationResultHandler documentation() {
             return MockMvcRestDocumentationWrapper.document("delete-comments",
-                ResourceSnippetParameters.builder()
-                    .tag("Comment API")
-                    .summary("댓글 삭제")
-                    .description("댓글 삭제에 사용되는 API"),
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                tokenRequestHeader(),
-                pathParameters(
-                    parameterWithName("commentId").description("댓글 Id")
-                )
-            );
+                ResourceSnippetParameters.builder().tag("Comment API").summary("댓글 삭제")
+                    .description("댓글 삭제에 사용되는 API"), preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), tokenRequestHeader(),
+                pathParameters(parameterWithName("commentId").description("댓글 Id")));
         }
     }
 
@@ -204,53 +170,35 @@ class CommentApiTest extends IntegrationTest {
         @DisplayName("작성된 글에 댓글을 작성할 수 있다.")
         void createCommentTest() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
-            Create request = Create.builder()
-                .content("댓글 내용")
-                .build();
+            Create request = Create.builder().content("댓글 내용").build();
             Long studyId = 1L;
             Long postId = 1L;
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, studyId);
-            Post post = makePostWithId(GENERAL, study,
-                makeUserWithId(givenUser.userInfo().id()), postId);
+            Post post = makePostWithId(GENERAL, study, makeUserWithId(givenUser.userInfo().id()),
+                postId);
             Long response = 1L;
-            given(commentCommandFacade.createComment(
-                post.getId(),
-                givenUser.userInfo().id(),
-                request)
-            ).willReturn(response);
+            given(commentFacade.createComment(post.getId(), givenUser.userInfo().id(),
+                request)).willReturn(response);
 
-            ResultActions result = mockMvc.perform(post("/api/comments")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                .param("postId", String.valueOf(postId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
-            );
+            ResultActions result = mockMvc.perform(
+                post("/api/comments").header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + givenUser.accessToken()).param("postId", String.valueOf(postId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)));
 
-            result.andExpect(status().isCreated())
-                .andDo(documentation());
+            result.andExpect(status().isCreated()).andDo(documentation());
         }
 
         private RestDocumentationResultHandler documentation() {
             return MockMvcRestDocumentationWrapper.document("create-comments",
-                ResourceSnippetParameters.builder()
-                    .tag("Comment API")
-                    .summary("댓글 생성")
-                    .description("댓글 생성에 사용되는 API")
-                    .requestSchema(Schema.schema("댓글 생성 요청"))
-                    .responseSchema(Schema.schema("댓글 생성 응답")),
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                tokenRequestHeader(),
-                requestParameters(
-                    parameterWithName("postId").description("게시글 Id")
-                ),
-                requestFields(
-                    fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용")
-                ),
+                ResourceSnippetParameters.builder().tag("Comment API").summary("댓글 생성")
+                    .description("댓글 생성에 사용되는 API").requestSchema(Schema.schema("댓글 생성 요청"))
+                    .responseSchema(Schema.schema("댓글 생성 응답")), preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), tokenRequestHeader(),
+                requestParameters(parameterWithName("postId").description("게시글 Id")), requestFields(
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용")),
                 responseFields(
-                    fieldWithPath("data").type(JsonFieldType.NUMBER).description("댓글 ID")
-                )
-            );
+                    fieldWithPath("data").type(JsonFieldType.NUMBER).description("댓글 ID")));
         }
 
     }
@@ -277,40 +225,26 @@ class CommentApiTest extends IntegrationTest {
         @DisplayName("S 댓글을 수정할 수 있다")
         void editComment() throws Exception {
 
-            Edit request = Edit.builder()
-                .content("댓글 수정 내용")
-                .build();
+            Edit request = Edit.builder().content("댓글 수정 내용").build();
 
-            willDoNothing()
-                .given(commentCommandService)
+            willDoNothing().given(commentCommandService)
                 .editComment(anyLong(), anyLong(), any(Edit.class));
 
-            mockMvc.perform(put("/api/comments/{commentId}", comment.getId())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNoContent())
-                .andDo(documentation());
+            mockMvc.perform(
+                    put("/api/comments/{commentId}", comment.getId()).header(HttpHeaders.AUTHORIZATION,
+                            "Bearer " + givenUser.accessToken()).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNoContent()).andDo(documentation());
         }
 
         private RestDocumentationResultHandler documentation() {
             return MockMvcRestDocumentationWrapper.document("edit-comments",
-                ResourceSnippetParameters.builder()
-                    .tag("Comment API")
-                    .summary("댓글 수정")
-                    .description("댓글 수정에 사용되는 API")
-                    .requestSchema(Schema.schema("댓글 수정 요청"))
-                    .responseSchema(Schema.schema("댓글 수정 응답")),
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                tokenRequestHeader(),
-                pathParameters(
-                    parameterWithName("commentId").description("댓글 Id")
-                ),
-                requestFields(
-                    fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용")
-                )
-            );
+                ResourceSnippetParameters.builder().tag("Comment API").summary("댓글 수정")
+                    .description("댓글 수정에 사용되는 API").requestSchema(Schema.schema("댓글 수정 요청"))
+                    .responseSchema(Schema.schema("댓글 수정 응답")), preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), tokenRequestHeader(),
+                pathParameters(parameterWithName("commentId").description("댓글 Id")), requestFields(
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("댓글 내용")));
         }
 
         @Test
@@ -318,40 +252,32 @@ class CommentApiTest extends IntegrationTest {
         void editCommentFailed1() throws Exception {
 
             String editContent = "1234567890".repeat(51);
-            Edit request = Edit.builder()
-                .content(editContent)
-                .build();
+            Edit request = Edit.builder().content(editContent).build();
 
-            willDoNothing()
-                .given(commentCommandService)
+            willDoNothing().given(commentCommandService)
                 .editComment(anyLong(), anyLong(), any(Edit.class));
 
-            mockMvc.perform(put("/api/comments/{commentId}", comment.getId())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
+            mockMvc.perform(
+                    put("/api/comments/{commentId}", comment.getId()).header(HttpHeaders.AUTHORIZATION,
+                            "Bearer " + givenUser.accessToken()).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest()).andDo(print());
         }
 
         @Test
         @DisplayName("F 댓글이 없으면 댓글을 수정할 수 없다")
         void editCommentFailed2() throws Exception {
 
-            Edit request = Edit.builder()
-                .content("댓글 수정 내용")
-                .build();
+            Edit request = Edit.builder().content("댓글 수정 내용").build();
 
-            willThrow(new CommentNotFoundException())
-                .given(commentCommandService)
+            willThrow(new CommentNotFoundException()).given(commentCommandService)
                 .editComment(anyLong(), anyLong(), any(Edit.class));
 
-            mockMvc.perform(put("/api/comments/{commentId}", comment.getId())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound())
-                .andDo(print());
+            mockMvc.perform(
+                    put("/api/comments/{commentId}", comment.getId()).header(HttpHeaders.AUTHORIZATION,
+                            "Bearer " + givenUser.accessToken()).contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound()).andDo(print());
         }
 
     }
