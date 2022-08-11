@@ -2,11 +2,14 @@ package com.devcourse.checkmoi.domain.book.api;
 
 import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfos;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
 import com.devcourse.checkmoi.domain.book.dto.SimplePage;
 import com.devcourse.checkmoi.domain.book.service.BookCommandService;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
+import com.devcourse.checkmoi.global.model.PageRequest;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/books")
+@RequestMapping("/api")
 public class BookApi {
 
     private final BookCommandService bookCommandService;
@@ -30,7 +33,7 @@ public class BookApi {
         this.bookQueryService = bookQueryService;
     }
 
-    @PostMapping
+    @PostMapping("/books")
     public ResponseEntity<SuccessResponse<Long>> register(
         @Valid @RequestBody CreateBook createRequest
     ) {
@@ -41,7 +44,7 @@ public class BookApi {
             .body(new SuccessResponse<>(bookId));
     }
 
-    @GetMapping
+    @GetMapping("/books")
     public ResponseEntity<SuccessResponse<LatestAllBooks>> topBooks() {
         LatestAllBooks topBooks = bookQueryService.getAllTop(SimplePage.defaultPage());
 
@@ -50,24 +53,37 @@ public class BookApi {
         );
     }
 
-    @GetMapping("/{bookId}")
-    public ResponseEntity<SuccessResponse<BookSpecification>> getById(
+    @GetMapping("/books/{bookId}")
+    public ResponseEntity<SuccessResponse<BookInfo>> getById(
         @PathVariable Long bookId
     ) {
-        BookSpecification bookSpecification = bookQueryService.getById(bookId);
+        BookInfo bookSpecification = bookQueryService.getById(bookId);
 
         return ResponseEntity.ok(
             new SuccessResponse<>(bookSpecification)
         );
     }
 
-    @GetMapping("/isbn/{isbn}")
-    public ResponseEntity<SuccessResponse<BookSpecification>> getByIsbn(@PathVariable String isbn) {
-        BookSpecification book = bookQueryService.getByIsbn(isbn);
+    @GetMapping("/books/isbn/{isbn}")
+    public ResponseEntity<SuccessResponse<BookInfo>> getByIsbn(@PathVariable String isbn) {
+        BookInfo book = bookQueryService.getByIsbn(isbn);
 
         return ResponseEntity.ok(
             new SuccessResponse<>(book)
         );
+    }
+
+    /********************************* API v2  ****************************************/
+
+    @GetMapping("/v2/books")
+    public ResponseEntity<SuccessResponse<BookInfos>> findAllByCondition(
+        Search request,
+        PageRequest simplePage
+    ) {
+        BookInfos books = bookQueryService.findAllByCondition(request, simplePage.of());
+
+        return ResponseEntity.ok()
+            .body(new SuccessResponse<>(books));
     }
 
 }
