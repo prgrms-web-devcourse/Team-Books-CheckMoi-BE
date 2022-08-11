@@ -32,7 +32,7 @@ public class Scheduler {
     }
 
     private void progressStudies() {
-        studyManager.getAllStudies().studies()
+        studyManager.getAllStudiesToBeProgressed().studies()
             .forEach(studyId ->
                 studyManager.updateStudyWithMembers(studyId, StudyStatus.IN_PROGRESS,
                     StudyMemberStatus.DENIED));
