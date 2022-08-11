@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.study.service;
 
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.ACCESS_DENIED;
 import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
@@ -131,7 +132,7 @@ class StudyCommandServiceImplTest {
                 .name("스터디 이름")
                 .thumbnail("https://example.com")
                 .description("스터디 설명")
-                .status("IN_PROGRESS")
+                .status(IN_PROGRESS.toString())
                 .build();
             Long userId = 1L;
             Long studyId = 1L;

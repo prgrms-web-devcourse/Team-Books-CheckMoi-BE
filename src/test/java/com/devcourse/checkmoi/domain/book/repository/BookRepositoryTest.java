@@ -120,7 +120,7 @@ class BookRepositoryTest extends RepositoryTest {
         void searchStudies() {
             Search search = Search.builder()
                 .bookId(books.get(0).getId())
-                .studyStatus("IN_PROGRESS")
+                .studyStatus(IN_PROGRESS.toString())
                 .build();
 
             com.devcourse.checkmoi.global.model.PageRequest page = new com.devcourse.checkmoi.global.model.PageRequest();

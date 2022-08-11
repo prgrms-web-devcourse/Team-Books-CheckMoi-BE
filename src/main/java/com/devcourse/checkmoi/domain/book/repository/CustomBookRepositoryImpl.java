@@ -73,7 +73,7 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
         if (studyStatus == null) {
             return null;
         }
-        return study.status.eq(StudyStatus.valueOf(studyStatus));
+        return study.status.eq(StudyStatus.nameOf(studyStatus));
     }
 
     private BooleanExpression eqStudyId(Long studyId) {
