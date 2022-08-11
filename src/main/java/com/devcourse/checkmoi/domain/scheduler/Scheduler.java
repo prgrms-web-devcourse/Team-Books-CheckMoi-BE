@@ -18,7 +18,11 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0 * * * *")
     void changeStudyAsInProgress() {
-        progressStudies();
+        try {
+            progressStudies();
+        } catch (Exception e) {
+            log.error("[ERROR] : 스터디를 진행중 상태로 변경하는 스케줄링 작업 실패", e);
+        }
     }
 
     private void progressStudies() {
