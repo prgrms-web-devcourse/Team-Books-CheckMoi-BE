@@ -9,10 +9,13 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
+import com.devcourse.checkmoi.domain.comment.exception.CommentNoPermissionException;
+import com.devcourse.checkmoi.domain.comment.exception.CommentNotFoundException;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
 import com.devcourse.checkmoi.domain.post.model.Post;
@@ -140,18 +143,64 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
         Comment givenComment;
 
-        Edit request = Edit.builder()
-            .content("댓글 수정 테스트입니다.")
-            .build();
+        User otherUser;
+
+        Edit request;
+
+        @BeforeEach
+        void setUp() {
+            givenComment = commentRepository.save(makeComment(givenPost, givenUser));
+            otherUser = userRepository.save(makeUser());
+            request = Edit.builder()
+                .content("댓글 수정 테스트입니다.")
+                .build();
+        }
+
+        @AfterEach
+        void tearDown() {
+            commentRepository.deleteAllInBatch();
+            userRepository.deleteById(otherUser.getId());
+        }
 
         @Test
         @DisplayName("S 댓글을 수정할 수 있다")
         void editComment() {
-            givenComment = commentRepository.save(makeComment(givenPost, givenUser));
             commentCommandService.editComment(givenUser.getId(), givenComment.getId(), request);
 
-            Comment editedComment = commentRepository.findById(givenComment.getId()).get();
+            Comment editedComment = commentRepository.findById(givenComment.getId())
+                .orElseThrow(CommentNotFoundException::new);
             assertThat(editedComment.getContent()).isEqualTo(request.content());
+        }
+
+        @Test
+        @DisplayName("F 해당 댓글이 존재하지 않을 경우 예외 발생")
+        void commentNotExist() {
+            Long userId = givenUser.getId();
+            Long wrongCommentId = 0L;
+
+            assertThatExceptionOfType(CommentNotFoundException.class)
+                .isThrownBy(
+                    () -> commentCommandService.editComment(userId, wrongCommentId, request)
+                );
+        }
+
+        @Test
+        @DisplayName("F 댓글 작성자가 현재 로그인 유저가 아닐 경우 예외 발생")
+        void commentEditNotPermission() {
+            assertThatExceptionOfType(CommentNoPermissionException.class)
+                .isThrownBy(() ->
+                    commentCommandService.editComment(
+                        otherUser.getId(),
+                        givenComment.getId(),
+                        request
+                    )
+                );
+        }
+
+        @Test
+        @DisplayName("F 현재 진행중인 스터디가 아닐 경우 예외 발생")
+        void finishedStudy() {
+
         }
     }
 

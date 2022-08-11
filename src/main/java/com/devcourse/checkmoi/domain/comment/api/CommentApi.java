@@ -1,15 +1,14 @@
 package com.devcourse.checkmoi.domain.comment.api;
 
 import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
-import com.devcourse.checkmoi.domain.comment.facade.CommentQueryFacade;
-import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
 import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
+import com.devcourse.checkmoi.domain.comment.facade.CommentQueryFacade;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
-import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import javax.validation.Valid;
