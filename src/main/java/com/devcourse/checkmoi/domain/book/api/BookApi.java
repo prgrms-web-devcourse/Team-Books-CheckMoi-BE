@@ -42,11 +42,12 @@ public class BookApi {
     }
 
     @GetMapping
-    public ResponseEntity<SuccessResponse<LatestAllBooks>> topBooks(
-        SimplePage pageRequest
-    ) {
-        pageRequest.setSize(4);
-        LatestAllBooks topBooks = bookQueryService.getAllTop(pageRequest.of());
+    public ResponseEntity<SuccessResponse<LatestAllBooks>> topBooks() {
+        SimplePage pageRequest = SimplePage.builder()
+            .page(1)
+            .size(4)
+            .build();
+        LatestAllBooks topBooks = bookQueryService.getAllTop(pageRequest.pageRequest());
 
         return ResponseEntity.ok(
             new SuccessResponse<>(topBooks)

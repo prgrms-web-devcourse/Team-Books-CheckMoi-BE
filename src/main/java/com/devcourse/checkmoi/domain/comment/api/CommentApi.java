@@ -45,7 +45,7 @@ public class CommentApi {
     ) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(
-                commentQueryFacade.findAllComments(user.id(), request, simplePage.of()))
+                commentQueryFacade.findAllComments(user.id(), request, simplePage.pageRequest()))
             );
     }
 

@@ -124,11 +124,13 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("책 아이디를 기준으로 모집중인 스터디 정보를 조회한다.")
         void findRecruitingStudyByBookId() {
-            SimplePage simplePage = new SimplePage();
-            simplePage.setSize(4);
             int totalPage = 1;
+            SimplePage simplePage = SimplePage.builder()
+                .page(totalPage)
+                .size(4)
+                .build();
             Page<StudyInfo> result =
-                studyRepository.findRecruitingStudyByBookId(givenBook.getId(), simplePage.of());
+                studyRepository.findRecruitingStudyByBookId(givenBook.getId(), simplePage.pageRequest());
 
             assertThat(result.getContent()).hasSize(4);
             assertThat(result.getTotalPages()).isEqualTo(totalPage);
@@ -426,7 +428,7 @@ class StudyRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
             assertThat(result.getContent()).hasSize(3);
         }
 
@@ -444,7 +446,7 @@ class StudyRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
             assertThat(result.getContent()).hasSize(2);
         }
 
@@ -460,7 +462,7 @@ class StudyRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.of());
+                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
             assertThat(result.getContent()).hasSize(2);
         }
 
@@ -477,7 +479,7 @@ class StudyRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result = studyRepository.findAllByCondition(givenUser.getId(),
-                search, page.of());
+                search, page.pageRequest());
             assertThat(result.getContent()).hasSize(1);
         }
     }

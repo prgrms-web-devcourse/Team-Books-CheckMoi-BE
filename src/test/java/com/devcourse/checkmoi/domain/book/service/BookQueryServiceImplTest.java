@@ -45,10 +45,12 @@ class BookQueryServiceImplTest {
         @Test
         @DisplayName("최신순으로 책 목록을 가져온다")
         void getTopBooks() {
-            SimplePage simplePage = new SimplePage();
-            simplePage.setSize(4);
+            SimplePage simplePage = SimplePage.builder()
+                .page(1)
+                .size(4)
+                .build();
 
-            LatestAllBooks allTopBooks = bookQueryService.getAllTop(simplePage.of());
+            LatestAllBooks allTopBooks = bookQueryService.getAllTop(simplePage.pageRequest());
 
             Assertions.assertThat(allTopBooks.latestBooks().get(0).id())
                 .isEqualTo(lastCatBook.getId());

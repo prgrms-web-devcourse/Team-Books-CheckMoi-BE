@@ -116,9 +116,12 @@ class CommentQueryServiceImplTest extends IntegrationTest {
             Search search = Search.builder()
                 .postId(givenPost.getId())
                 .build();
-            SimplePage simplePage = new SimplePage();
+            SimplePage simplePage = SimplePage.builder()
+                .size(3)
+                .page(1)
+                .build();
             Comments comments =
-                commentQueryService.findAllComments(search, simplePage.of());
+                commentQueryService.findAllComments(search, simplePage.pageRequest());
 
             assertThat(comments.comments())
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")

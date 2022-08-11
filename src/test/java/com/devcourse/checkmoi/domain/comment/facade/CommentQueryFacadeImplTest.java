@@ -46,7 +46,10 @@ class CommentQueryFacadeImplTest {
             Long postId = 1L;
             Search search = new Search(postId);
             PostInfo postInfo = makePostInfo();
-            SimplePage simplePage = new SimplePage();
+            SimplePage simplePage = SimplePage.builder()
+                .page(1)
+                .size(3)
+                .build();
             long totalPage = 1L;
             Comments want = new Comments(
                 List.of(
@@ -61,7 +64,7 @@ class CommentQueryFacadeImplTest {
             given(commentQueryService.findAllComments(any(Search.class), any(Pageable.class)))
                 .willReturn(want);
 
-            Comments got = commentQueryFacade.findAllComments(userId, search, simplePage.of());
+            Comments got = commentQueryFacade.findAllComments(userId, search, simplePage.pageRequest());
             assertThat(got.comments()).hasSize(want.comments().size());
             assertThat(want.totalPage()).isEqualTo(want.totalPage());
         }

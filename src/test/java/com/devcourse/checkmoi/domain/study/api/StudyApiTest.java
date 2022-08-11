@@ -268,8 +268,12 @@ class StudyApiTest extends IntegrationTest {
         @DisplayName("현재 모집중인 특정 책에 대한 스터디 목록을 조회한다.")
         void getStudies() throws Exception {
             Long bookId = 1L;
-            SimplePage simplePage = new SimplePage();
-            Pageable pageable = simplePage.of();
+            SimplePage simplePage = SimplePage
+                .builder()
+                .page(1)
+                .size(2)
+                .build();
+            Pageable pageable = simplePage.pageRequest();
 
             Studies response = new Studies(
                 List.of(
@@ -278,7 +282,7 @@ class StudyApiTest extends IntegrationTest {
                     ).stream()
                     .map(studyConverter::studyToStudyInfo)
                     .toList(),
-                0
+                1
             );
 
             given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))

@@ -7,37 +7,29 @@ import org.springframework.data.domain.Sort.Direction;
 
 public class SimplePage {
 
+    private static final int LOWER_LIMIT_VALID_PAGE_SIZE = 1;
+
+    private static final int LOWER_LIMIT_VALID_PAGE = 1;
+
     private static final int DEFAULT_PAGE = 1;
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
-    private int page = DEFAULT_PAGE;
+    private Integer page;
 
-    private int size = DEFAULT_PAGE_SIZE;
+    private Integer size;
 
-    private Direction direction = Direction.DESC;
+    private Direction direction;
 
     @Builder
-    public SimplePage() {
-
+    public SimplePage(Integer page, Integer size, Direction direction) {
+        this.page = isInvalidPage(page) ? DEFAULT_PAGE : page;
+        this.size = isInvalidSize(size) ? DEFAULT_PAGE_SIZE : size;
+        this.direction = isInvalidDirection(direction) ? Direction.ASC : direction;
     }
 
-    public void setPage(int page) {
-        this.page = page <= 0 ? 1 : page;
-    }
-
-    public void setSize(int size) {
-        int defaultSize = 10;
-        int maxSize = 50;
-        this.size = size > maxSize ? defaultSize : size;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
-    public PageRequest of() {
-        return PageRequest.of(page - 1, size, direction, "createdAt");
+    public PageRequest pageRequest() {
+        return PageRequest.of(page - 1, size, Direction.ASC, "createdAt");
     }
 
     public int getPage() {
@@ -48,4 +40,19 @@ public class SimplePage {
         return size;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
+    private boolean isInvalidPage(Integer page) {
+        return page == null || page < LOWER_LIMIT_VALID_PAGE;
+    }
+
+    private boolean isInvalidSize(Integer size) {
+        return size == null || size < LOWER_LIMIT_VALID_PAGE_SIZE;
+    }
+
+    public boolean isInvalidDirection(Direction direction) {
+        return direction == null;
+    }
 }

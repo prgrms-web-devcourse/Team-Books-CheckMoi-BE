@@ -72,8 +72,11 @@ class StudyQueryServiceImplTest {
         void getStudies() {
             Long bookId = 1L;
             long totalPage = 1L;
-            SimplePage simplePage = new SimplePage();
-            Pageable pageable = simplePage.of();
+            SimplePage simplePage = SimplePage.builder()
+                .page(1)
+                .size(2)
+                .build();
+            Pageable pageable = simplePage.pageRequest();
             Page<StudyInfo> studies = new PageImpl<>(List.of(
                 makeStudyInfo(makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 1L)),
                 makeStudyInfo(makeStudyWithId(makeBookWithId(1L), StudyStatus.RECRUITING, 3L))

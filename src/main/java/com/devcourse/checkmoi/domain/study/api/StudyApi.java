@@ -86,7 +86,7 @@ public class StudyApi {
         @RequestParam Long bookId,
         SimplePage simplePage
     ) {
-        Pageable pageable = simplePage.of();
+        Pageable pageable = simplePage.pageRequest();
         Studies response = studyQueryService.getStudies(bookId, pageable);
         return ResponseEntity.ok(new SuccessResponse<>(response));
     }
@@ -131,7 +131,7 @@ public class StudyApi {
     ) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(
-                studyQueryService.findAllByCondition(user.id(), search, pageable.of())));
+                studyQueryService.findAllByCondition(user.id(), search, pageable.pageRequest())));
     }
 
 }

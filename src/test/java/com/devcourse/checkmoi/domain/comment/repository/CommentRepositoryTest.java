@@ -93,11 +93,13 @@ class CommentRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("S 댓글을 조회한다.")
         void getComments() {
-            Search search = new Search(post.getId());
-            SimplePage pageRequest = new SimplePage();
             int size = 2;
-            pageRequest.setSize(size);
-            Pageable pageable = pageRequest.of();
+            Search search = new Search(post.getId());
+            SimplePage pageRequest = SimplePage.builder()
+                .page(1)
+                .size(size)
+                .build();
+            Pageable pageable = pageRequest.pageRequest();
             long totalPage = 3L;
 
             Page<CommentInfo> got = commentRepository.findAllByCondition(search,

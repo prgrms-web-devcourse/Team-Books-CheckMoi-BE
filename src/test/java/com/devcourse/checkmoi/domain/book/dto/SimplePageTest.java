@@ -13,9 +13,10 @@ class SimplePageTest {
         int size = 0;
         int page = 0;
 
-        SimplePage pageable = new SimplePage();
-        pageable.setSize(0);
-        pageable.setPage(0);
+        SimplePage pageable = SimplePage.builder()
+            .size(0)
+            .page(0)
+            .build();
 
         Assertions.assertThat(pageable.getPage())
             .isNotEqualTo(page);
