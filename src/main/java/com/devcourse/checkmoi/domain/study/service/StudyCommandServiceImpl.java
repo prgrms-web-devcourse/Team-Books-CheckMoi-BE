@@ -112,4 +112,16 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
         return studyMemberRepository.save(request).getId();
     }
+
+    @Override
+    public void updateStudyStatus(Long studyId, StudyStatus toStatus) {
+        studyRepository.updateStudyStatus(studyId, toStatus);
+    }
+
+    @Override
+    public void updateApplicants(Long studyId, StudyMemberStatus toMemberStatus) {
+        if (toMemberStatus.equals(StudyMemberStatus.DENIED)) {
+            studyRepository.updateAllApplicantsAsDenied(studyId);
+        }
+    }
 }

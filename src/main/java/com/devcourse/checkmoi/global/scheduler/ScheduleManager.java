@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.domain.scheduler;
+package com.devcourse.checkmoi.global.scheduler;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
