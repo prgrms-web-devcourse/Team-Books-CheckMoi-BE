@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.comment.service;
 
 import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeComment;
@@ -20,8 +21,10 @@ import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
+import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.user.model.User;
@@ -62,6 +65,7 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
     private Post givenPost;
 
+    private Comment finishComment;
 
     @BeforeEach
     void setBasicGiven() {
@@ -71,16 +75,19 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         givenUser = userRepository.save(makeUser());
         // study
         Study givenStudy = studyRepository.save(makeStudy(book, IN_PROGRESS));
+        Study finishStudy = studyRepository.save(makeStudy(book, FINISHED));
 
         // studyMember
         studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
         studyMemberRepository.save(
             makeStudyMember(givenStudy, givenUser, StudyMemberStatus.ACCEPTED));
         studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
-
+        studyMemberRepository.save(makeStudyMember(finishStudy, givenUser, StudyMemberStatus.OWNED));
         // post
         givenPost = postRepository.save(makePost(GENERAL, givenStudy, givenUser));
-
+        Post finishPost = postRepository.save(makePost(GENERAL, finishStudy, givenUser));
+        // comment
+        finishComment = commentRepository.save(makeComment(finishPost, givenUser));
     }
 
     @AfterEach
@@ -187,11 +194,14 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         @Test
         @DisplayName("F 댓글 작성자가 현재 로그인 유저가 아닐 경우 예외 발생")
         void commentEditNotPermission() {
+            Long otherUserId = otherUser.getId();
+            Long commentId = givenComment.getId();
+            
             assertThatExceptionOfType(CommentNoPermissionException.class)
                 .isThrownBy(() ->
                     commentCommandService.editComment(
-                        otherUser.getId(),
-                        givenComment.getId(),
+                        otherUserId,
+                        commentId,
                         request
                     )
                 );
@@ -200,7 +210,16 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         @Test
         @DisplayName("F 현재 진행중인 스터디가 아닐 경우 예외 발생")
         void finishedStudy() {
-
+            Long givenUserId = givenUser.getId();
+            Long finishCommentId = finishComment.getId();
+            assertThatExceptionOfType(FinishedStudyException.class)
+                .isThrownBy(() ->
+                    commentCommandService.editComment(
+                        givenUserId,
+                        finishCommentId,
+                        request
+                    )
+                );
         }
     }
 
