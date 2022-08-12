@@ -1,33 +1,48 @@
 package com.devcourse.checkmoi.domain.study.model;
 
-import java.util.Arrays;
+import com.devcourse.checkmoi.global.annotation.CodeMappable;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-public enum StudyStatus {
-    RECRUITING("RECRUITING",
+public enum StudyStatus implements CodeMappable {
+    RECRUITING("recruiting",
         Set.of(NextStatus.IN_PROGRESS, NextStatus.RECRUITING_FINISHED)),
-    RECRUITING_FINISHED("RECRUITINGFINISHED",
+    RECRUITING_FINISHED("recruitingFinished",
         Set.of(NextStatus.IN_PROGRESS)),
-    IN_PROGRESS("INPROGRESS",
+    IN_PROGRESS("inProgress",
         Set.of(NextStatus.FINISHED)),
-    FINISHED("FINISHED",
+    FINISHED("finished",
         Collections.emptySet());
 
-    private final String name;
+    private static final Map<String, StudyStatus> strToStudyStatus = new HashMap<>();
+
+    static {
+        strToStudyStatus.put(RECRUITING.getMappingCode(), RECRUITING);
+        strToStudyStatus.put(RECRUITING_FINISHED.getMappingCode(), RECRUITING_FINISHED);
+        strToStudyStatus.put(IN_PROGRESS.getMappingCode(), IN_PROGRESS);
+        strToStudyStatus.put(FINISHED.getMappingCode(), FINISHED);
+    }
+
+    private final String code;
 
     private final Set<NextStatus> allowedNextStatus;
 
-    StudyStatus(String name, Set<NextStatus> allowedNextStatus) {
-        this.name = name;
+    StudyStatus(String code, Set<NextStatus> allowedNextStatus) {
+        this.code = code;
         this.allowedNextStatus = allowedNextStatus;
     }
 
-    public static StudyStatus nameOf(String name) {
-        return Arrays.stream(values())
-            .filter(value -> value.name.equals(name.toUpperCase()))
-            .findFirst()
-            .orElse(null);
+    public static StudyStatus nameOf(String inputCode) {
+        return strToStudyStatus.getOrDefault(inputCode, null);
+    }
+
+    @JsonValue
+    @Override
+    public String getMappingCode() {
+        return this.code;
     }
 
     public boolean isAllowedToChangeStatus(StudyStatus status) {
@@ -54,10 +69,5 @@ public enum StudyStatus {
             return NextStatus.valueOf(status.name());
         }
 
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 }

@@ -17,7 +17,7 @@ public sealed interface BookRequest permits CreateBook, Search {
         // 검색조건
         @Nullable Long bookId,
         @Nullable Long studyId,
-        @ValueOfEnum(enumClass = StudyStatus.class)
+        @ValueOfEnum(codeMappingEnumClass = StudyStatus.class)
         @Nullable String studyStatus,
 
         // 정렬조건

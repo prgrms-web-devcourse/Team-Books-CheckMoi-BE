@@ -439,8 +439,8 @@ class StudyRepositoryTest extends RepositoryTest {
             Search search = Search.builder()
                 .bookId(book.getId())
                 .isMember(true)
-                .studyStatus(IN_PROGRESS.toString())
-                .memberStatus(ACCEPTED.toString())
+                .studyStatus(IN_PROGRESS.getMappingCode())
+                .memberStatus(ACCEPTED.getMappingCode())
                 .build();
             SimplePage page = SimplePage.builder().build();
 
@@ -473,7 +473,7 @@ class StudyRepositoryTest extends RepositoryTest {
             Search search = Search.builder()
                 .userId(givenUser.getId())
                 .studyStatus("recruiting")
-                .memberStatus("owned")
+                .memberStatus("OWNED")
                 .build();
             SimplePage page = SimplePage.builder().build();
 

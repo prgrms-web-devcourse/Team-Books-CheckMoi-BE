@@ -13,7 +13,7 @@ public sealed interface PostRequest permits Search, Create, Edit {
 
     record Search(
         @NotNull(message = "게시글을 조회하려는 스터디 식별정보를 알려주세요") Long studyId,
-        @ValueOfEnum(enumClass = PostCategory.class, message = "카테고리는 NOTICE 또는 GENERAL 이어야 합니다") String category
+        @ValueOfEnum(codeMappingEnumClass = PostCategory.class, message = "카테고리는 NOTICE 또는 GENERAL 이어야 합니다") String category
     ) implements PostRequest {
 
         @Builder
@@ -26,7 +26,7 @@ public sealed interface PostRequest permits Search, Create, Edit {
         String title,
         @Size(max = 6000, message = "게시글 본문은 6,000자 이내로 작성해 주세요")
         String content,
-        @ValueOfEnum(enumClass = PostCategory.class) @Size(max = 20, message = "카테고리 이름은 20자 이내여야 합니다")
+        @ValueOfEnum(codeMappingEnumClass = PostCategory.class) @Size(max = 20, message = "카테고리 이름은 20자 이내여야 합니다")
         String category,
         Long studyId
     ) implements PostRequest {

@@ -78,7 +78,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .from(study)
             .where(
                 eqBookId(bookId),
-                eqStudyStatus(RECRUITING.toString())
+                eqStudyStatus(RECRUITING.getMappingCode())
             );
 
         List<StudyInfo> studies = query
@@ -153,7 +153,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 .on(studyMember.study.id.eq(study.id))
                 .where(
                     eqUserId(userId),
-                    eqStudyMemberStatus(OWNED.toString())
+                    eqStudyMemberStatus(OWNED.name())
                 )
                 .fetch(), 0
         );
