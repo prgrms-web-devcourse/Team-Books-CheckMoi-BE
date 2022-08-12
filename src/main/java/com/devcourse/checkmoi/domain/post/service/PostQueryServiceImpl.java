@@ -36,8 +36,9 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     @Override
     public Posts findAllByCondition(Long userId, Search request, SimplePage page) {
-        memberRepository.findByUserAndStudy(userId, request.studyId())
-            .orElseThrow(NotJoinedMemberException::new);
+        if (memberRepository.findByUserAndStudy(userId, request.studyId()).isEmpty()) {
+            throw new NotJoinedMemberException();
+        }
 
         PageRequest pageRequest = PageRequest.of(
             page.getPage() - 1,
