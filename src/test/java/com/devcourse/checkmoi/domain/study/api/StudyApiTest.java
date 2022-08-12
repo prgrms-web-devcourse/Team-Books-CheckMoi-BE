@@ -38,7 +38,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMemberInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
-import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
+import com.devcourse.checkmoi.domain.study.facade.StudyFacade;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
@@ -53,6 +53,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -76,7 +77,7 @@ class StudyApiTest extends IntegrationTest {
     private StudyQueryService studyQueryService;
 
     @MockBean
-    private StudyUserFacade studyUserFacade;
+    private StudyFacade studyFacade;
 
 
     @Nested
@@ -101,8 +102,8 @@ class StudyApiTest extends IntegrationTest {
                 .build();
             Long createdStudyId = 1L;
 
-            when(studyCommandService.createStudy(any(StudyRequest.Create.class), anyLong()))
-                .thenReturn(createdStudyId);
+            given(studyFacade.createStudy(any(StudyRequest.Create.class), anyLong()))
+                .willReturn(createdStudyId);
 
             ResultActions result = mockMvc.perform(
                 RestDocumentationRequestBuilders.post("/api/studies")
@@ -269,24 +270,19 @@ class StudyApiTest extends IntegrationTest {
         @DisplayName("현재 모집중인 특정 책에 대한 스터디 목록을 조회한다.")
         void getStudies() throws Exception {
             Long bookId = 1L;
-            SimplePage simplePage = SimplePage
-                .builder()
-                .page(1)
-                .size(2)
-                .build();
-            Pageable pageable = simplePage.pageRequest();
+            Long totalPage = 1L;
 
             Studies response = new Studies(
-                List.of(
+                Stream.of(
                         makeStudyWithId(makeBookWithId(1L), RECRUITING, 1L),
                         makeStudyWithId(makeBookWithId(1L), RECRUITING, 3L)
-                    ).stream()
+                    )
                     .map(studyConverter::studyToStudyInfo)
                     .toList(),
-                1
+                totalPage
             );
 
-            given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
+            given(studyFacade.getStudies(anyLong(), any(Pageable.class)))
                 .willReturn(response);
 
             ResultActions result = mockMvc.perform(
@@ -607,7 +603,7 @@ class StudyApiTest extends IntegrationTest {
             MyStudies response = new MyStudies(
                 makeUserInfo(), studies.get(0), studies.get(1), studies.get(2)
             );
-            given(studyUserFacade.getMyStudies(anyLong()))
+            given(studyFacade.getMyStudies(anyLong()))
                 .willReturn(response);
 
             ResultActions result = mockMvc.perform(get("/api/studies/me")

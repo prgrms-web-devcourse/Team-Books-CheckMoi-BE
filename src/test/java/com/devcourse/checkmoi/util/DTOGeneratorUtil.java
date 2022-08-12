@@ -3,6 +3,8 @@ package com.devcourse.checkmoi.util;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
+import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
@@ -16,6 +18,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public abstract class DTOGeneratorUtil {
+
+
+    // book
+    public static BookInfo makeBookInfo(Book book) {
+        return BookInfo.builder()
+            .id(book.getId())
+            .description(book.getDescription())
+            .createdAt(book.getCreatedAt())
+            .image(book.getThumbnail())
+            .isbn(book.getIsbn())
+            .author(book.getAuthor())
+            .title(book.getTitle())
+            .pubDate(book.getPublishedAt().getPublishedAt())
+            .publisher(book.getPublisher())
+            .build();
+    }
 
     // study
     public static StudyInfo makeStudyInfo(Study study) {
