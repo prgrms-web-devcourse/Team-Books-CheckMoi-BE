@@ -22,6 +22,7 @@ import com.devcourse.checkmoi.domain.post.exception.PostNotFoundException;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.post.service.validator.PostServiceValidator;
+import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
@@ -32,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -62,6 +64,25 @@ class PostQueryServiceImplTest {
     @Nested
     @DisplayName("게시글을 다중 조회할 수 있다 #86")
     class FindAllPostsTest {
+
+        @Test
+        @DisplayName("F 스터디 멤버가 아니면 게시글을 조회 할 수 없다 ")
+        void findAllPostsFail() {
+            User user = makeUserWithId(1L);
+            Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
+
+            Search request = Search.builder()
+                .studyId(study.getId())
+                .build();
+
+            given(memberRepository.findByUserAndStudy(user.getId(), study.getId()))
+                .willReturn(Optional.empty());
+
+            Assertions.assertThatExceptionOfType(NotJoinedMemberException.class)
+                .isThrownBy(() ->
+                    postQueryService.findAllByCondition(user.getId(), request,
+                        SimplePage.builder().build()));
+        }
 
         @Test
         @DisplayName("S 게시글을 다중 조회할 수 있다")
