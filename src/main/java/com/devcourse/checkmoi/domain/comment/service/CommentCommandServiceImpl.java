@@ -7,8 +7,8 @@ import com.devcourse.checkmoi.domain.comment.exception.CommentNotFoundException;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
 import com.devcourse.checkmoi.domain.comment.service.validator.CommentValidator;
-import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,12 +26,15 @@ public class CommentCommandServiceImpl implements CommentCommandService {
 
     private final StudyRepository studyRepository;
 
-    @Override
-    public void deleteById(Long userId, Long commentId) {
+    private final StudyValidator studyValidator;
+
+        @Override
+        public void deleteById(Long userId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFoundException::new);
         Long ownerId = studyRepository.findStudyOwner(comment.getPost().getStudy().getId());
-        commentValidator.deleteComment(comment, ownerId, userId);
+        commentValidator.commentPermission(userId, ownerId, comment.getUser().getId());
+        studyValidator.ongoingStudy(comment.getPost().getStudy());
         commentRepository.deleteById(commentId);
     }
 
@@ -46,7 +49,8 @@ public class CommentCommandServiceImpl implements CommentCommandService {
     public void editComment(Long userId, Long commentId, Edit request) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFoundException::new);
-        commentValidator.editComment(comment, userId);
+        commentValidator.commentPermission(userId, comment.getUser().getId());
+        studyValidator.ongoingStudy(comment.getPost().getStudy());
         comment.editComment(request.content());
     }
 

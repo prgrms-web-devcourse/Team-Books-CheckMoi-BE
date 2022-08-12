@@ -27,7 +27,7 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
-import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.global.model.SimplePage;
 import java.util.List;
@@ -58,7 +58,7 @@ class StudyQueryServiceImplTest {
     StudyRepository studyRepository;
 
     @Mock
-    StudyServiceValidator studyValidator;
+    StudyValidator studyValidator;
 
     @Mock
     StudyMemberRepository studyMemberRepository;

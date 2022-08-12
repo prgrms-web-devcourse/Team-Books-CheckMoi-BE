@@ -3,7 +3,7 @@ package com.devcourse.checkmoi.domain.study.service.validator;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 
-public interface StudyServiceValidator {
+public interface StudyValidator {
 
     void validateExistStudy(boolean existStudy);
 
