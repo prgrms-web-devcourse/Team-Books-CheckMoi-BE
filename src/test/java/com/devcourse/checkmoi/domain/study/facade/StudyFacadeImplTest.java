@@ -1,11 +1,12 @@
 package com.devcourse.checkmoi.domain.study.facade;
 
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeBookInfo;
 import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeStudyInfo;
 import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeUserInfo;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -22,8 +23,11 @@ import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.service.UserQueryService;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import java.time.LocalDate;
 import java.util.List;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class StudyFacadeImplTest {
@@ -125,6 +130,39 @@ class StudyFacadeImplTest {
             Long got = studyFacade.createStudy(request, userId);
 
             assertThat(got).isEqualTo(createdStudyId);
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 조회 #204")
+    class GetStudiesTest {
+
+        Book book = makeBookWithId(1L);
+
+        @Test
+        @DisplayName("S 스터디 조회")
+        void createStudy() {
+            Long totalPage = 1L;
+            SimplePage simplePage = SimplePage.builder()
+                .page(1)
+                .size(2)
+                .build();
+            Studies want = new Studies(
+                List.of(
+                    makeStudyInfo(makeStudyWithId(makeBookWithId(1L), RECRUITING, 1L)),
+                    makeStudyInfo(makeStudyWithId(makeBookWithId(1L), RECRUITING, 3L))
+                ),
+                totalPage
+            );
+            BookInfo bookInfo = makeBookInfo(book);
+            given(bookQueryService.getById(anyLong()))
+                .willReturn(bookInfo);
+            given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
+                .willReturn(want);
+
+            Studies got = studyFacade.getStudies(book.getId(), simplePage.pageRequest());
+
+            assertThat(got).usingRecursiveComparison().isEqualTo(want);
         }
     }
 }

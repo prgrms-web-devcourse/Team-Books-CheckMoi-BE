@@ -3,10 +3,12 @@ package com.devcourse.checkmoi.domain.study.facade;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.user.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,5 +37,11 @@ public class StudyFacadeImpl implements StudyFacade {
     public Long createStudy(Create request, Long userId) {
         bookQueryService.getById(request.bookId());
         return studyCommandService.createStudy(request, userId);
+    }
+
+    @Override
+    public Studies getStudies(Long bookId, Pageable pageable) {
+        bookQueryService.getById(bookId);
+        return studyQueryService.getStudies(bookId, pageable);
     }
 }

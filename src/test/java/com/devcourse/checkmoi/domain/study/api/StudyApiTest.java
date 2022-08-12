@@ -53,6 +53,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -269,24 +270,19 @@ class StudyApiTest extends IntegrationTest {
         @DisplayName("현재 모집중인 특정 책에 대한 스터디 목록을 조회한다.")
         void getStudies() throws Exception {
             Long bookId = 1L;
-            SimplePage simplePage = SimplePage
-                .builder()
-                .page(1)
-                .size(2)
-                .build();
-            Pageable pageable = simplePage.pageRequest();
+            Long totalPage = 1L;
 
             Studies response = new Studies(
-                List.of(
+                Stream.of(
                         makeStudyWithId(makeBookWithId(1L), RECRUITING, 1L),
                         makeStudyWithId(makeBookWithId(1L), RECRUITING, 3L)
-                    ).stream()
+                    )
                     .map(studyConverter::studyToStudyInfo)
                     .toList(),
-                1
+                totalPage
             );
 
-            given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
+            given(studyFacade.getStudies(anyLong(), any(Pageable.class)))
                 .willReturn(response);
 
             ResultActions result = mockMvc.perform(

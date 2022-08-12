@@ -85,8 +85,7 @@ public class StudyApi {
         @RequestParam Long bookId,
         SimplePage simplePage
     ) {
-        Pageable pageable = simplePage.pageRequest();
-        Studies response = studyQueryService.getStudies(bookId, pageable);
+        Studies response = studyFacade.getStudies(bookId, simplePage.pageRequest());
         return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 
