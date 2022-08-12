@@ -37,10 +37,8 @@ public class PostApi {
     public ResponseEntity<SuccessResponse<PostResponse.Posts>> findAllPosts(
         @AuthenticationPrincipal JwtAuthentication user,
         @Valid Search request,
-        SimplePage page
-    ) {
-        System.out.println(page);
-        System.out.println(request);
+        SimplePage page) {
+
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(
                 postQueryService.findAllByCondition(user.id(), request, page)));
@@ -48,39 +46,29 @@ public class PostApi {
 
     @GetMapping("/posts/{postId}")
     public ResponseEntity<SuccessResponse<PostInfo>> findPost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long postId
-    ) {
+        @AuthenticationPrincipal JwtAuthentication user, @PathVariable Long postId) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(postQueryService.findByPostId(user.id(), postId)));
     }
 
     @PostMapping("/posts")
     public ResponseEntity<SuccessResponse<Long>> createPost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @Valid @RequestBody Create request
-    ) {
+        @AuthenticationPrincipal JwtAuthentication user, @Valid @RequestBody Create request) {
         Long postId = postCommandService.createPost(user.id(), request);
-        return ResponseEntity
-            .created(generatedUri(postId))
-            .body(new SuccessResponse<>(postId));
+        return ResponseEntity.created(generatedUri(postId)).body(new SuccessResponse<>(postId));
     }
 
     @PutMapping("/posts/{postId}")
     public ResponseEntity<SuccessResponse<Void>> editPost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long postId,
-        @Valid @RequestBody Edit request
-    ) {
+        @AuthenticationPrincipal JwtAuthentication user, @PathVariable Long postId,
+        @Valid @RequestBody Edit request) {
         postCommandService.editPost(user.id(), postId, request);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<SuccessResponse<Void>> deletePost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long postId
-    ) {
+        @AuthenticationPrincipal JwtAuthentication user, @PathVariable Long postId) {
         postCommandService.deletePost(user.id(), postId);
         return ResponseEntity.noContent().build();
     }

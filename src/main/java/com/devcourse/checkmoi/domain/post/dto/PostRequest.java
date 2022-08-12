@@ -13,7 +13,7 @@ public sealed interface PostRequest permits Search, Create, Edit {
 
     record Search(
         @NotNull(message = "게시글을 조회하려는 스터디 식별정보를 알려주세요") Long studyId,
-        @ValueOfEnum(enumClass = PostCategory.class) String category
+        @ValueOfEnum(enumClass = PostCategory.class, message = "카테고리는 NOTICE 또는 GENERAL 이어야 합니다") String category
     ) implements PostRequest {
 
         @Builder
