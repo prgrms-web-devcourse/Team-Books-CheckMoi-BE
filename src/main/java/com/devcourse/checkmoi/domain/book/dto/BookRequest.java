@@ -2,6 +2,8 @@ package com.devcourse.checkmoi.domain.book.dto;
 
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.global.annotation.ValueOfEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -12,9 +14,15 @@ import org.springframework.lang.Nullable;
 public sealed interface BookRequest permits CreateBook, Search {
 
     record Search(
+        // 검색조건
         @Nullable Long bookId,
         @Nullable Long studyId,
-        @Nullable String studyStatus
+        @ValueOfEnum(enumClass = StudyStatus.class)
+        @Nullable String studyStatus,
+
+        // 정렬조건
+        @Nullable Boolean latestStudy,
+        @Nullable Boolean mostStudy
     ) implements BookRequest {
 
         @Builder
