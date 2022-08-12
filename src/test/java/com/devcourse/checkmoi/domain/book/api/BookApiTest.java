@@ -362,8 +362,20 @@ class BookApiTest extends IntegrationTest {
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
                 requestParameters(
-                    parameterWithName("studyId").description("스터디 아이디").optional(),
-                    parameterWithName("studyStatus").description("스터디 상태").optional(),
+                    parameterWithName("bookId").description("책 아이디")
+                        .optional(),
+                    parameterWithName("studyId").description("스터디 아이디")
+                        .optional(),
+                    parameterWithName("studyStatus")
+                        .description(
+                            "스터디 상태").
+                        optional(),
+                    parameterWithName("latestStudy").description(
+                            "스터디 최신순 정렬 (true : 최근에 스터디가 개설된 기준 정렬)")
+                        .optional(),
+                    parameterWithName("mostStudy").description(
+                            "스터디 인기순 정렬 (true : 스터디가 많이 열린 기준 정렬)")
+                        .optional(),
                     parameterWithName("page").description("페이지").optional(),
                     parameterWithName("size").description("사이즈").optional()
                 ),

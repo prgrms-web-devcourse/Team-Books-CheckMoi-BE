@@ -95,7 +95,10 @@ class BookRepositoryTest extends RepositoryTest {
         private List<Study> studies = new ArrayList<>();
 
         @BeforeEach
-        void setUp() {
+        void setUp() throws InterruptedException {
+            tearDown();
+
+            books.add(bookRepository.save(makeBook()));
             books.add(bookRepository.save(makeBook()));
             books.add(bookRepository.save(makeBook()));
 
@@ -107,6 +110,9 @@ class BookRepositoryTest extends RepositoryTest {
             // book2 study
             studies.add(studyRepository.save(makeStudy(books.get(1), IN_PROGRESS)));
             studies.add(studyRepository.save(makeStudy(books.get(1), FINISHED)));
+
+            // book3 study
+            // NONE
         }
 
         @AfterEach
@@ -139,7 +145,21 @@ class BookRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<BookInfo> result = bookRepository.findAllByCondition(search, page.pageRequest());
-            assertThat(result.getContent()).hasSize(2);
+            assertThat(result.getContent()).hasSize(3);
+        }
+
+        @Test
+        @DisplayName("S 정렬조건에 의해서 정렬된 데이터가 나온다")
+        void searchStudies3() {
+            Search search = Search.builder()
+                .mostStudy(true)
+                .latestStudy(true)
+                .build();
+
+            SimplePage page = SimplePage.builder().build();
+
+            Page<BookInfo> result = bookRepository.findAllByCondition(search, page.pageRequest());
+            assertThat(result.getContent()).hasSize(3);
         }
     }
 }
