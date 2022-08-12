@@ -1,9 +1,10 @@
 package com.devcourse.checkmoi.domain.study.service.validator;
 
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 
-public interface StudyServiceValidator {
+public interface StudyValidator {
 
     void validateExistStudy(boolean existStudy);
 
@@ -11,7 +12,11 @@ public interface StudyServiceValidator {
 
     void validateDuplicateStudyMemberRequest(StudyMember studyMember);
 
-    void ongoingStudy(Study study);
+    void validateOngoingStudy(Study study);
 
-    void participateUser(Long memberId);
+    void validateParticipateUser(Long memberId);
+
+    void validateRecruitingStudy(Study study);
+
+    void validateFullMemberStudy(Study study, Audit request);
 }

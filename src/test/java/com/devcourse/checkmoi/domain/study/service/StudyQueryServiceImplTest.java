@@ -7,6 +7,7 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -17,21 +18,24 @@ import static org.mockito.Mockito.times;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMemberInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
+import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
-import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.global.model.SimplePage;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -58,7 +62,7 @@ class StudyQueryServiceImplTest {
     StudyRepository studyRepository;
 
     @Mock
-    StudyServiceValidator studyValidator;
+    StudyValidator studyValidator;
 
     @Mock
     StudyMemberRepository studyMemberRepository;
@@ -97,13 +101,13 @@ class StudyQueryServiceImplTest {
 
     @Nested
     @DisplayName("스터디 신청 내역 조회")
-    class GetStudyAppliersTest {
+    class GetStudyMembersTest {
 
         private Long studyLeaderId = 1L;
 
         private Long studyId = 1L;
 
-        private StudyAppliers expectedAppliers = createAppliersData();
+        private StudyMembers expectedAppliers = createAppliersData();
 
 
         @Test
@@ -121,7 +125,7 @@ class StudyQueryServiceImplTest {
                 .when(studyValidator)
                 .validateStudyOwner(anyLong(), anyLong(), anyString());
 
-            StudyAppliers returnedAppliers = studyQueryService.getStudyAppliers(userId, studyId);
+            StudyMembers returnedAppliers = studyQueryService.getStudyAppliers(userId, studyId);
 
             Assertions.assertThat(returnedAppliers)
                 .usingRecursiveComparison()
@@ -129,7 +133,24 @@ class StudyQueryServiceImplTest {
         }
 
         @Test
-        @DisplayName("S 해당 스터디의 스터디 장이 아니면 스터디 신청 내역 조회에 실패한다")
+        @DisplayName("F 해당 스터디가 존재하지 않는다면 예외가 발생합니다.")
+        void studyNotFound() {
+            Long userId = 1L;
+            Long notExistStudyId = 0L;
+
+            given(studyRepository.existsById(notExistStudyId))
+                .willReturn(false);
+
+            doThrow(StudyNotFoundException.class)
+                .when(studyValidator)
+                .validateExistStudy(anyBoolean());
+
+            Assertions.assertThatExceptionOfType(StudyNotFoundException.class)
+                .isThrownBy(() -> studyQueryService.getStudyAppliers(userId, notExistStudyId));
+        }
+
+        @Test
+        @DisplayName("F 해당 스터디의 스터디 장이 아니면 스터디 신청 내역 조회에 실패한다")
         void getAsNonLeaderFail() {
             Long userId = 2L;
 
@@ -145,34 +166,42 @@ class StudyQueryServiceImplTest {
             ).isInstanceOf(NotStudyOwnerException.class);
         }
 
-        private StudyAppliers createAppliersData() {
+        private StudyMembers createAppliersData() {
+            List<StudyUserInfo> users = List.of(
+                makeStudyUserInfoWithId(1L),
+                makeStudyUserInfoWithId(2L),
+                makeStudyUserInfoWithId(3L)
+            );
 
-            return StudyAppliers.builder()
-                .appliers(
+            return StudyMembers.builder()
+                .members(
                     List.of(
-                        StudyUserInfo.builder()
+                        StudyMemberInfo.builder()
                             .id(1L)
-                            .email("abc@naver.com")
-                            .name("abc")
-                            .image("https://south/dev/abc.png")
-                            .temperature(36.5f)
+                            .user(makeStudyUserInfoWithId(1L))
                             .build(),
-                        StudyUserInfo.builder()
-                            .id(2L)
-                            .email("abcd@naver.com")
-                            .name("abcd")
-                            .image("https://south/dev/abcd.png")
-                            .temperature(36.5f)
+                        StudyMemberInfo.builder()
+                            .id(1L)
+                            .user(makeStudyUserInfoWithId(1L))
                             .build(),
-                        StudyUserInfo.builder()
-                            .id(3L)
-                            .email("abce@naver.com")
-                            .name("abce")
-                            .image("https://south/dev/abce.png")
-                            .temperature(36.5f)
+                        StudyMemberInfo.builder()
+                            .id(1L)
+                            .user(makeStudyUserInfoWithId(1L))
                             .build()
                     )
-                ).build();
+                )
+                .build();
+        }
+
+        private StudyUserInfo makeStudyUserInfoWithId(Long id) {
+            String email = UUID.randomUUID().toString().substring(20);
+            return StudyUserInfo.builder()
+                .id(id)
+                .email(email + "@naver.com")
+                .name("abc")
+                .image("https://south/dev/abc.png")
+                .temperature(36.5f)
+                .build();
         }
     }
 
@@ -263,11 +292,11 @@ class StudyQueryServiceImplTest {
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(study));
 
-            studyQueryService.ongoingStudy(study.getId());
+            studyQueryService.validateOngoingStudy(study.getId());
 
             then(studyValidator)
                 .should(times(1))
-                .ongoingStudy(any(Study.class));
+                .validateOngoingStudy(any(Study.class));
         }
 
         @Test
@@ -278,10 +307,10 @@ class StudyQueryServiceImplTest {
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(finishedStudy));
             doThrow(FinishedStudyException.class)
-                .when(studyValidator).ongoingStudy(finishedStudy);
+                .when(studyValidator).validateOngoingStudy(finishedStudy);
 
             assertThatExceptionOfType(FinishedStudyException.class)
-                .isThrownBy(() -> studyQueryService.ongoingStudy(finishedStudy.getId()));
+                .isThrownBy(() -> studyQueryService.validateOngoingStudy(finishedStudy.getId()));
         }
     }
 
@@ -303,11 +332,11 @@ class StudyQueryServiceImplTest {
             given(studyMemberRepository.participateUserInStudy(anyLong(), anyLong()))
                 .willReturn(memberId);
 
-            studyQueryService.participateUser(study.getId(), user.getId());
+            studyQueryService.validateParticipateUser(study.getId(), user.getId());
 
             then(studyValidator)
                 .should(times(1))
-                .participateUser(anyLong());
+                .validateParticipateUser(anyLong());
         }
 
         @Test
@@ -319,10 +348,11 @@ class StudyQueryServiceImplTest {
             given(studyMemberRepository.participateUserInStudy(anyLong(), anyLong()))
                 .willReturn(notFoundMemberId);
             doThrow(NotJoinedMemberException.class)
-                .when(studyValidator).participateUser(notFoundMemberId);
+                .when(studyValidator).validateParticipateUser(notFoundMemberId);
 
             assertThatExceptionOfType(NotJoinedMemberException.class)
-                .isThrownBy(() -> studyQueryService.participateUser(study.getId(), otherUserId));
+                .isThrownBy(
+                    () -> studyQueryService.validateParticipateUser(study.getId(), otherUserId));
         }
     }
 }

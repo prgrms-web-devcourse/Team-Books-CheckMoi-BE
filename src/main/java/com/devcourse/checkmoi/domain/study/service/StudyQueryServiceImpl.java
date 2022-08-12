@@ -2,16 +2,16 @@ package com.devcourse.checkmoi.domain.study.service;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
-import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StudyQueryServiceImpl implements StudyQueryService {
 
-    private final StudyServiceValidator studyValidator;
+    private final StudyValidator studyValidator;
 
     private final StudyRepository studyRepository;
 
@@ -33,8 +33,8 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
     @Override
     public Studies findAllByCondition(Long userId, Search search, Pageable pageable) {
-        Page<StudyInfo> studyInfos = studyRepository.findAllByCondition(userId, search,
-            pageable);
+        Page<StudyInfo> studyInfos =
+            studyRepository.findAllByCondition(userId, search, pageable);
         return new Studies(
             studyInfos.getContent(),
             studyInfos.getTotalPages()
@@ -56,7 +56,8 @@ public class StudyQueryServiceImpl implements StudyQueryService {
     }
 
     @Override
-    public StudyAppliers getStudyAppliers(Long userId, Long studyId) {
+    public StudyMembers getStudyAppliers(Long userId, Long studyId) {
+        studyValidator.validateExistStudy(studyRepository.existsById(studyId));
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
 
         studyValidator.validateStudyOwner(userId, studyOwnerId,
@@ -82,21 +83,24 @@ public class StudyQueryServiceImpl implements StudyQueryService {
         return studyRepository.getOwnedStudies(userId);
     }
 
-    @Override
-    public void ongoingStudy(Long studyId) {
-        Study study = studyRepository.findById(studyId)
-            .orElseThrow(StudyNotFoundException::new);
-        studyValidator.ongoingStudy(study);
-    }
-
-    @Override
-    public void participateUser(Long studyId, Long userId) {
-        studyValidator.participateUser(
-            studyMemberRepository.participateUserInStudy(studyId, userId));
-    }
 
     @Override
     public ExpiredStudies getAllExpiredStudies(LocalDate criteriaTime, StudyStatus toStatus) {
-        return studyRepository.getAllToBeProcessed(criteriaTime, toStatus);
+        return studyRepository.getAllTobeProgressed(criteriaTime, toStatus);
     }
+
+    /******************* Validate *******************/
+    @Override
+    public void validateOngoingStudy(Long studyId) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(StudyNotFoundException::new);
+        studyValidator.validateOngoingStudy(study);
+    }
+
+    @Override
+    public void validateParticipateUser(Long studyId, Long userId) {
+        studyValidator.validateParticipateUser(
+            studyMemberRepository.participateUserInStudy(studyId, userId));
+    }
+
 }

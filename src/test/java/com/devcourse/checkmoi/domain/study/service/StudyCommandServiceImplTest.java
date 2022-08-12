@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.domain.study.service;
 
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.PENDING;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.ACCESS_DENIED;
@@ -14,7 +15,6 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -24,16 +24,20 @@ import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.study.converter.StudyConverter;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
+import com.devcourse.checkmoi.domain.study.exception.NotRecruitingStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
 import com.devcourse.checkmoi.domain.study.exception.StudyJoinRequestNotFoundException;
+import com.devcourse.checkmoi.domain.study.exception.StudyMemberFullException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
-import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
@@ -67,7 +71,7 @@ class StudyCommandServiceImplTest {
     UserRepository userRepository;
 
     @Mock
-    StudyServiceValidator studyValidator;
+    StudyValidator studyValidator;
 
     @Nested
     @DisplayName("스터디 등록 #5")
@@ -203,24 +207,30 @@ class StudyCommandServiceImplTest {
     @DisplayName("스터디 가입 승낙 및 거절 #37")
     class AuditTest {
 
+        private final Long studyId = 1L;
+
+        private final Long memberId = 1L;
+
+        private final Long userId = 1L;
+
+        private final StudyRequest.Audit request = StudyRequest.Audit.builder()
+            .status("ACCEPTED")
+            .build();
+
+        private final Book book = makeBookWithId(1L);
+
+        private final User user = makeUserWithId(userId);
+
+        Study study = makeStudyWithId(book, StudyStatus.RECRUITING, studyId);
+
+        private final StudyMember studyMember = makeStudyMemberWithId(study, user, PENDING, 1L);
+
         @Test
         @DisplayName("S 스터디 가입 승낙 및 거절할 수 있다.")
         void auditStudyParticipationTest() {
-            Long studyId = 1L;
-            Long memberId = 1L;
-            Long userId = 1L;
             Long studyOwnerId = 1L;
 
-            StudyRequest.Audit request = StudyRequest.Audit.builder()
-                .status("ACCEPTED")
-                .build();
-
-            StudyMember studyMember = StudyMember.builder()
-                .id(1L)
-                .status(StudyMemberStatus.PENDING)
-                .build();
-
-            given(studyRepository.existsById(anyLong())).willReturn(true);
+            given(studyRepository.findById(anyLong())).willReturn(Optional.of(study));
             given(studyRepository.findStudyOwner(anyLong())).willReturn(studyOwnerId);
             given(studyMemberRepository.findById(anyLong()))
                 .willReturn(Optional.of(studyMember));
@@ -233,20 +243,42 @@ class StudyCommandServiceImplTest {
         @Test
         @DisplayName("F 존재하지 않는 스터디 ID일 경우 예외가 발생한다.")
         void validateExistStudy() {
-            Long studyId = 1L;
-            Long memberId = 1L;
-            Long userId = 1L;
-            StudyRequest.Audit request = StudyRequest.Audit.builder()
-                .status("ACCEPTED")
-                .build();
-
-            doThrow(StudyNotFoundException.class)
-                .when(studyValidator)
-                .validateExistStudy(anyBoolean());
-
-            given(studyRepository.existsById(anyLong())).willReturn(false);
+            given(studyRepository.findById(anyLong()))
+                .willThrow(new StudyNotFoundException());
 
             assertThatExceptionOfType(StudyNotFoundException.class)
+                .isThrownBy(
+                    () -> studyCommandService.auditStudyParticipation(studyId, memberId, userId,
+                        request));
+        }
+
+        @Test
+        @DisplayName("현재 모집중인 스터디만 승인, 거절 값을 전달할 수 있습니다.")
+        void recruitingStudy() {
+            Study inProgressStudy = makeStudyWithId(book, IN_PROGRESS, studyId);
+
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.of(inProgressStudy));
+            doThrow(NotRecruitingStudyException.class)
+                .when(studyValidator)
+                .validateRecruitingStudy(any(Study.class));
+            assertThatExceptionOfType(NotRecruitingStudyException.class)
+                .isThrownBy(
+                    () -> studyCommandService.auditStudyParticipation(studyId, memberId, userId,
+                        request));
+        }
+
+        @Test
+        @DisplayName("현재 스터디원이 최대치에 도달했을때 더 이상 승인을 할 수 없습니다")
+        void fullMemberStudy() {
+            Study inProgressStudy = makeStudyWithId(book, IN_PROGRESS, studyId);
+
+            given(studyRepository.findById(anyLong()))
+                .willReturn(Optional.of(inProgressStudy));
+            doThrow(StudyMemberFullException.class)
+                .when(studyValidator)
+                .validateFullMemberStudy(any(Study.class), any(Audit.class));
+            assertThatExceptionOfType(StudyMemberFullException.class)
                 .isThrownBy(
                     () -> studyCommandService.auditStudyParticipation(studyId, memberId, userId,
                         request));
@@ -271,7 +303,7 @@ class StudyCommandServiceImplTest {
                 .when(studyValidator)
                 .validateStudyOwner(anyLong(), anyLong(), anyString());
 
-            given(studyRepository.existsById(anyLong())).willReturn(true);
+            given(studyRepository.findById(anyLong())).willReturn(Optional.of(study));
             given(studyRepository.findStudyOwner(anyLong())).willReturn(studyOwnerId);
 
             assertThatExceptionOfType(NotStudyOwnerException.class)
@@ -293,7 +325,7 @@ class StudyCommandServiceImplTest {
                 .status("ACCEPTED")
                 .build();
 
-            given(studyRepository.existsById(anyLong())).willReturn(true);
+            given(studyRepository.findById(anyLong())).willReturn(Optional.of(study));
             given(studyRepository.findStudyOwner(anyLong())).willReturn(studyOwnerId);
             given(studyMemberRepository.findById(anyLong()))
                 .willReturn(Optional.empty());

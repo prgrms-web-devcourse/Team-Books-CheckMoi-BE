@@ -32,12 +32,13 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMemberInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
-import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
+import com.devcourse.checkmoi.domain.study.facade.StudyFacade;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
@@ -52,6 +53,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -75,7 +77,7 @@ class StudyApiTest extends IntegrationTest {
     private StudyQueryService studyQueryService;
 
     @MockBean
-    private StudyUserFacade studyUserFacade;
+    private StudyFacade studyFacade;
 
 
     @Nested
@@ -100,8 +102,8 @@ class StudyApiTest extends IntegrationTest {
                 .build();
             Long createdStudyId = 1L;
 
-            when(studyCommandService.createStudy(any(StudyRequest.Create.class), anyLong()))
-                .thenReturn(createdStudyId);
+            given(studyFacade.createStudy(any(StudyRequest.Create.class), anyLong()))
+                .willReturn(createdStudyId);
 
             ResultActions result = mockMvc.perform(
                 RestDocumentationRequestBuilders.post("/api/studies")
@@ -241,7 +243,7 @@ class StudyApiTest extends IntegrationTest {
         private RestDocumentationResultHandler documentation() {
             return MockMvcRestDocumentationWrapper.document("study-audit",
                 ResourceSnippetParameters.builder()
-                    .tag("Study API")
+                    .tag("Study Member API")
                     .summary("스터디 가입 승낙 및 거절")
                     .description("스터디 가입 승낙 및 거절에 사용되는 API입니다.")
                     .requestSchema(Schema.schema("스터디 가입 승낙 및 거절 요청")),
@@ -268,24 +270,19 @@ class StudyApiTest extends IntegrationTest {
         @DisplayName("현재 모집중인 특정 책에 대한 스터디 목록을 조회한다.")
         void getStudies() throws Exception {
             Long bookId = 1L;
-            SimplePage simplePage = SimplePage
-                .builder()
-                .page(1)
-                .size(2)
-                .build();
-            Pageable pageable = simplePage.pageRequest();
+            Long totalPage = 1L;
 
             Studies response = new Studies(
-                List.of(
+                Stream.of(
                         makeStudyWithId(makeBookWithId(1L), RECRUITING, 1L),
                         makeStudyWithId(makeBookWithId(1L), RECRUITING, 3L)
-                    ).stream()
+                    )
                     .map(studyConverter::studyToStudyInfo)
                     .toList(),
-                1
+                totalPage
             );
 
-            given(studyQueryService.getStudies(anyLong(), any(Pageable.class)))
+            given(studyFacade.getStudies(anyLong(), any(Pageable.class)))
                 .willReturn(response);
 
             ResultActions result = mockMvc.perform(
@@ -370,7 +367,7 @@ class StudyApiTest extends IntegrationTest {
         private RestDocumentationResultHandler documentation() {
             return MockMvcRestDocumentationWrapper.document("study-join-request",
                 ResourceSnippetParameters.builder()
-                    .tag("Study API")
+                    .tag("Study Member API")
                     .summary("스터디 가입 신청")
                     .description("스터디 가입 신청에 사용되는 API입니다.")
                     .responseSchema(Schema.schema("스터디 가입 요청 응답")),
@@ -399,7 +396,18 @@ class StudyApiTest extends IntegrationTest {
             StudyDetailWithMembers expected = StudyDetailWithMembers.builder()
                 .study(givenStudyInfo())
                 .book(givenStudyBookInfo())
-                .members(List.of(givenUserInfo(), givenUserInfo()))
+                .members(
+                    List.of(
+                        StudyMemberInfo.builder()
+                            .id(1L)
+                            .user(givenUserInfo())
+                            .build(),
+                        StudyMemberInfo.builder()
+                            .id(2L)
+                            .user(givenUserInfo())
+                            .build()
+                    )
+                )
                 .build();
 
             given(studyQueryService.getStudyInfoWithMembers(anyLong())).willReturn(expected);
@@ -452,14 +460,18 @@ class StudyApiTest extends IntegrationTest {
                     // study member info
                     fieldWithPath("data.members[].id").
                         description("스터디 멤버 아이디"),
-                    fieldWithPath("data.members[].name")
-                        .description("스터디 멤버 이름"),
-                    fieldWithPath("data.members[].email")
-                        .description("스터디 멤버 이메일"),
-                    fieldWithPath("data.members[].temperature")
-                        .description("스터디 멤버 온도"),
-                    fieldWithPath("data.members[].image")
-                        .description("스터디 멤버 이미지 URL")
+
+                    // study member user info
+                    fieldWithPath("data.members[].user.id").
+                        description("스터디 멤버 유저 아이디"),
+                    fieldWithPath("data.members[].user.name")
+                        .description("스터디 멤버 유저 이름"),
+                    fieldWithPath("data.members[].user.email")
+                        .description("스터디 멤버 유저 이메일"),
+                    fieldWithPath("data.members[].user.temperature")
+                        .description("스터디 멤버 유저 온도"),
+                    fieldWithPath("data.members[].user.image")
+                        .description("스터디 멤버 유저 이미지 URL")
                 ));
         }
 
@@ -514,9 +526,17 @@ class StudyApiTest extends IntegrationTest {
 
             Long studyId = 1L;
 
+            var studyMember1 = StudyMemberInfo.builder()
+                .id(1L)
+                .user(userInfoList().get(0))
+                .build();
+            var studyMember2 = StudyMemberInfo.builder()
+                .id(2L)
+                .user(userInfoList().get(1))
+                .build();
+
             given(studyQueryService.getStudyAppliers(anyLong(), anyLong()))
-                .willReturn(
-                    new StudyAppliers(userInfoList()));
+                .willReturn(new StudyMembers(List.of(studyMember1, studyMember2)));
 
             mockMvc.perform(get("/api/studies/{studyId}/members", studyId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken()))
@@ -527,7 +547,7 @@ class StudyApiTest extends IntegrationTest {
         private RestDocumentationResultHandler documentation() {
             return MockMvcRestDocumentationWrapper.document("study-join-request-list",
                 ResourceSnippetParameters.builder()
-                    .tag("Study API")
+                    .tag("Study Member API")
                     .summary("스터디 신청자 목록 조회 API")
                     .description("해당하는 스터디에 대해 아직 처리되지 않은 신청자 목록을 가져옵니다")
                     .requestSchema(Schema.schema("스터디 신청자 목록 요청"))
@@ -535,25 +555,28 @@ class StudyApiTest extends IntegrationTest {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
+
                 pathParameters(
                     parameterWithName("studyId").description("스터디 아이디")
                 ),
                 responseFields(
-                    fieldWithPath("data.appliers[].id").
-                        description("스터디 신청 멤버 아이디"),
-                    fieldWithPath("data.appliers[].name")
-                        .description("스터디 신청 멤버 이름"),
-                    fieldWithPath("data.appliers[].email")
-                        .description("스터디 신청 멤버 이메일"),
-                    fieldWithPath("data.appliers[].temperature")
-                        .description("스터디 신청 멤버 온도"),
-                    fieldWithPath("data.appliers[].image")
-                        .description("스터디 신청 멤버 이미지 URL")
+                    fieldWithPath("data.members[].id").
+                        description("스터디 멤버 아이디"),
+
+                    fieldWithPath("data.members[].user.id")
+                        .description("스터디 멤버 유저 아이디"),
+                    fieldWithPath("data.members[].user.name")
+                        .description("스터디 멤버 유저 이름"),
+                    fieldWithPath("data.members[].user.email")
+                        .description("스터디 멤버 유저 이메일"),
+                    fieldWithPath("data.members[].user.temperature")
+                        .description("스터디 멤버 유저 온도"),
+                    fieldWithPath("data.members[].user.image")
+                        .description("스터디 멤버 유저 이미지 URL")
                 ));
         }
 
         private List<StudyUserInfo> userInfoList() {
-
             return LongStream.range(1, 3).mapToObj(this::createUserInfo).toList();
         }
 
@@ -580,7 +603,7 @@ class StudyApiTest extends IntegrationTest {
             MyStudies response = new MyStudies(
                 makeUserInfo(), studies.get(0), studies.get(1), studies.get(2)
             );
-            given(studyUserFacade.getMyStudies(anyLong()))
+            given(studyFacade.getMyStudies(anyLong()))
                 .willReturn(response);
 
             ResultActions result = mockMvc.perform(get("/api/studies/me")
