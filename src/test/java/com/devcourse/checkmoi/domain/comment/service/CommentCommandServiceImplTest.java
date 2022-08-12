@@ -24,7 +24,6 @@ import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
-import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.user.model.User;
@@ -63,6 +62,10 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
     private User givenUser;
 
+    private User ownedUser;
+
+    private User otherUser;
+
     private Post givenPost;
 
     private Comment finishComment;
@@ -71,18 +74,21 @@ class CommentCommandServiceImplTest extends IntegrationTest {
     void setBasicGiven() {
         Book book = bookRepository.save(makeBook());
         // user
-        User user = userRepository.save(makeUser());
+        ownedUser = userRepository.save(makeUser());
         givenUser = userRepository.save(makeUser());
+        otherUser = userRepository.save(makeUser());
         // study
         Study givenStudy = studyRepository.save(makeStudy(book, IN_PROGRESS));
         Study finishStudy = studyRepository.save(makeStudy(book, FINISHED));
 
         // studyMember
-        studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
+        studyMemberRepository.save(makeStudyMember(givenStudy, ownedUser, StudyMemberStatus.OWNED));
         studyMemberRepository.save(
             makeStudyMember(givenStudy, givenUser, StudyMemberStatus.ACCEPTED));
-        studyMemberRepository.save(makeStudyMember(givenStudy, user, StudyMemberStatus.OWNED));
-        studyMemberRepository.save(makeStudyMember(finishStudy, givenUser, StudyMemberStatus.OWNED));
+        studyMemberRepository.save(
+            makeStudyMember(finishStudy, givenUser, StudyMemberStatus.OWNED));
+        studyMemberRepository.save(
+            makeStudyMember(givenStudy, otherUser, StudyMemberStatus.ACCEPTED));
         // post
         givenPost = postRepository.save(makePost(GENERAL, givenStudy, givenUser));
         Post finishPost = postRepository.save(makePost(GENERAL, finishStudy, givenUser));
@@ -109,7 +115,6 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         @BeforeEach
         void createComment() {
             comment = commentRepository.save(makeComment(givenPost, givenUser));
-            assertThat(commentRepository.existsById(comment.getId())).isTrue();
         }
 
         @Test
@@ -117,6 +122,49 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         void deleteComment() {
             commentCommandService.deleteById(givenUser.getId(), comment.getId());
             assertThat(commentRepository.existsById(comment.getId())).isFalse();
+        }
+
+        @Test
+        @DisplayName("S 스터디장은 댓글을 삭제할 수 있다")
+        void ownedDeleteComment() {
+            commentCommandService.deleteById(ownedUser.getId(), comment.getId());
+            assertThat(commentRepository.existsById(comment.getId())).isFalse();
+        }
+
+        @Test
+        @DisplayName("F 댓글이 존재하지 않는 경우 예외 발생")
+        void commentNotFound() {
+            Long userId = givenUser.getId();
+            Long notExistCommentId = 0L;
+
+            assertThatExceptionOfType(CommentNotFoundException.class)
+                .isThrownBy(
+                    () -> commentCommandService.deleteById(userId, notExistCommentId)
+                );
+        }
+
+        @Test
+        @DisplayName("F 댓글 작성자나 관리자가 아니라면 예외 발생")
+        void commentNoPermission() {
+            Long otherUserId = otherUser.getId();
+            Long commentId = comment.getId();
+
+            assertThatExceptionOfType(CommentNoPermissionException.class)
+                .isThrownBy(
+                    () -> commentCommandService.deleteById(otherUserId, commentId)
+                );
+        }
+
+        @Test
+        @DisplayName("F 스터디가 종료되었을 경우 예외 발생")
+        void finishedStudy() {
+            Long userId = givenUser.getId();
+            Long finishCommentId = finishComment.getId();
+
+            assertThatExceptionOfType(FinishedStudyException.class)
+                .isThrownBy(
+                    () -> commentCommandService.deleteById(userId, finishCommentId)
+                );
         }
     }
 
@@ -196,7 +244,7 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         void commentEditNotPermission() {
             Long otherUserId = otherUser.getId();
             Long commentId = givenComment.getId();
-            
+
             assertThatExceptionOfType(CommentNoPermissionException.class)
                 .isThrownBy(() ->
                     commentCommandService.editComment(

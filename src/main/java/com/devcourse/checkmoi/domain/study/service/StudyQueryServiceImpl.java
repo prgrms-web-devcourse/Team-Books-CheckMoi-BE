@@ -11,7 +11,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
-import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StudyQueryServiceImpl implements StudyQueryService {
 
-    private final StudyServiceValidator studyValidator;
+    private final StudyValidator studyValidator;
 
     private final StudyRepository studyRepository;
 

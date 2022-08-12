@@ -33,7 +33,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
-import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
@@ -67,7 +67,7 @@ class StudyCommandServiceImplTest {
     UserRepository userRepository;
 
     @Mock
-    StudyServiceValidator studyValidator;
+    StudyValidator studyValidator;
 
     @Nested
     @DisplayName("스터디 등록 #5")
