@@ -14,12 +14,16 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.devcourse.checkmoi.domain.book.model.Book;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
+import com.devcourse.checkmoi.domain.study.exception.NotRecruitingStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
+import com.devcourse.checkmoi.domain.study.exception.StudyMemberFullException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -77,12 +81,74 @@ class StudyValidatorImplTest {
     class ParticipateUserTest {
 
         @Test
-        @DisplayName("스터디 멤버 아이디가 null이라면 예외 발생")
+        @DisplayName("스터디 멤버 아이디가 존재한다면 정상 종료")
         void participateUser() {
+            Long memberId = 1L;
+
+            studyValidator.validateParticipateUser(memberId);
+        }
+
+        @Test
+        @DisplayName("스터디 멤버 아이디가 null이라면 예외 발생")
+        void notParticipateUser() {
             Long notFoundMemberId = null;
             assertThatExceptionOfType(NotJoinedMemberException.class)
                 .isThrownBy(() -> studyValidator.validateParticipateUser(notFoundMemberId));
         }
     }
 
+    @Nested
+    @DisplayName("스터디 멤버 아이디를 확인하여 스터디 참여중인지 검사 #200")
+    class RecruitingStudyTest {
+
+        Book book = makeBookWithId(1L);
+
+        @Test
+        @DisplayName("스터디 상태가 RECRUITING이라면 정상 종료")
+        void validateRecruitingStudy() {
+            Study study = makeStudyWithId(book, RECRUITING, 1L);
+
+            studyValidator.validateRecruitingStudy(study);
+        }
+
+        @Test
+        @DisplayName("스터디 상태가 RECRUITING이 아니라면 예외 발생")
+        void notRecruitingStudy() {
+            Study notRecruitingStudy = makeStudyWithId(book, StudyStatus.IN_PROGRESS, 1L);
+            assertThatExceptionOfType(NotRecruitingStudyException.class)
+                .isThrownBy(() -> studyValidator.validateRecruitingStudy(notRecruitingStudy));
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 참가인원이 가득 찼는지 검사 #200")
+    class FullMemberStudyTest {
+
+        private final Audit audit = Audit.builder()
+            .status("ACCEPTED")
+            .build();
+
+        @Test
+        @DisplayName("현재 인원이 최대인원보다 작을 경우 정상 종료")
+        void notFullMemberStudy() {
+            Study study = Study.builder()
+                .currentParticipant(1)
+                .maxParticipant(3)
+                .build();
+
+            studyValidator.validateFullMemberStudy(study, audit);
+        }
+
+        @Test
+        @DisplayName("현재 인원이 최대인원에 도달했을 경우 예외 발생")
+        void FullMemberStudy() {
+            Study memberFullStudy = Study.builder()
+                .currentParticipant(3)
+                .maxParticipant(3)
+                .build();
+
+            assertThatExceptionOfType(StudyMemberFullException.class)
+                .isThrownBy(() -> studyValidator.validateFullMemberStudy(memberFullStudy, audit));
+        }
+    }
 }
