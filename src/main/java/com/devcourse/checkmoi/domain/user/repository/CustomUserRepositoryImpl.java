@@ -47,7 +47,6 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             .where(
                 studyMember.status.in(OWNED, ACCEPTED)
             )
-            .limit(5)
             .on(studyMember.user.id.eq(userId))
             .where(
                 studyMember.status.in(OWNED, ACCEPTED)
