@@ -74,10 +74,10 @@ security:
     permit-all:
       ALL: [ ]
       GET:
-        - /docs/**
         - /api/tokens/**
-        - /api/books/**
-        - /api/studies
+        - /api/**/books/**
+        - /api/**/studies/**
+        - /login
       POST: [ ]
       PATCH: [ ]
       PUT: [ ]

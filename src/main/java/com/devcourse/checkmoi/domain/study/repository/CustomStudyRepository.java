@@ -27,7 +27,7 @@ public interface CustomStudyRepository {
     Studies getOwnedStudies(Long userId);
 
 
-    Page<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable);
+    Page<StudyInfo> findAllByCondition(Search search, Pageable pageable);
 
     ExpiredStudies getAllTobeProgressed(LocalDate current, StudyStatus toStatus);
 

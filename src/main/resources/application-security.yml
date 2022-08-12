@@ -56,8 +56,8 @@ security:
         - /docs/**
       GET:
         - /api/tokens/**
-        - /api/books/**
-        - /api/studies/**
+        - /api/**/books/**
+        - /api/**/studies/**
         - /login
       POST: [ ]
       PATCH: [ ]

@@ -27,7 +27,7 @@ public interface StudyQueryService {
 
     void validateParticipateUser(Long studyId, Long userId);
 
-    Studies findAllByCondition(Long userId, Search search, Pageable pageable);
+    Studies findAllByCondition(Search search, Pageable pageable);
 
     ExpiredStudies getAllExpiredStudies(LocalDate criteriaTime, StudyStatus toStatus);
 }
