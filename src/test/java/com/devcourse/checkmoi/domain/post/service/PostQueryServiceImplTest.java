@@ -13,24 +13,27 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
+import com.devcourse.checkmoi.domain.post.dto.PostResponse.Posts;
 import com.devcourse.checkmoi.domain.post.exception.PostNotFoundException;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
 import com.devcourse.checkmoi.domain.post.service.validator.PostServiceValidator;
+import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,6 +41,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class PostQueryServiceImplTest {
@@ -62,10 +66,30 @@ class PostQueryServiceImplTest {
     class FindAllPostsTest {
 
         @Test
+        @DisplayName("F 스터디 멤버가 아니면 게시글을 조회 할 수 없다 ")
+        void findAllPostsFail() {
+            User user = makeUserWithId(1L);
+            Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
+
+            Search request = Search.builder()
+                .studyId(study.getId())
+                .build();
+
+            given(memberRepository.findByUserAndStudy(user.getId(), study.getId()))
+                .willReturn(Optional.empty());
+
+            Assertions.assertThatExceptionOfType(NotJoinedMemberException.class)
+                .isThrownBy(() ->
+                    postQueryService.findAllByCondition(user.getId(), request,
+                        SimplePage.builder().build()));
+        }
+
+        @Test
         @DisplayName("S 게시글을 다중 조회할 수 있다")
         void findAllPosts() {
             User user = makeUserWithId(1L);
             Study study = makeStudyWithId(makeBook(), IN_PROGRESS, 2L);
+            StudyMember member = makeStudyMember(study, user, StudyMemberStatus.ACCEPTED);
 
             List<PostInfo> posts = Stream.of(
                 makePostWithId(GENERAL, study, user, 3L),
@@ -73,13 +97,25 @@ class PostQueryServiceImplTest {
                 makePostWithId(GENERAL, study, user, 5L)
             ).map(postConverter::postToInfo).toList();
 
-            Search request = Search.builder().studyId(study.getId()).build();
+            Search request = Search.builder()
+                .studyId(study.getId())
+                .build();
 
-            when(postRepository.findAllByCondition(anyLong(), any(Search.class))).thenReturn(posts);
+            given(postRepository.findAllByCondition(anyLong(), any(Search.class),
+                any(Pageable.class)))
+                .willReturn(new Posts(3L, posts));
 
-            postQueryService.findAllByCondition(user.getId(), request);
+            given(memberRepository.findByUserAndStudy(user.getId(), study.getId()))
+                .willReturn(Optional.of(member));
 
-            then(postRepository).should(times(1)).findAllByCondition(user.getId(), request);
+            postQueryService.findAllByCondition(user.getId(), request,
+                SimplePage.builder().build());
+
+            then(postRepository).should(times(1))
+                .findAllByCondition(
+                    user.getId(),
+                    request,
+                    SimplePage.builder().build().pageRequest());
         }
 
     }

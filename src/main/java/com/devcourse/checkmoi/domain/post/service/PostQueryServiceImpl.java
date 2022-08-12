@@ -3,6 +3,7 @@ package com.devcourse.checkmoi.domain.post.service;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
+import com.devcourse.checkmoi.domain.post.dto.PostResponse.Posts;
 import com.devcourse.checkmoi.domain.post.exception.PostNotFoundException;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
@@ -11,8 +12,12 @@ import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
-import java.util.List;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.NullHandling;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,11 +34,22 @@ public class PostQueryServiceImpl implements PostQueryService {
 
     private final StudyMemberRepository memberRepository;
 
-    // TODO: validation
-    // TODO: pageable
     @Override
-    public List<PostInfo> findAllByCondition(Long userId, Search request) {
-        return postRepository.findAllByCondition(userId, request);
+    public Posts findAllByCondition(Long userId, Search request, SimplePage page) {
+        if (memberRepository.findByUserAndStudy(userId, request.studyId()).isEmpty()) {
+            throw new NotJoinedMemberException();
+        }
+
+        PageRequest pageRequest = PageRequest.of(
+            page.getPage() - 1,
+            page.getSize(),
+            Sort.by(new Order(page.getDirection(), "createdAt", NullHandling.NATIVE)));
+
+        return postRepository.findAllByCondition(
+            userId,
+            request,
+            pageRequest
+        );
     }
 
     @Override

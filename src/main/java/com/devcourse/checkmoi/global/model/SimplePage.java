@@ -15,11 +15,11 @@ public class SimplePage {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
-    private Integer page;
+    private final Integer page;
 
-    private Integer size;
+    private final Integer size;
 
-    private Direction direction;
+    private final Direction direction;
 
     @Builder
     public SimplePage(Integer page, Integer size, Direction direction) {

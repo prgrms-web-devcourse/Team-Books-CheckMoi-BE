@@ -4,12 +4,13 @@ import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
+import com.devcourse.checkmoi.domain.post.dto.PostResponse;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
 import com.devcourse.checkmoi.domain.post.service.PostCommandService;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,49 +34,41 @@ public class PostApi {
     private final PostQueryService postQueryService;
 
     @GetMapping("/posts")
-    public ResponseEntity<SuccessResponse<List<PostInfo>>> findAllPosts(
+    public ResponseEntity<SuccessResponse<PostResponse.Posts>> findAllPosts(
         @AuthenticationPrincipal JwtAuthentication user,
-        Search request
-    ) {
+        @Valid Search request,
+        SimplePage page) {
+
         return ResponseEntity.ok()
-            .body(new SuccessResponse<>(postQueryService.findAllByCondition(user.id(), request)));
+            .body(new SuccessResponse<>(
+                postQueryService.findAllByCondition(user.id(), request, page)));
     }
 
     @GetMapping("/posts/{postId}")
     public ResponseEntity<SuccessResponse<PostInfo>> findPost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long postId
-    ) {
+        @AuthenticationPrincipal JwtAuthentication user, @PathVariable Long postId) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(postQueryService.findByPostId(user.id(), postId)));
     }
 
     @PostMapping("/posts")
     public ResponseEntity<SuccessResponse<Long>> createPost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @Valid @RequestBody Create request
-    ) {
+        @AuthenticationPrincipal JwtAuthentication user, @Valid @RequestBody Create request) {
         Long postId = postCommandService.createPost(user.id(), request);
-        return ResponseEntity
-            .created(generatedUri(postId))
-            .body(new SuccessResponse<>(postId));
+        return ResponseEntity.created(generatedUri(postId)).body(new SuccessResponse<>(postId));
     }
 
     @PutMapping("/posts/{postId}")
     public ResponseEntity<SuccessResponse<Void>> editPost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long postId,
-        @Valid @RequestBody Edit request
-    ) {
+        @AuthenticationPrincipal JwtAuthentication user, @PathVariable Long postId,
+        @Valid @RequestBody Edit request) {
         postCommandService.editPost(user.id(), postId, request);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<SuccessResponse<Void>> deletePost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long postId
-    ) {
+        @AuthenticationPrincipal JwtAuthentication user, @PathVariable Long postId) {
         postCommandService.deletePost(user.id(), postId);
         return ResponseEntity.noContent().build();
     }
