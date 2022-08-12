@@ -155,7 +155,7 @@ class BookRepositoryTest extends RepositoryTest {
         @DisplayName("S 정렬조건에 의해서 정렬된 데이터가 나온다")
         void searchStudies3() {
             Search search = Search.builder()
-                //.mostStudy(true)
+                .mostStudy(true)
                 .latestStudy(true)
                 .build();
 
