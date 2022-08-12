@@ -2,11 +2,12 @@ package com.devcourse.checkmoi.domain.study.dto;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetail;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMemberInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
@@ -19,7 +20,7 @@ import lombok.Builder;
 public sealed interface StudyResponse permits
     StudyInfo, StudyDetail, StudyDetailWithMembers,
     Studies, StudyBookInfo, StudyUserInfo,
-    StudyAppliers, MyStudies {
+    StudyMemberInfo, StudyMembers, MyStudies {
 
     record StudyInfo(
         Long id,
@@ -55,7 +56,7 @@ public sealed interface StudyResponse permits
     record StudyDetailWithMembers(
         StudyInfo study,
         StudyBookInfo book,
-        List<StudyUserInfo> members
+        List<StudyMemberInfo> members
     ) implements StudyResponse {
 
         @Builder
@@ -109,12 +110,22 @@ public sealed interface StudyResponse permits
         }
     }
 
-    record StudyAppliers(
-        List<StudyUserInfo> appliers
+    record StudyMembers(
+        List<StudyMemberInfo> members
     ) implements StudyResponse {
 
         @Builder
-        public StudyAppliers {
+        public StudyMembers {
+        }
+    }
+
+    record StudyMemberInfo(
+        Long id,
+        StudyUserInfo user
+    ) implements StudyResponse {
+
+        @Builder
+        public StudyMemberInfo {
         }
     }
 
