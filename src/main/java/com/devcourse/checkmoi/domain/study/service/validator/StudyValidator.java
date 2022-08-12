@@ -18,5 +18,5 @@ public interface StudyValidator {
 
     void validateRecruitingStudy(Study study);
 
-    void validateFullMemberStudy(Study study, Audit request);
+    void validateFullMemberStudy(Study study);
 }

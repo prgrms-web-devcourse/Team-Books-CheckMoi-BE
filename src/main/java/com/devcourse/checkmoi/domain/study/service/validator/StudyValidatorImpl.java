@@ -2,7 +2,6 @@ package com.devcourse.checkmoi.domain.study.service.validator;
 
 import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.ACCESS_DENIED;
 import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
@@ -61,11 +60,8 @@ public class StudyValidatorImpl implements StudyValidator {
     }
 
     @Override
-    public void validateFullMemberStudy(Study study, Audit request) {
-        StudyMemberStatus status = StudyMemberStatus.valueOf(request.status().toUpperCase());
-
-        if (study.getCurrentParticipant() >= study.getMaxParticipant()
-            && status == StudyMemberStatus.ACCEPTED) {
+    public void validateFullMemberStudy(Study study) {
+        if (study.getCurrentParticipant() >= study.getMaxParticipant()) {
             throw new StudyMemberFullException();
         }
     }

@@ -50,13 +50,6 @@ public class Study extends BaseEntity {
 
     private LocalDate studyEndDate;
 
-    public Study(String name, String thumbnailUrl, String description, Integer maxParticipant,
-        StudyStatus status, Book book, LocalDate gatherStartDate, LocalDate gatherEndDate,
-        LocalDate studyStartDate, LocalDate studyEndDate) {
-        this(null, name, thumbnailUrl, description, status, 0, maxParticipant, book, gatherStartDate,
-            gatherEndDate, studyStartDate, studyEndDate);
-    }
-
     @Builder
     public Study(Long id, String name, String thumbnailUrl, String description, StudyStatus status,
         int currentParticipant, Integer maxParticipant, Book book, LocalDate gatherStartDate, LocalDate gatherEndDate,
