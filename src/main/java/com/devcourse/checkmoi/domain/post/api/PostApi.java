@@ -4,12 +4,13 @@ import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
+import com.devcourse.checkmoi.domain.post.dto.PostResponse;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
 import com.devcourse.checkmoi.domain.post.service.PostCommandService;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,12 +34,16 @@ public class PostApi {
     private final PostQueryService postQueryService;
 
     @GetMapping("/posts")
-    public ResponseEntity<SuccessResponse<List<PostInfo>>> findAllPosts(
+    public ResponseEntity<SuccessResponse<PostResponse.Posts>> findAllPosts(
         @AuthenticationPrincipal JwtAuthentication user,
-        Search request
+        @Valid Search request,
+        SimplePage page
     ) {
+        System.out.println(page);
+        System.out.println(request);
         return ResponseEntity.ok()
-            .body(new SuccessResponse<>(postQueryService.findAllByCondition(user.id(), request)));
+            .body(new SuccessResponse<>(
+                postQueryService.findAllByCondition(user.id(), request, page)));
     }
 
     @GetMapping("/posts/{postId}")

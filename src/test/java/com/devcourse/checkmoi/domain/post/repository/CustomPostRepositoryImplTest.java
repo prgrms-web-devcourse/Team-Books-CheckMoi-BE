@@ -15,7 +15,7 @@ import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.post.converter.PostConverter;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
-import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
+import com.devcourse.checkmoi.domain.post.dto.PostResponse.Posts;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
@@ -24,12 +24,15 @@ import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.template.RepositoryTest;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 
 class CustomPostRepositoryImplTest extends RepositoryTest {
 
@@ -93,9 +96,10 @@ class CustomPostRepositoryImplTest extends RepositoryTest {
                 .studyId(study.getId())
                 .build();
 
-            List<PostInfo> got = postRepository.findAllByCondition(user.getId(), search);
+            Posts result = postRepository.findAllByCondition(user.getId(), search,
+                PageRequest.of(0, 1, Sort.by(new Order(Direction.ASC, "createdAt"))));
 
-            assertThat(got)
+            assertThat(result.posts())
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
                 .contains(postConverter.postToInfo(post));
         }
