@@ -1,6 +1,8 @@
 package com.devcourse.checkmoi.domain.user.repository;
 
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import static com.devcourse.checkmoi.domain.user.model.QUser.user;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfoWithStudy;
@@ -42,6 +44,10 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             ).from(studyMember)
             .innerJoin(studyMember.study)
             .innerJoin(studyMember.user)
+            .where(
+                studyMember.status.in(OWNED, ACCEPTED)
+            )
+            .limit(5)
             .on(studyMember.user.id.eq(userId))
             .fetch();
     }
