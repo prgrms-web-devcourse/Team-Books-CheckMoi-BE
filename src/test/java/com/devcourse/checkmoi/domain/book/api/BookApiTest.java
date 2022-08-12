@@ -343,7 +343,6 @@ class BookApiTest extends IntegrationTest {
 
             mockMvc.perform(get("/api/v2/books").contentType(MediaType.APPLICATION_JSON)
                     .characterEncoding("utf-8")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
                     .params(params))
                 .andExpect(status().isOk())
                 .andDo(documentation());
@@ -360,7 +359,6 @@ class BookApiTest extends IntegrationTest {
                     .responseSchema(Schema.schema("책 검색 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                tokenRequestHeader(),
                 requestParameters(
                     parameterWithName("bookId").description("책 아이디")
                         .optional(),

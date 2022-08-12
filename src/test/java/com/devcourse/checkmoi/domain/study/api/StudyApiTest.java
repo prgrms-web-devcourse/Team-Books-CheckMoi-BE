@@ -43,7 +43,6 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
-import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -746,7 +745,7 @@ class StudyApiTest extends IntegrationTest {
             StudyInfo study3 = makeStudyInfo(makeStudyWithId(makeBook(), FINISHED, 3L));
             StudyInfo study4 = makeStudyInfo(makeStudyWithId(makeBook(), FINISHED, 4L));
 
-            given(studyQueryService.findAllByCondition(anyLong(), any(Search.class), any()))
+            given(studyQueryService.findAllByCondition(any(Search.class), any()))
                 .willReturn(
                     new Studies(List.of(study3, study4), 1)
                 );
@@ -766,7 +765,6 @@ class StudyApiTest extends IntegrationTest {
 
             mockMvc.perform(get("/api/v2/studies").contentType(MediaType.APPLICATION_JSON)
                     .characterEncoding("utf-8")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
                     .params(params))
                 .andExpect(status().isOk())
                 .andDo(documentation());
@@ -783,7 +781,6 @@ class StudyApiTest extends IntegrationTest {
                     .responseSchema(Schema.schema("스터디 검색 응답 v2")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                tokenRequestHeader(),
                 requestParameters(
                     parameterWithName("userId").description("유저 아이디").optional(),
                     parameterWithName("studyId").description("스터디 아이디").optional(),

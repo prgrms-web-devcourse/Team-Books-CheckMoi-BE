@@ -47,7 +47,7 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
 
 
     @Override
-    public Page<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable) {
+    public Page<StudyInfo> findAllByCondition(Search search, Pageable pageable) {
         JPQLQuery<StudyInfo> query = jpaQueryFactory
             .select(studyInfoConstructor())
             .from(study)

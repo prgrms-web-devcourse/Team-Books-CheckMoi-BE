@@ -427,7 +427,7 @@ class StudyRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
+                studyRepository.findAllByCondition(search, page.pageRequest());
             assertThat(result.getContent()).hasSize(3);
         }
 
@@ -445,7 +445,7 @@ class StudyRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
+                studyRepository.findAllByCondition(search, page.pageRequest());
             assertThat(result.getContent()).hasSize(2);
         }
 
@@ -461,7 +461,7 @@ class StudyRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<StudyInfo> result =
-                studyRepository.findAllByCondition(givenUser.getId(), search, page.pageRequest());
+                studyRepository.findAllByCondition(search, page.pageRequest());
             assertThat(result.getContent()).hasSize(2);
         }
 
@@ -477,8 +477,8 @@ class StudyRepositoryTest extends RepositoryTest {
                 .build();
             SimplePage page = SimplePage.builder().build();
 
-            Page<StudyInfo> result = studyRepository.findAllByCondition(givenUser.getId(),
-                search, page.pageRequest());
+            Page<StudyInfo> result =
+                studyRepository.findAllByCondition(search, page.pageRequest());
             assertThat(result.getContent()).hasSize(1);
         }
     }
