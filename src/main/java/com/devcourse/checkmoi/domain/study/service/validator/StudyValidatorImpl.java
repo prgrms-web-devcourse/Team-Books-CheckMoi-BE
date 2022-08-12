@@ -13,7 +13,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StudyServiceValidatorImpl implements StudyServiceValidator {
+public class StudyValidatorImpl implements StudyValidator {
 
     @Override
     public void validateExistStudy(boolean existStudy) {

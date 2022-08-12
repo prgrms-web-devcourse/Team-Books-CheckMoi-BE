@@ -41,6 +41,7 @@ import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.study.model.Study;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.template.IntegrationTest;

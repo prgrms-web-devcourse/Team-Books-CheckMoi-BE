@@ -25,35 +25,35 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class StudyServiceValidatorImplTest {
+class StudyValidatorImplTest {
 
-    StudyServiceValidator studyServiceValidator = new StudyServiceValidatorImpl();
+    StudyValidator studyValidator = new StudyValidatorImpl();
 
     @Test
     @DisplayName("해당하는 스터디가 존재하는지 검사")
     void validateExistStudy() {
-        studyServiceValidator.validateExistStudy(true);
+        studyValidator.validateExistStudy(true);
         assertThrows(StudyNotFoundException.class,
-            () -> studyServiceValidator.validateExistStudy(false));
+            () -> studyValidator.validateExistStudy(false));
     }
 
     @Test
     @DisplayName("해당하는 아이디는 스터디장의 아이디와 일치하는지 검사")
     void validateStudyOwner() {
-        studyServiceValidator.validateStudyOwner(1L, 1L, "message");
+        studyValidator.validateStudyOwner(1L, 1L, "message");
         assertThrows(NotStudyOwnerException.class,
-            () -> studyServiceValidator.validateStudyOwner(1L, 2L, "스터디장은 2L"));
+            () -> studyValidator.validateStudyOwner(1L, 2L, "스터디장은 2L"));
     }
 
     @Test
     @DisplayName("스터디에 중복해서 가입신청하는지 검사")
     void validateDuplicateStudyMemberRequest() {
         User user = makeUser();
-        studyServiceValidator.validateDuplicateStudyMemberRequest(
+        studyValidator.validateDuplicateStudyMemberRequest(
             makeStudyMember(makeStudy(makeBook(), RECRUITING), user, DENIED));
 
         assertThrows(DuplicateStudyJoinRequestException.class,
-            () -> studyServiceValidator.validateDuplicateStudyMemberRequest(
+            () -> studyValidator.validateDuplicateStudyMemberRequest(
                 makeStudyMember(makeStudy(makeBook(), RECRUITING), user, PENDING)));
     }
 
@@ -68,7 +68,7 @@ class StudyServiceValidatorImplTest {
             Study study = makeStudyWithId(book, FINISHED, 1L);
 
             assertThatExceptionOfType(FinishedStudyException.class)
-                .isThrownBy(() -> studyServiceValidator.validateOngoingStudy(study));
+                .isThrownBy(() -> studyValidator.validateOngoingStudy(study));
         }
     }
 
@@ -81,7 +81,7 @@ class StudyServiceValidatorImplTest {
         void participateUser() {
             Long notFoundMemberId = null;
             assertThatExceptionOfType(NotJoinedMemberException.class)
-                .isThrownBy(() -> studyServiceValidator.validateParticipateUser(notFoundMemberId));
+                .isThrownBy(() -> studyValidator.validateParticipateUser(notFoundMemberId));
         }
     }
 

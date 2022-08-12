@@ -7,6 +7,7 @@ import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
