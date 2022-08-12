@@ -11,7 +11,7 @@ public interface StudyValidator {
 
     void validateDuplicateStudyMemberRequest(StudyMember studyMember);
 
-    void ongoingStudy(Study study);
+    void validateOngoingStudy(Study study);
 
-    void participateUser(Long memberId);
+    void validateParticipateUser(Long memberId);
 }

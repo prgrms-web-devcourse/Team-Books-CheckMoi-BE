@@ -1,18 +1,18 @@
 package com.devcourse.checkmoi.domain.study.api;
 
 import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
-import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import javax.validation.Valid;
@@ -68,17 +68,16 @@ public class StudyApi {
             new SuccessResponse<>(studyCommandService.editStudyInfo(studyId, user.id(), request)));
     }
 
-    @PutMapping("/studies/{studyId}/members/{memberId}")
-    public ResponseEntity<Void> auditStudyParticipation(
-        @PathVariable Long studyId,
-        @PathVariable Long memberId,
-        @AuthenticationPrincipal JwtAuthentication user,
-        @Valid @RequestBody Audit request
+
+    @GetMapping("/studies/me")
+    public ResponseEntity<SuccessResponse<MyStudies>> getMyStudies(
+        @AuthenticationPrincipal JwtAuthentication user
     ) {
-        studyCommandService.auditStudyParticipation(studyId, memberId, user.id(), request);
-        return ResponseEntity
-            .noContent()
-            .build();
+        MyStudies response = studyUserFacade.getMyStudies(user.id());
+
+        return ResponseEntity.ok(
+            new SuccessResponse<>(response)
+        );
     }
 
     @GetMapping("/studies")
@@ -101,8 +100,10 @@ public class StudyApi {
             .body(new SuccessResponse<>(studyMemberId));
     }
 
+    /********************************* StudyMember  ****************************************/
+
     @GetMapping("/studies/{studyId}/members")
-    public ResponseEntity<SuccessResponse<StudyAppliers>> getStudyAppliers(
+    public ResponseEntity<SuccessResponse<StudyMembers>> getStudyAppliers(
         @PathVariable Long studyId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
@@ -110,15 +111,17 @@ public class StudyApi {
             .body(new SuccessResponse<>(studyQueryService.getStudyAppliers(user.id(), studyId)));
     }
 
-    @GetMapping("/studies/me")
-    public ResponseEntity<SuccessResponse<MyStudies>> getMyStudies(
-        @AuthenticationPrincipal JwtAuthentication user
+    @PutMapping("/studies/{studyId}/members/{memberId}")
+    public ResponseEntity<Void> auditStudyParticipation(
+        @PathVariable Long studyId,
+        @PathVariable Long memberId,
+        @AuthenticationPrincipal JwtAuthentication user,
+        @Valid @RequestBody Audit request
     ) {
-        MyStudies response = studyUserFacade.getMyStudies(user.id());
-
-        return ResponseEntity.ok(
-            new SuccessResponse<>(response)
-        );
+        studyCommandService.auditStudyParticipation(studyId, memberId, user.id(), request);
+        return ResponseEntity
+            .noContent()
+            .build();
     }
 
     /********************************* API v2  ****************************************/

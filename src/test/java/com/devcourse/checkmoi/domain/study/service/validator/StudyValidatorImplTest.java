@@ -68,7 +68,7 @@ class StudyValidatorImplTest {
             Study study = makeStudyWithId(book, FINISHED, 1L);
 
             assertThatExceptionOfType(FinishedStudyException.class)
-                .isThrownBy(() -> studyValidator.ongoingStudy(study));
+                .isThrownBy(() -> studyValidator.validateOngoingStudy(study));
         }
     }
 
@@ -81,7 +81,7 @@ class StudyValidatorImplTest {
         void participateUser() {
             Long notFoundMemberId = null;
             assertThatExceptionOfType(NotJoinedMemberException.class)
-                .isThrownBy(() -> studyValidator.participateUser(notFoundMemberId));
+                .isThrownBy(() -> studyValidator.validateParticipateUser(notFoundMemberId));
         }
     }
 

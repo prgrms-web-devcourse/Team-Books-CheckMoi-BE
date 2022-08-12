@@ -37,14 +37,14 @@ public class StudyValidatorImpl implements StudyValidator {
     }
 
     @Override
-    public void ongoingStudy(Study study) {
+    public void validateOngoingStudy(Study study) {
         if (study.isFinished()) {
             throw new FinishedStudyException();
         }
     }
 
     @Override
-    public void participateUser(Long memberId) {
+    public void validateParticipateUser(Long memberId) {
         if (memberId == null) {
             throw new NotJoinedMemberException();
         }

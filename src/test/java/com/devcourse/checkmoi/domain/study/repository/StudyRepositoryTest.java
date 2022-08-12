@@ -13,19 +13,19 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMemberInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.template.RepositoryTest;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,9 +91,9 @@ class StudyRepositoryTest extends RepositoryTest {
 
             studyRepository.updateAllApplicantsAsDenied(study.getId());
 
-            List<StudyUserInfo> appliers = studyRepository
+            List<StudyMemberInfo> appliers = studyRepository
                 .getStudyApplicants(study.getId())
-                .appliers();
+                .members();
 
             Assertions.assertThat(appliers)
                 .isEmpty();
@@ -130,7 +130,8 @@ class StudyRepositoryTest extends RepositoryTest {
                 .size(4)
                 .build();
             Page<StudyInfo> result =
-                studyRepository.findRecruitingStudyByBookId(givenBook.getId(), simplePage.pageRequest());
+                studyRepository.findRecruitingStudyByBookId(givenBook.getId(),
+                    simplePage.pageRequest());
 
             assertThat(result.getContent()).hasSize(4);
             assertThat(result.getTotalPages()).isEqualTo(totalPage);
@@ -190,16 +191,14 @@ class StudyRepositoryTest extends RepositoryTest {
         private void validateMembers(StudyDetailWithMembers response) {
             assertAll(
                 () -> assertThat(response.members().get(0)).hasFieldOrProperty("id"),
-                () -> assertThat(response.members().get(0)).hasFieldOrProperty("name"),
-                () -> assertThat(response.members().get(0)).hasFieldOrProperty("email"),
-                () -> assertThat(response.members().get(0)).hasFieldOrProperty("image")
+                () -> assertThat(response.members().get(0)).hasFieldOrProperty("user")
             );
         }
     }
 
     @Nested
     @DisplayName("스터디 신청 목록 가져오기")
-    class GetStudyAppliersTest {
+    class GetStudyMembersTest {
 
         private Study study;
 
@@ -246,20 +245,20 @@ class StudyRepositoryTest extends RepositoryTest {
         @Test
         @DisplayName("S 아직 수락, 거절 되지 않은 스터디 신청자 목록을 가져온다")
         void getAllAppliersSuccess() {
-            StudyAppliers studyAppliers = studyRepository.getStudyApplicants(study.getId());
+            StudyMembers studyMembers = studyRepository.getStudyApplicants(study.getId());
 
-            Assertions.assertThat(studyAppliers.appliers())
+            Assertions.assertThat(studyMembers.members())
                 .hasSize(2);
         }
 
         @Test
         @DisplayName("S 아직 수락, 거절 되지 않은 스터디 신청자 목록을 오래된순으로 가져온다")
         void getAllAppliersAscSuccess() {
-            StudyAppliers studyAppliers = studyRepository.getStudyApplicants(study.getId());
+            StudyMembers studyMembers = studyRepository.getStudyApplicants(study.getId());
 
-            StudyUserInfo firstUserInfo = studyAppliers.appliers().get(0);
+            StudyMemberInfo firstUserInfo = studyMembers.members().get(0);
 
-            Assertions.assertThat(firstUserInfo.id())
+            Assertions.assertThat(firstUserInfo.user().id())
                 .isEqualTo(user1Pending.getId());
         }
 
@@ -360,9 +359,9 @@ class StudyRepositoryTest extends RepositoryTest {
         @DisplayName("S 내가 스터디장인 스터디 목록을 가져온다.")
         void getOwnedStudies() {
             Studies got = studyRepository.getOwnedStudies(user.getId());
-            Studies want = new Studies(List.of(
-                makeStudyInfo(study1)
-            ), 0);
+            Studies want = new Studies(
+                List.of(makeStudyInfo(study1)), 0
+            );
 
             assertThat(got.studies()).hasSize(want.studies().size());
             assertThat(got)

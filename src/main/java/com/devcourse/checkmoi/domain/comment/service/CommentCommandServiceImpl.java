@@ -28,13 +28,13 @@ public class CommentCommandServiceImpl implements CommentCommandService {
 
     private final StudyValidator studyValidator;
 
-        @Override
-        public void deleteById(Long userId, Long commentId) {
+    @Override
+    public void deleteById(Long userId, Long commentId) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFoundException::new);
         Long ownerId = studyRepository.findStudyOwner(comment.getPost().getStudy().getId());
         commentValidator.commentPermission(userId, ownerId, comment.getUser().getId());
-        studyValidator.ongoingStudy(comment.getPost().getStudy());
+        studyValidator.validateOngoingStudy(comment.getPost().getStudy());
         commentRepository.deleteById(commentId);
     }
 
@@ -50,7 +50,7 @@ public class CommentCommandServiceImpl implements CommentCommandService {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFoundException::new);
         commentValidator.commentPermission(userId, comment.getUser().getId());
-        studyValidator.ongoingStudy(comment.getPost().getStudy());
+        studyValidator.validateOngoingStudy(comment.getPost().getStudy());
         comment.editComment(request.content());
     }
 
