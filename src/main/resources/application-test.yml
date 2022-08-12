@@ -86,3 +86,5 @@ security:
 
 front-url:
   http://localhost:8080
+
+order_by_field_list: decode
