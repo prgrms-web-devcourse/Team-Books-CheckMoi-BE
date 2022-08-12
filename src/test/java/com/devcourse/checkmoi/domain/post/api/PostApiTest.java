@@ -237,7 +237,8 @@ class PostApiTest extends IntegrationTest {
                     parameterWithName("studyId").description("스터디 아이디").optional(),
                     parameterWithName("page").description("목록 페이지").optional(),
                     parameterWithName("size").description("목록 크기").optional(),
-                    parameterWithName("category").description("게시글 카테고리").optional(),
+                    parameterWithName("category").description("게시글 카테고리리(NOTICE,GENERAL)")
+                        .optional(),
                     parameterWithName("direction").description("정렬조건(최신순,오래된순: DESC,ASC)")
                         .optional()
                 ),
