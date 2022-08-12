@@ -95,7 +95,7 @@ class BookRepositoryTest extends RepositoryTest {
         private List<Study> studies = new ArrayList<>();
 
         @BeforeEach
-        void setUp() throws InterruptedException {
+        void setUp() {
             tearDown();
 
             books.add(bookRepository.save(makeBook()));
@@ -127,7 +127,7 @@ class BookRepositoryTest extends RepositoryTest {
         void searchStudies() {
             Search search = Search.builder()
                 .bookId(books.get(0).getId())
-                .studyStatus(IN_PROGRESS.toString())
+                .studyStatus(IN_PROGRESS.getMappingCode())
                 .build();
 
             SimplePage page = SimplePage.builder().build();

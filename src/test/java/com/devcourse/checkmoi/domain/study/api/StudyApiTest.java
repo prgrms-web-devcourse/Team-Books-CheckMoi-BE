@@ -171,7 +171,7 @@ class StudyApiTest extends IntegrationTest {
                 .name("스터디 이름")
                 .thumbnail("https://example.com")
                 .description("스터디 설명")
-                .status("IN_PROGRESS")
+                .status("inProgress")
                 .build();
             Long requestId = 1L;
 
@@ -718,7 +718,7 @@ class StudyApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("스터디 조회 v2 #158")
-    class SearchStudies {
+    class SearchStudiesTest {
 
         private StudyInfo makeStudyInfo(Study study) {
             return StudyInfo.builder()
@@ -751,9 +751,9 @@ class StudyApiTest extends IntegrationTest {
                 );
 
             Search search = Search.builder()
-                .studyStatus(FINISHED.toString())
+                .studyStatus(FINISHED.getMappingCode())
                 // For Coverage
-                .memberStatus(OWNED.toString())
+                .memberStatus(OWNED.getMappingCode())
                 .userId(1L)
                 .studyId(1L)
                 .bookId(1L)

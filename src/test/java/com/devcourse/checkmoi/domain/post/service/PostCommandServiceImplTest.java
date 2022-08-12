@@ -75,7 +75,7 @@ class PostCommandServiceImplTest {
             Post post = makePostWithId(GENERAL, study, user, 3L);
 
             PostRequest.Create request = Create.builder().title(post.getTitle())
-                .content(post.getContent()).category(post.getCategory().toString())
+                .content(post.getContent()).category(post.getCategory().getMappingCode())
                 .studyId(study.getId()).build();
 
             given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
@@ -99,7 +99,7 @@ class PostCommandServiceImplTest {
             Post post = makePostWithId(PostCategory.GENERAL, study, user, 3L);
 
             PostRequest.Create request = Create.builder().title(post.getTitle())
-                .content(post.getContent()).category(post.getCategory().toString())
+                .content(post.getContent()).category(post.getCategory().getMappingCode())
                 .studyId(study.getId()).build();
 
             given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
@@ -121,7 +121,7 @@ class PostCommandServiceImplTest {
             Post post = makePostWithId(PostCategory.NOTICE, study, user, 3L);
 
             PostRequest.Create request = Create.builder().title(post.getTitle())
-                .content(post.getContent()).category(post.getCategory().toString())
+                .content(post.getContent()).category(post.getCategory().getMappingCode())
                 .studyId(study.getId()).build();
 
             given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(
@@ -143,7 +143,7 @@ class PostCommandServiceImplTest {
             Post post = makePostWithId(PostCategory.NOTICE, study, user, 3L);
 
             PostRequest.Create request = Create.builder().title(post.getTitle())
-                .content(post.getContent()).category(post.getCategory().toString())
+                .content(post.getContent()).category(post.getCategory().getMappingCode())
                 .studyId(study.getId()).build();
 
             given(studyMemberRepository.findWithStudyByUserAndStudy(any(), anyLong())).willReturn(

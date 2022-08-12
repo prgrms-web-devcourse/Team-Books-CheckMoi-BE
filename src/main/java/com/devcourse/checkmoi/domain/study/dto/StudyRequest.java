@@ -23,8 +23,8 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
         @Nullable Long studyId,
         @Nullable Long bookId,
         @Nullable Boolean isMember,
-        @Nullable @ValueOfEnum(enumClass = StudyMemberStatus.class) String memberStatus,
-        @Nullable @ValueOfEnum(enumClass = StudyStatus.class) String studyStatus
+        @Nullable @ValueOfEnum(codeMappingEnumClass = StudyMemberStatus.class) String memberStatus,
+        @Nullable @ValueOfEnum(codeMappingEnumClass = StudyStatus.class) String studyStatus
     ) implements StudyRequest {
 
         @Builder
@@ -74,7 +74,7 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
     }
 
     record Audit(
-        @ValueOfEnum(enumClass = StudyMemberStatus.class) String status
+        @ValueOfEnum(codeMappingEnumClass = StudyMemberStatus.class) String status
     ) implements StudyRequest {
 
         @Builder

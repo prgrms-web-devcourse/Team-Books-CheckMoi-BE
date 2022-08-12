@@ -300,7 +300,7 @@ class BookApiTest extends IntegrationTest {
 
     @Nested
     @DisplayName("책 검색 v2")
-    class SearchBooks {
+    class SearchBooksTest {
 
         private BookInfo makeBookInfo(Book book) {
             return BookInfo.builder()
@@ -334,7 +334,7 @@ class BookApiTest extends IntegrationTest {
 
             Search search = Search.builder()
                 .studyId(study.getId())
-                .studyStatus(study.getStatus().toString())
+                .studyStatus(study.getStatus().getMappingCode())
                 .build();
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
