@@ -18,5 +18,3 @@ spring:
 
 front-url:
   http://localhost:3000
-
-order_by_field_list: FIELD

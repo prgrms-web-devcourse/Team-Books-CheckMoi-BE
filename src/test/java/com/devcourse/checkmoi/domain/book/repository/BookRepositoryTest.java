@@ -6,6 +6,7 @@ import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
+import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
@@ -95,8 +96,13 @@ class BookRepositoryTest extends RepositoryTest {
         private List<Study> studies = new ArrayList<>();
 
         @BeforeEach
-        void setUp() {
+        void setUp() throws InterruptedException {
+            tearDown();
+
             books.add(bookRepository.save(makeBook()));
+            sleep(1000);
+            books.add(bookRepository.save(makeBook()));
+            sleep(1000);
             books.add(bookRepository.save(makeBook()));
 
             // book1 study
@@ -107,6 +113,9 @@ class BookRepositoryTest extends RepositoryTest {
             // book2 study
             studies.add(studyRepository.save(makeStudy(books.get(1), IN_PROGRESS)));
             studies.add(studyRepository.save(makeStudy(books.get(1), FINISHED)));
+
+            // book3 study
+            // NONE
         }
 
         @AfterEach
@@ -139,21 +148,21 @@ class BookRepositoryTest extends RepositoryTest {
             SimplePage page = SimplePage.builder().build();
 
             Page<BookInfo> result = bookRepository.findAllByCondition(search, page.pageRequest());
-            assertThat(result.getContent()).hasSize(2);
+            assertThat(result.getContent()).hasSize(3);
         }
 
         @Test
         @DisplayName("S 정렬조건에 의해서 정렬된 데이터가 나온다")
         void searchStudies3() {
             Search search = Search.builder()
-                .mostStudy(true)
+                //.mostStudy(true)
                 .latestStudy(true)
                 .build();
 
             SimplePage page = SimplePage.builder().build();
 
             Page<BookInfo> result = bookRepository.findAllByCondition(search, page.pageRequest());
-            assertThat(result.getContent()).hasSize(2);
+            assertThat(result.getContent()).hasSize(3);
         }
     }
 }

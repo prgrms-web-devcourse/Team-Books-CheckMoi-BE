@@ -18,4 +18,3 @@ spring:
 
 front-url:
   https://checkmoi.vercel.app
-order_by_field_list: FIELD
