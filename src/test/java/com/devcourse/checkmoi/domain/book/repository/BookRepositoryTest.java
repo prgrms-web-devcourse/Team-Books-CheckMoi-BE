@@ -141,5 +141,19 @@ class BookRepositoryTest extends RepositoryTest {
             Page<BookInfo> result = bookRepository.findAllByCondition(search, page.pageRequest());
             assertThat(result.getContent()).hasSize(2);
         }
+
+        @Test
+        @DisplayName("S 정렬조건에 의해서 정렬된 데이터가 나온다")
+        void searchStudies3() {
+            Search search = Search.builder()
+                .mostStudy(true)
+                .latestStudy(true)
+                .build();
+
+            SimplePage page = SimplePage.builder().build();
+
+            Page<BookInfo> result = bookRepository.findAllByCondition(search, page.pageRequest());
+            assertThat(result.getContent()).hasSize(2);
+        }
     }
 }
