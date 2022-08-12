@@ -14,6 +14,7 @@ public sealed interface PostResponse permits PostInfo {
         String content,
         PostCategory category,
         Long studyId,
+        Long writerId,
         String writer,
         String writerImage,
         Integer commentCount,

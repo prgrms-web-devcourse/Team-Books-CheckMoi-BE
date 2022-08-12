@@ -202,6 +202,7 @@ class PostApiTest extends IntegrationTest {
                 .content(post.getContent())
                 .category(post.getCategory())
                 .studyId(post.getStudy().getId())
+                .writerId(post.getWriter().getId())
                 .writer(post.getWriter().getName())
                 .writerImage(post.getWriter().getProfileImgUrl())
                 .commentCount(post.getCommentCount())
@@ -231,6 +232,7 @@ class PostApiTest extends IntegrationTest {
                     fieldWithPath("data[].content").description("게시글 본문"),
                     fieldWithPath("data[].category").description("게시글 카테고리"),
                     fieldWithPath("data[].studyId").description("게시글이 작성된 스터디"),
+                    fieldWithPath("data[].writerId").description("게시글을 작성한 유저 아이디"),
                     fieldWithPath("data[].writer").description("게시글을 작성한 유저 이름"),
                     fieldWithPath("data[].writerImage").description("게시글을 작성한 유저 프로필 사진"),
                     fieldWithPath("data[].commentCount").description("게시글 댓글 수"),

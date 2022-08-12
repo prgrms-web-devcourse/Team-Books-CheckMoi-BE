@@ -26,6 +26,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                     post.content,
                     post.category,
                     post.study.id,
+                    post.writer.id,
                     post.writer.name,
                     post.writer.profileImgUrl,
                     post.commentCount,
