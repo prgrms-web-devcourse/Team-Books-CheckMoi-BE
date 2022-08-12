@@ -6,7 +6,6 @@ import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
-import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.Search;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
@@ -100,9 +99,7 @@ class BookRepositoryTest extends RepositoryTest {
             tearDown();
 
             books.add(bookRepository.save(makeBook()));
-            sleep(1000);
             books.add(bookRepository.save(makeBook()));
-            sleep(1000);
             books.add(bookRepository.save(makeBook()));
 
             // book1 study
