@@ -38,7 +38,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMemberInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
-import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
+import com.devcourse.checkmoi.domain.study.facade.StudyFacade;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
@@ -76,7 +76,7 @@ class StudyApiTest extends IntegrationTest {
     private StudyQueryService studyQueryService;
 
     @MockBean
-    private StudyUserFacade studyUserFacade;
+    private StudyFacade studyFacade;
 
 
     @Nested
@@ -101,8 +101,8 @@ class StudyApiTest extends IntegrationTest {
                 .build();
             Long createdStudyId = 1L;
 
-            when(studyCommandService.createStudy(any(StudyRequest.Create.class), anyLong()))
-                .thenReturn(createdStudyId);
+            given(studyFacade.createStudy(any(StudyRequest.Create.class), anyLong()))
+                .willReturn(createdStudyId);
 
             ResultActions result = mockMvc.perform(
                 RestDocumentationRequestBuilders.post("/api/studies")
@@ -607,7 +607,7 @@ class StudyApiTest extends IntegrationTest {
             MyStudies response = new MyStudies(
                 makeUserInfo(), studies.get(0), studies.get(1), studies.get(2)
             );
-            given(studyUserFacade.getMyStudies(anyLong()))
+            given(studyFacade.getMyStudies(anyLong()))
                 .willReturn(response);
 
             ResultActions result = mockMvc.perform(get("/api/studies/me")

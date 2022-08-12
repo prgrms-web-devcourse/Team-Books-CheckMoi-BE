@@ -1,22 +1,25 @@
 package com.devcourse.checkmoi.domain.study.facade;
 
+import com.devcourse.checkmoi.domain.book.service.BookQueryService;
+import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
+import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.service.UserQueryService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class StudyUserFacadeImpl implements
-    StudyUserFacade {
+public class StudyFacadeImpl implements StudyFacade {
 
     private final StudyQueryService studyQueryService;
 
+    private final StudyCommandService studyCommandService;
+
     private final UserQueryService userQueryService;
+
+    private final BookQueryService bookQueryService;
 
     @Override
     public MyStudies getMyStudies(Long userId) {
@@ -26,5 +29,11 @@ public class StudyUserFacadeImpl implements
             .finished(studyQueryService.getFinishedStudies(userId))
             .owned(studyQueryService.getOwnedStudies(userId))
             .build();
+    }
+
+    @Override
+    public Long createStudy(Create request, Long userId) {
+        bookQueryService.getById(request.bookId());
+        return studyCommandService.createStudy(request, userId);
     }
 }

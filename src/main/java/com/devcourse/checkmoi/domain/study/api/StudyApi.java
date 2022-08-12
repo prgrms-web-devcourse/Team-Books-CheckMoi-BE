@@ -9,7 +9,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
-import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
+import com.devcourse.checkmoi.domain.study.facade.StudyFacade;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.global.model.SimplePage;
@@ -38,7 +38,7 @@ public class StudyApi {
 
     private final StudyQueryService studyQueryService;
 
-    private final StudyUserFacade studyUserFacade;
+    private final StudyFacade studyFacade;
 
     @GetMapping("/studies/{studyId}")
     public ResponseEntity<SuccessResponse<StudyDetailWithMembers>> getDetailInfo(
@@ -53,7 +53,7 @@ public class StudyApi {
     public ResponseEntity<SuccessResponse<Long>> createStudy(
         @Valid @RequestBody Create request,
         @AuthenticationPrincipal JwtAuthentication user) {
-        Long studyId = studyCommandService.createStudy(request, user.id());
+        Long studyId = studyFacade.createStudy(request, user.id());
         return ResponseEntity
             .created(generatedUri(studyId))
             .body(new SuccessResponse<>(studyId));
@@ -73,7 +73,7 @@ public class StudyApi {
     public ResponseEntity<SuccessResponse<MyStudies>> getMyStudies(
         @AuthenticationPrincipal JwtAuthentication user
     ) {
-        MyStudies response = studyUserFacade.getMyStudies(user.id());
+        MyStudies response = studyFacade.getMyStudies(user.id());
 
         return ResponseEntity.ok(
             new SuccessResponse<>(response)
