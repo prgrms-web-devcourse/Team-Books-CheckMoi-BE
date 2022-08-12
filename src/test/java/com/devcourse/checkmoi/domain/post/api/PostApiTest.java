@@ -214,6 +214,7 @@ class PostApiTest extends IntegrationTest {
                 .content(post.getContent())
                 .category(post.getCategory())
                 .studyId(post.getStudy().getId())
+                .writerId(post.getWriter().getId())
                 .writer(post.getWriter().getName())
                 .writerImage(post.getWriter().getProfileImgUrl())
                 .commentCount(post.getCommentCount())
