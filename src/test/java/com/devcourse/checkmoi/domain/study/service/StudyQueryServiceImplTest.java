@@ -7,6 +7,7 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -23,6 +24,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
+import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
@@ -129,7 +131,24 @@ class StudyQueryServiceImplTest {
         }
 
         @Test
-        @DisplayName("S 해당 스터디의 스터디 장이 아니면 스터디 신청 내역 조회에 실패한다")
+        @DisplayName("F 해당 스터디가 존재하지 않는다면 예외가 발생합니다.")
+        void studyNotFound() {
+            Long userId = 1L;
+            Long notExistStudyId = 0L;
+
+            given(studyRepository.existsById(notExistStudyId))
+                .willReturn(false);
+
+            doThrow(StudyNotFoundException.class)
+                .when(studyValidator)
+                .validateExistStudy(anyBoolean());
+
+            Assertions.assertThatExceptionOfType(StudyNotFoundException.class)
+                .isThrownBy(() -> studyQueryService.getStudyAppliers(userId, notExistStudyId));
+        }
+
+        @Test
+        @DisplayName("F 해당 스터디의 스터디 장이 아니면 스터디 신청 내역 조회에 실패한다")
         void getAsNonLeaderFail() {
             Long userId = 2L;
 

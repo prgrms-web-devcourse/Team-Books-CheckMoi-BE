@@ -57,6 +57,7 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
     @Override
     public StudyAppliers getStudyAppliers(Long userId, Long studyId) {
+        studyValidator.validateExistStudy(studyRepository.existsById(studyId));
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
 
         studyValidator.validateStudyOwner(userId, studyOwnerId,
