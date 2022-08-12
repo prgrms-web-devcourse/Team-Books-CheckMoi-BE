@@ -5,14 +5,15 @@ import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.global.annotation.ValueOfEnum;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.Builder;
-import org.springframework.lang.Nullable;
 
 public sealed interface PostRequest permits Search, Create, Edit {
 
     record Search(
-        @Nullable Long studyId
+        @NotNull(message = "게시글을 조회하려는 스터디 식별정보를 알려주세요") Long studyId,
+        @ValueOfEnum(enumClass = PostCategory.class) String category
     ) implements PostRequest {
 
         @Builder
