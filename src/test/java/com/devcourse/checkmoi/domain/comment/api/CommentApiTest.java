@@ -2,6 +2,7 @@ package com.devcourse.checkmoi.domain.comment.api;
 
 import static com.devcourse.checkmoi.domain.post.model.PostCategory.GENERAL;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
+import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeCommentInfoWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeCommentWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makePostWithId;
@@ -115,6 +116,10 @@ class CommentApiTest extends IntegrationTest {
                         .description("댓글 아이디"),
                     fieldWithPath(commentsPath + ".userId").type(JsonFieldType.NUMBER)
                         .description("댓글 작성자 아이디"),
+                    fieldWithPath(commentsPath + ".userName").type(JsonFieldType.STRING)
+                        .description("댓글 작성자 이름"),
+                    fieldWithPath(commentsPath + ".userImage").type(JsonFieldType.STRING)
+                        .description("댓글 작성자 이미지"),
                     fieldWithPath(commentsPath + ".postId").type(JsonFieldType.NUMBER)
                         .description("게시글 아이디"),
                     fieldWithPath(commentsPath + ".content").type(JsonFieldType.STRING)
@@ -127,11 +132,7 @@ class CommentApiTest extends IntegrationTest {
                         .description("페이지 총 개수")));
         }
 
-        private CommentInfo makeCommentInfoWithId(User user, Post post, Long commentId) {
-            return CommentInfo.builder().id(commentId).userId(user.getId()).postId(post.getId())
-                .content("댓글 - " + UUID.randomUUID()).createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now()).build();
-        }
+
     }
 
     @Nested

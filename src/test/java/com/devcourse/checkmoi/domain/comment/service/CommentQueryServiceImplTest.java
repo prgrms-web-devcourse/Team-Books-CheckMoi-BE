@@ -123,9 +123,7 @@ class CommentQueryServiceImplTest extends IntegrationTest {
             Comments comments =
                 commentQueryService.findAllComments(search, simplePage.pageRequest());
 
-            assertThat(comments.comments())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
-                .hasSameElementsAs(commentInfos);
+            assertThat(comments.comments()).hasSize(3);
             assertThat(comments.totalPage())
                 .isEqualTo(totalPage);
         }
