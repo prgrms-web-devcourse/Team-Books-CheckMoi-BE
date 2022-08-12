@@ -28,8 +28,8 @@ public class CommentFacade {
 
     public Long createComment(Long postId, Long userId, Create request) {
         PostInfo post = postQueryService.findByPostId(userId, postId);
-        studyQueryService.ongoingStudy(post.studyId());
-        studyQueryService.participateUser(post.studyId(), userId);
+        studyQueryService.validateOngoingStudy(post.studyId());
+        studyQueryService.validateParticipateUser(post.studyId(), userId);
 
         return commentCommandService.createComment(postId, userId, request);
     }

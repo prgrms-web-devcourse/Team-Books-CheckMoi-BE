@@ -2,8 +2,8 @@ package com.devcourse.checkmoi.domain.study.service;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
 import java.time.LocalDate;
@@ -15,7 +15,7 @@ public interface StudyQueryService {
 
     StudyDetailWithMembers getStudyInfoWithMembers(Long studyId);
 
-    StudyAppliers getStudyAppliers(Long userId, Long studyId);
+    StudyMembers getStudyAppliers(Long userId, Long studyId);
 
     Studies getParticipationStudies(Long userId);
 
@@ -23,9 +23,9 @@ public interface StudyQueryService {
 
     Studies getOwnedStudies(Long userId);
 
-    void ongoingStudy(Long studyId);
+    void validateOngoingStudy(Long studyId);
 
-    void participateUser(Long studyId, Long userId);
+    void validateParticipateUser(Long studyId, Long userId);
 
     Studies findAllByCondition(Long userId, Search search, Pageable pageable);
 
