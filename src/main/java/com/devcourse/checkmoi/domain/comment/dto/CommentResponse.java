@@ -12,6 +12,8 @@ public sealed interface CommentResponse permits CommentInfo, Comments {
     record CommentInfo(
         Long id,
         Long userId,
+        String userName,
+        String userImage,
         Long postId,
         String content,
         @JsonFormat(pattern = "yyyy/MM/dd")
