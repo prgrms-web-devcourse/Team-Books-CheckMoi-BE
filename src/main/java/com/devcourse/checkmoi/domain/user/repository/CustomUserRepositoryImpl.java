@@ -22,7 +22,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     @Override
     public UserInfoWithStudy findUserInfoWithStudy(Long userId) {
 
-        List<StudyInfo> studyInfos = getUserStudiesInfo(userId);
+        List<StudyInfo> studyInfos = getUserStudiesInfo(userId, 5);
         UserInfo user = getUserInfo(userId);
 
         return UserInfoWithStudy.builder()
@@ -35,7 +35,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             .build();
     }
 
-    private List<StudyInfo> getUserStudiesInfo(Long userId) {
+    private List<StudyInfo> getUserStudiesInfo(Long userId, int limit) {
         return jpaQueryFactory.select(
                 Projections.constructor(
                     StudyInfo.class,
@@ -49,6 +49,10 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             )
             .limit(5)
             .on(studyMember.user.id.eq(userId))
+            .where(
+                studyMember.status.in(OWNED, ACCEPTED)
+            )
+            .limit(limit)
             .fetch();
     }
 
