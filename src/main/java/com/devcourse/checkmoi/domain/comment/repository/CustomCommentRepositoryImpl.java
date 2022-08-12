@@ -28,6 +28,8 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
                     CommentInfo.class,
                     comment.id,
                     comment.user.id,
+                    comment.user.name,
+                    comment.user.profileImgUrl,
                     comment.post.id,
                     comment.content,
                     comment.createdAt,

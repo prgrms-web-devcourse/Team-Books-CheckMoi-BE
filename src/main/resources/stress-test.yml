@@ -1,0 +1,29 @@
+config:
+  target: https://dev.checkmoi.ga
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: CheckMoi
+
+scenarios:
+  - name: "posting"
+    flow:
+      - post:
+          url: "/api/posts"
+          headers:
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FETUlOIiwiaWF0IjoxNjYwMjAxNDkyLCJleHAiOjE2NjAyMDUwOTJ9.s7TiZzxqX8vFpsDGvX8dpHizODybOoV0OoNGoElo9x0"
+          json:
+            title: "서버 부하 테스트 DOUBLE MAX!!!!!!!!"
+            content: "☠️☠️☠️☠️☠️"
+            category: "NOTICE"
+            studyId: "87"
+
+# 사용 설명서
+# 1. Artillery 설치
+# npm install -g artillery@latest
+
+# 2. 스크립트 실행
+# artillery.cmd run --output report.json src\main\resources\stress-test.yml
+
+# 3. 실행 후 생성된 json 파일 -> html 파일 변환
+# artillery.cmd report ./report.json

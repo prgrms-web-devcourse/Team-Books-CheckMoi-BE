@@ -7,6 +7,7 @@ import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
+import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -28,8 +29,8 @@ public class CommentFacade {
 
     public Long createComment(Long postId, Long userId, Create request) {
         PostInfo post = postQueryService.findByPostId(userId, postId);
-        studyQueryService.ongoingStudy(post.studyId());
-        studyQueryService.participateUser(post.studyId(), userId);
+        studyQueryService.validateOngoingStudy(post.studyId());
+        studyQueryService.validateParticipateUser(post.studyId(), userId);
 
         return commentCommandService.createComment(postId, userId, request);
     }

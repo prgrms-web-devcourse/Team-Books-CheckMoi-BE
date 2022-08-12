@@ -13,7 +13,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
-import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
@@ -34,7 +34,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     private final UserRepository userRepository;
 
-    private final StudyServiceValidator studyValidator;
+    private final StudyValidator studyValidator;
 
     @Override
     public Long createStudy(Create request, Long userId) {
@@ -80,7 +80,10 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request) {
-        studyValidator.validateExistStudy(studyRepository.existsById(studyId));
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(StudyNotFoundException::new);
+        studyValidator.validateRecruitingStudy(study);
+        studyValidator.validateFullMemberStudy(study, request);
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
         studyValidator.validateStudyOwner(userId, studyOwnerId,
             "스터디 승인 권한이 없습니다. 유저 Id : " + userId + " 스터디 장 Id : " + studyOwnerId
