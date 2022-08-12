@@ -80,7 +80,10 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request) {
-        studyValidator.validateExistStudy(studyRepository.existsById(studyId));
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(StudyNotFoundException::new);
+        studyValidator.validateRecruitingStudy(study);
+        studyValidator.validateFullMemberStudy(study, request);
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
         studyValidator.validateStudyOwner(userId, studyOwnerId,
             "스터디 승인 권한이 없습니다. 유저 Id : " + userId + " 스터디 장 Id : " + studyOwnerId
