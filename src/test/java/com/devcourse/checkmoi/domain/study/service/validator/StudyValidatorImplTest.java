@@ -124,10 +124,6 @@ class StudyValidatorImplTest {
     @DisplayName("스터디 참가인원이 가득 찼는지 검사 #200")
     class FullMemberStudyTest {
 
-        private final Audit audit = Audit.builder()
-            .status("ACCEPTED")
-            .build();
-
         @Test
         @DisplayName("현재 인원이 최대인원보다 작을 경우 정상 종료")
         void notFullMemberStudy() {
@@ -136,7 +132,7 @@ class StudyValidatorImplTest {
                 .maxParticipant(3)
                 .build();
 
-            studyValidator.validateFullMemberStudy(study, audit);
+            studyValidator.validateFullMemberStudy(study);
         }
 
         @Test
@@ -148,7 +144,7 @@ class StudyValidatorImplTest {
                 .build();
 
             assertThatExceptionOfType(StudyMemberFullException.class)
-                .isThrownBy(() -> studyValidator.validateFullMemberStudy(memberFullStudy, audit));
+                .isThrownBy(() -> studyValidator.validateFullMemberStudy(memberFullStudy));
         }
     }
 }

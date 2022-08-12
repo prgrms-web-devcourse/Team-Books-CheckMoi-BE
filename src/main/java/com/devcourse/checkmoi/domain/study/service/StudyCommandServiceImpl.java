@@ -83,7 +83,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
         studyValidator.validateRecruitingStudy(study);
-        studyValidator.validateFullMemberStudy(study, request);
+        studyValidator.validateFullMemberStudy(study);
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
         studyValidator.validateStudyOwner(userId, studyOwnerId,
             "스터디 승인 권한이 없습니다. 유저 Id : " + userId + " 스터디 장 Id : " + studyOwnerId
@@ -99,6 +99,8 @@ public class StudyCommandServiceImpl implements StudyCommandService {
             .orElseThrow(StudyNotFoundException::new);
         User user = userRepository.findById(userId)
             .orElseThrow(UserNotFoundException::new);
+        studyValidator.validateRecruitingStudy(study);
+        studyValidator.validateFullMemberStudy(study);
         StudyMember request = studyMemberRepository.findByUserAndStudy(user.getId(), studyId)
             .map(studyMember -> {
                 studyValidator.validateDuplicateStudyMemberRequest(studyMember);

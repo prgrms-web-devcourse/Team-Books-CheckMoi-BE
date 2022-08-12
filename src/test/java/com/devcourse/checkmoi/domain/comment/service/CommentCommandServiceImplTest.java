@@ -108,7 +108,7 @@ class CommentCommandServiceImplTest extends IntegrationTest {
 
     @Nested
     @DisplayName("댓글 삭제 #136")
-    class DeleteComment {
+    class DeleteCommentTest {
 
         Comment comment;
 
@@ -175,7 +175,6 @@ class CommentCommandServiceImplTest extends IntegrationTest {
         Create request = Create.builder()
             .content("댓글 작성 테스트입니다.")
             .build();
-
 
         @Test
         @DisplayName("S 게시글에 댓글을 작성할 수 있다.")
