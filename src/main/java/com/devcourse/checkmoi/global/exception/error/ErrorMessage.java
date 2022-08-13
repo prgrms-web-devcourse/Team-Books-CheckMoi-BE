@@ -30,6 +30,7 @@ public enum ErrorMessage {
 
     // file error
     NOT_ALLOWED_FILE("허용할 수 없는 파일입니다", HttpStatus.BAD_REQUEST),
+    FILE_SIZE_EXCEED("파일 크기는 1MB 를 넘을 수 없습니다", HttpStatus.PAYLOAD_TOO_LARGE),
 
     // study error
     NOT_ALLOWED_STUDY_STATUS("스터디 상태 변경을 할 수 없습니다", HttpStatus.BAD_REQUEST),
@@ -44,6 +45,7 @@ public enum ErrorMessage {
 
     //comment error
     COMMENT_NO_PERMISSION("해당 댓글에 대한 접근 권한이 없습니다", HttpStatus.FORBIDDEN);
+
     private final String message;
 
     private final HttpStatus status;
