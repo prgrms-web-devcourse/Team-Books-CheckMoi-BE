@@ -9,4 +9,5 @@ public interface UserQueryService {
 
     UserInfoWithStudy findUserInfoWithStudy(Long id);
 
+    int userJoinedStudies(Long userId);
 }

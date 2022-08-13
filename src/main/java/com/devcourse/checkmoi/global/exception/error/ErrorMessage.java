@@ -38,7 +38,7 @@ public enum ErrorMessage {
     NOT_JOINED_USER("해당 스터디에 참가하지 않은 유저입니다.", HttpStatus.FORBIDDEN),
     NOT_RECRUITING_STUDY("모집중인 스터디가 아닙니다.", HttpStatus.FORBIDDEN),
     STUDY_IS_FULL("해당 스터디는 모집인원이 가득찼습니다.", HttpStatus.FORBIDDEN),
-
+    STUDY_JOIN_MAXIMUM_REACHED("최대 스터디 가입 수에 도달하여 더 이상 가입할 수 없습니다.", HttpStatus.FORBIDDEN),
     // post error
     NOT_ALLOWED_WRITER("게시글 작성 권한이 없습니다", HttpStatus.FORBIDDEN),
     CLOSED_STUDY("종료된 스터디입니다. 자유게시판만 사용가능합니다", HttpStatus.BAD_REQUEST),

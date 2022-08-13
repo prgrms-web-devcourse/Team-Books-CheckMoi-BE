@@ -97,11 +97,9 @@ public class StudyCommandServiceImpl implements StudyCommandService {
     public Long requestStudyJoin(Long studyId, Long userId) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
-        User user = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
         studyValidator.validateRecruitingStudy(study);
         studyValidator.validateFullMemberStudy(study);
-        StudyMember request = studyMemberRepository.findByUserAndStudy(user.getId(), studyId)
+        StudyMember request = studyMemberRepository.findByUserAndStudy(userId, studyId)
             .map(studyMember -> {
                 studyValidator.validateDuplicateStudyMemberRequest(studyMember);
                 studyMember.changeStatus(StudyMemberStatus.PENDING);
@@ -110,7 +108,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
             .orElseGet(() ->
                 StudyMember.builder()
                     .study(study)
-                    .user(user)
+                    .user(User.builder().id(userId).build())
                     .status(StudyMemberStatus.PENDING)
                     .build()
             );

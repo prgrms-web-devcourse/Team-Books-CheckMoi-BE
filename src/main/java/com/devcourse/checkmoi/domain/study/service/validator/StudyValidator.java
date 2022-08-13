@@ -1,6 +1,5 @@
 package com.devcourse.checkmoi.domain.study.service.validator;
 
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyMember;
 
@@ -19,4 +18,6 @@ public interface StudyValidator {
     void validateRecruitingStudy(Study study);
 
     void validateFullMemberStudy(Study study);
+
+    void validateMaximumJoinStudy(int joinStudy);
 }

@@ -35,6 +35,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             .build();
     }
 
+    @Override
+    public int userJoinedStudies(Long userId) {
+        return getUserStudiesInfo(userId, 10).size();
+    }
+
     private List<StudyInfo> getUserStudiesInfo(Long userId, int limit) {
         return jpaQueryFactory.select(
                 Projections.constructor(

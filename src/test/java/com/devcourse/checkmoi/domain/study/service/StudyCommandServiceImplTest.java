@@ -350,8 +350,6 @@ class StudyCommandServiceImplTest {
         void requestStudyJoin() {
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(study));
-            given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user));
             given(studyMemberRepository.findByUserAndStudy(anyLong(), anyLong()))
                 .willReturn(Optional.empty());
             given(studyMemberRepository.save(any(StudyMember.class)))
@@ -371,8 +369,6 @@ class StudyCommandServiceImplTest {
 
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(study));
-            given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user));
             given(studyMemberRepository.findByUserAndStudy(anyLong(), anyLong()))
                 .willReturn(Optional.of(deniedMember));
             given(studyMemberRepository.save(any(StudyMember.class)))
@@ -398,27 +394,12 @@ class StudyCommandServiceImplTest {
         }
 
         @Test
-        @DisplayName("F 유저가 존재하지 않는다면 예외 발생")
-        void userNotFound() {
-            given(studyRepository.findById(anyLong()))
-                .willReturn(Optional.of(study));
-            given(userRepository.findById(anyLong()))
-                .willReturn(Optional.empty());
-
-            assertThatExceptionOfType(UserNotFoundException.class)
-                .isThrownBy(
-                    () -> studyCommandService.requestStudyJoin(study.getId(), user.getId()));
-        }
-
-        @Test
         @DisplayName("현재 모집중인 스터디만 가입 신청을 할 수 있습니다.")
         void recruitingStudy() {
             Study inProgressStudy = makeStudyWithId(book, IN_PROGRESS, study.getId());
 
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(inProgressStudy));
-            given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user));
             doThrow(NotRecruitingStudyException.class)
                 .when(studyValidator)
                 .validateRecruitingStudy(any(Study.class));
@@ -432,8 +413,6 @@ class StudyCommandServiceImplTest {
         void fullMemberStudy() {
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(study));
-            given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user));
             doThrow(StudyMemberFullException.class)
                 .when(studyValidator)
                 .validateFullMemberStudy(any(Study.class));
@@ -453,8 +432,6 @@ class StudyCommandServiceImplTest {
 
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(study));
-            given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user));
             given(studyMemberRepository.findByUserAndStudy(anyLong(), anyLong()))
                 .willReturn(Optional.of(studyMember));
 

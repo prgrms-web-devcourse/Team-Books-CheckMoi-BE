@@ -7,9 +7,15 @@ import static com.devcourse.checkmoi.util.DTOGeneratorUtil.makeUserInfo;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
@@ -17,10 +23,12 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Create;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
+import com.devcourse.checkmoi.domain.study.exception.StudyJoinMaximumReachedException;
 import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.service.UserQueryService;
 import com.devcourse.checkmoi.global.model.SimplePage;
@@ -54,6 +62,9 @@ class StudyFacadeImplTest {
 
     @Mock
     StudyCommandService studyCommandService;
+
+    @Mock
+    StudyValidator studyValidator;
 
     @Nested
     @DisplayName("내 스터디 참여 현황 조회 #116")
@@ -163,6 +174,48 @@ class StudyFacadeImplTest {
             Studies got = studyFacade.getStudies(book.getId(), simplePage.pageRequest());
 
             assertThat(got).usingRecursiveComparison().isEqualTo(want);
+        }
+    }
+
+    @Nested
+    @DisplayName("스터디 참가 신청 #223")
+    class RequestStudyJoinTest {
+
+        private final Long userId = 1L;
+
+        private final Long studyId = 1L;
+
+        @Test
+        @DisplayName("S 스터디 참가 신청")
+        void requestStudyJoin() {
+            Long studyMemberId = 1L;
+            int joinStudies = 5;
+            given(userQueryService.userJoinedStudies(anyLong()))
+                .willReturn(joinStudies);
+            given(studyCommandService.requestStudyJoin(anyLong(), anyLong()))
+                .willReturn(studyMemberId);
+
+            Long got = studyFacade.requestStudyJoin(studyId, userId);
+
+            then(studyValidator)
+                .should(times(1))
+                .validateMaximumJoinStudy(anyInt());
+            assertThat(got).isEqualTo(studyMemberId);
+        }
+
+        @Test
+        @DisplayName("F 스터디 참여 개수가 10개 이상이라면 예외 발생")
+        void maximumJoinStudy() {
+            int maxJoinStudies = 10;
+
+            given(userQueryService.userJoinedStudies(anyLong()))
+                .willReturn(maxJoinStudies);
+            doThrow(StudyJoinMaximumReachedException.class)
+                .when(studyValidator)
+                .validateMaximumJoinStudy(maxJoinStudies);
+
+            assertThatExceptionOfType(StudyJoinMaximumReachedException.class)
+                .isThrownBy(() -> studyFacade.requestStudyJoin(studyId, userId));
         }
     }
 }

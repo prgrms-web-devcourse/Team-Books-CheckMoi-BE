@@ -350,7 +350,7 @@ class StudyApiTest extends IntegrationTest {
             Long studyId = 1L;
             Long studyMemberId = 1L;
 
-            given(studyCommandService.requestStudyJoin(studyId, givenUser.userInfo().id()))
+            given(studyFacade.requestStudyJoin(studyId, givenUser.userInfo().id()))
                 .willReturn(studyMemberId);
 
             ResultActions result = mockMvc.perform(

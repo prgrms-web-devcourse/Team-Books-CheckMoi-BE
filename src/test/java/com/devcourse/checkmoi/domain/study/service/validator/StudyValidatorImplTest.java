@@ -14,12 +14,12 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.devcourse.checkmoi.domain.book.model.Book;
-import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Audit;
 import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
 import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.exception.NotRecruitingStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
+import com.devcourse.checkmoi.domain.study.exception.StudyJoinMaximumReachedException;
 import com.devcourse.checkmoi.domain.study.exception.StudyMemberFullException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
@@ -145,6 +145,29 @@ class StudyValidatorImplTest {
 
             assertThatExceptionOfType(StudyMemberFullException.class)
                 .isThrownBy(() -> studyValidator.validateFullMemberStudy(memberFullStudy));
+        }
+    }
+
+
+    @Nested
+    @DisplayName("유저가 현재 참가한 스터디수가 최대치에 도달했을 경우 #223")
+    class MaximumJoinStudyTest {
+
+        @Test
+        @DisplayName("S 유저가 현재 참가한 스터디수가 최대치에 도달하지 않았을 경우 정상 종료")
+        void notFullMemberStudy() {
+            int joinStudy = 1;
+
+            studyValidator.validateMaximumJoinStudy(joinStudy);
+        }
+
+        @Test
+        @DisplayName("현재 인원이 최대인원에 도달했을 경우 예외 발생")
+        void FullMemberStudy() {
+            int maxJoinStudy = 10;
+
+            assertThatExceptionOfType(StudyJoinMaximumReachedException.class)
+                .isThrownBy(() -> studyValidator.validateMaximumJoinStudy(maxJoinStudy));
         }
     }
 }

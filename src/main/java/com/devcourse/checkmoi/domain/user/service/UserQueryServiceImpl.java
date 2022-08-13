@@ -30,4 +30,9 @@ public class UserQueryServiceImpl implements UserQueryService {
         return userRepository.findUserInfoWithStudy(userId);
     }
 
+    @Override
+    public int userJoinedStudies(Long userId) {
+        return userRepository.userJoinedStudies(userId);
+    }
+
 }

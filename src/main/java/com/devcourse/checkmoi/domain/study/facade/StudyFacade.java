@@ -12,4 +12,6 @@ public interface StudyFacade {
     Long createStudy(Create request, Long userId);
 
     Studies getStudies(Long bookId, Pageable pageable);
+
+    Long requestStudyJoin(Long studyId, Long userId);
 }
