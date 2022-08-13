@@ -75,4 +75,10 @@ public class TokenService {
         token.refresh(refreshToken);
         return jwtTokenProvider.createAccessToken(userId, "ROLE_ADMIN");
     }
+
+    @Transactional
+    public String createTestToken() {
+        long expireTime = 10_000;
+        return jwtTokenProvider.createTestToken(7, "ROLE_LOGIN", expireTime);
+    }
 }

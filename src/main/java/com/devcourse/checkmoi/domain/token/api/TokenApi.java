@@ -46,4 +46,10 @@ public class TokenApi {
         return tokenService.createTemporaryAccessToken(userId);
     }
 
+    // INFO: 테스트용 메서드 입니다.
+    @GetMapping("/tokens/test")
+    public String createTestToken() {
+        return tokenService.createTestToken();
+    }
+
 }
