@@ -29,7 +29,7 @@ public interface CustomStudyRepository {
 
     Page<StudyInfo> findAllByCondition(Search search, Pageable pageable);
 
-    ExpiredStudies getAllTobeProgressed(LocalDate current, StudyStatus toStatus);
+    ExpiredStudies getAllTobeProcessed(LocalDate current, StudyStatus toStatus);
 
     void updateStudyStatus(Long studyId, StudyStatus studyStatus);
 

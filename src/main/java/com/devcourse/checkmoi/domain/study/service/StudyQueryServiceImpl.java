@@ -86,7 +86,7 @@ public class StudyQueryServiceImpl implements StudyQueryService {
 
     @Override
     public ExpiredStudies getAllExpiredStudies(LocalDate criteriaTime, StudyStatus toStatus) {
-        return studyRepository.getAllTobeProgressed(criteriaTime, toStatus);
+        return studyRepository.getAllTobeProcessed(criteriaTime, toStatus);
     }
 
     /******************* Validate *******************/
