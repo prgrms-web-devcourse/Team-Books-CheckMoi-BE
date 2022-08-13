@@ -25,7 +25,7 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public TokenWithUserInfo createToken(Register user) {
+    public TokenWithUserInfo createTokenWithRegisterUser(Register user) {
         String accessToken = jwtTokenProvider.createAccessToken(user.id(), user.role());
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
@@ -47,22 +47,17 @@ public class TokenService {
 
     @Transactional
     public AccessToken refreshAccessToken(String accessToken) {
-        jwtTokenProvider.validateAccessToken(accessToken);
 
-        Claims claims = jwtTokenProvider.getClaims(accessToken);
+        Claims claims = jwtTokenProvider.parseUserClaimsFromExpiredAccessToken(accessToken)
+            .orElseThrow(InvalidTokenException::new);
         Long userId = claims.get("userId", Long.class);
         String role = claims.get("role", String.class);
 
-        log.warn("refresh Token을 재발급 하는 userId : {}", userId);
         String findRefreshToken = tokenRepository.findTokenByUserId(userId)
             .map(Token::getRefreshToken)
             .orElseThrow(InvalidTokenException::new);
 
-        log.warn("db에서 찾은 refresh Token  : {}", findRefreshToken);
-
-        jwtTokenProvider.validateToken(findRefreshToken);
-        
-        log.warn("db에서 찾은 refresh Token  : {}", findRefreshToken);
+        jwtTokenProvider.validateRefreshToken(findRefreshToken);
 
         String newAccessToken = jwtTokenProvider.createAccessToken(userId, role);
         return new AccessToken(newAccessToken);
@@ -76,6 +71,7 @@ public class TokenService {
     @Transactional
     public String createTemporaryAccessToken(Long userId) {
         String refreshToken = jwtTokenProvider.createRefreshToken();
+
         Token token = tokenRepository.findTokenByUserId(userId)
             .orElseGet(() -> tokenRepository.save(new Token(refreshToken, userId)));
 
@@ -84,10 +80,18 @@ public class TokenService {
     }
 
     @Transactional
-    public String createTestToken() {
-        long fakeUser = 7;
-        long expireTime = 30_000; // 30초
-        return jwtTokenProvider.createTestToken(fakeUser, "ROLE_LOGIN", expireTime);
+    public String createTestToken(Long userId, Long accessTime, Long refreshTime) {
+        log.info("테스트용 토큰을 발급합니다 - userId : {}, "
+            + "액세스 토큰 만료시간 {}, 리프레시 토큰 만료시간 {}", userId, accessTime, refreshTime);
+
+        String refreshToken = jwtTokenProvider.createTestToken(
+            userId, "ROLE_LOGIN", refreshTime);
+
+        Token token = tokenRepository.findTokenByUserId(userId)
+            .orElseGet(() -> tokenRepository.save(new Token(refreshToken, userId)));
+        token.refresh(refreshToken);
+
+        return jwtTokenProvider.createTestToken(userId, "ROLE_LOGIN", accessTime);
     }
 
 }

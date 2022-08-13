@@ -4,12 +4,14 @@ import com.devcourse.checkmoi.global.security.jwt.exception.ExpiredTokenExceptio
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,70 +33,63 @@ public class JwtTokenProvider {
         @Value("${jwt.issuer}") String issuer,
         @Value("${jwt.secret-key}") String secretKey,
         @Value("${jwt.access-token.expire-length}") long accessTokenValidTime,
-        @Value("${jwt.refresh-token.expire-length}") long refreshTokenValidTime) {
+        @Value("${jwt.refresh-token.expire-length}") long refreshTokenValidTime
+    ) {
         this.issuer = issuer;
         this.secretKey = secretKey;
         this.accessTokenValidTime = accessTokenValidTime;
         this.refreshTokenValidTime = refreshTokenValidTime;
     }
 
-    public String createTestToken(long payload, String role, long time) {
-        Map<String, Object> claims = Map.of("userId", payload, "role", role);
-        Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + time);
-
+    // create Token
+    private String createToken(Map<String, Object> claims, long expireTime) {
+        var now = new Date();
         return Jwts.builder()
             .setIssuer(issuer)
             .setClaims(claims)
             .setIssuedAt(now)
-            .setExpiration(expiredDate)
+            .setExpiration(new Date(now.getTime() + expireTime))
             .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
             .compact();
     }
 
     public String createAccessToken(long payload, String role) {
         Map<String, Object> claims = Map.of("userId", payload, "role", role);
-        Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + accessTokenValidTime);
-
-        return Jwts.builder()
-            .setIssuer(issuer)
-            .setClaims(claims)
-            .setIssuedAt(now)
-            .setExpiration(expiredDate)
-            .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
-            .compact();
+        return createToken(claims, accessTokenValidTime);
     }
 
     public String createRefreshToken() {
         String payload = UUID.randomUUID().toString();
         Claims claims = Jwts.claims().setSubject(payload);
-        Date now = new Date();
-        Date expiredDate = new Date(now.getTime() + refreshTokenValidTime);
-
-        return Jwts.builder()
-            .setIssuer(issuer)
-            .setClaims(claims)
-            .setIssuedAt(now)
-            .setExpiration(expiredDate)
-            .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
-            .compact();
+        return createToken(claims, refreshTokenValidTime);
     }
 
-    public Claims getClaims(String token) {
+    // validate Token
+    private Jws<Claims> parsingToken(String token) {
         return Jwts.parserBuilder()
             .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
             .build()
-            .parseClaimsJws(token)
-            .getBody();
+            .parseClaimsJws(token);
     }
 
-    public void validateToken(String token) {
+    public Claims getClaims(String token) {
+        return parsingToken(token).getBody();
+    }
+
+    public void validateRefreshToken(String refreshToken) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
-                .build()
-                .parseClaimsJws(token);
+            parsingToken(refreshToken);
+        } catch (ExpiredJwtException e) {
+            throw new ExpiredTokenException();
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidTokenException();
+        }
+        log.info("refreshToken 검증 성공! 새로운 accessToken 을 발급합니다.");
+    }
+
+    public void validateAccessToken(String accessToken) {
+        try {
+            parsingToken(accessToken);
         } catch (ExpiredJwtException e) {
             throw new ExpiredTokenException();
         } catch (JwtException | IllegalArgumentException e) {
@@ -102,12 +97,23 @@ public class JwtTokenProvider {
         }
     }
 
-    public void validateAccessToken(String accessToken) {
+    public Optional<Claims> parseUserClaimsFromExpiredAccessToken(String accessToken) {
+        Optional<Claims> claims;
         try {
-            validateToken(accessToken);
-        } catch (ExpiredTokenException ignored) {
-            log.info("accessToken 유효기간이 지났습니다. Refresh 토큰을 재발급합니다.");
+            claims = Optional.of(parsingToken(accessToken).getBody());
+        } catch (ExpiredJwtException e) {
+            Long userId = e.getClaims().get("userId", Long.class);
+            log.info("userId - {}의 accessToken 유효기간이 지났습니다. refreshToken 검증을 시작하겠습니다..", userId);
+            return Optional.of(e.getClaims());
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidTokenException();
         }
+        return claims;
     }
 
+    // INFO : Token Test Method
+    public String createTestToken(long payload, String role, long expireTime) {
+        Map<String, Object> claims = Map.of("userId", payload, "role", role);
+        return createToken(claims, expireTime);
+    }
 }
