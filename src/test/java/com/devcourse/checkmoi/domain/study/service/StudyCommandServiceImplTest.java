@@ -6,7 +6,6 @@ import static com.devcourse.checkmoi.domain.study.model.StudyStatus.IN_PROGRESS;
 import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
 import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.ACCESS_DENIED;
 import static com.devcourse.checkmoi.global.exception.error.ErrorMessage.STUDY_JOIN_REQUEST_DUPLICATE;
-import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMemberWithId;
@@ -18,7 +17,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import com.devcourse.checkmoi.domain.book.model.Book;
@@ -38,7 +36,6 @@ import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
-import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
 import com.devcourse.checkmoi.global.exception.error.ErrorMessage;
@@ -364,8 +361,11 @@ class StudyCommandServiceImplTest {
     class RequestStudyJoinTest {
 
         Book book = makeBookWithId(1L);
+
         User user = makeUserWithId(1L);
+
         Study study = makeStudyWithId(book, RECRUITING, 1L);
+
         StudyMember studyMember = makeStudyMember(study, user, StudyMemberStatus.PENDING);
 
         @Test
@@ -413,7 +413,8 @@ class StudyCommandServiceImplTest {
                 .willReturn(Optional.empty());
 
             assertThatExceptionOfType(StudyNotFoundException.class)
-                .isThrownBy(() -> studyCommandService.requestStudyJoin(notExistStudyId, user.getId()));
+                .isThrownBy(
+                    () -> studyCommandService.requestStudyJoin(notExistStudyId, user.getId()));
         }
 
         @Test

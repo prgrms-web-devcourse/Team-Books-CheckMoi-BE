@@ -40,6 +40,8 @@ public class StudyFacadeImpl implements StudyFacade {
     @Override
     public Long createStudy(Create request, Long userId) {
         bookQueryService.getById(request.bookId());
+        int joinStudies = userQueryService.userJoinedStudies(userId);
+        studyValidator.validateMaximumJoinStudy(joinStudies);
         return studyCommandService.createStudy(request, userId);
     }
 

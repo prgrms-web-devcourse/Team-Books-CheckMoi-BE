@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
+import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.service.BookQueryService;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
@@ -114,33 +115,66 @@ class StudyFacadeImplTest {
     @DisplayName("스터디 생성 #204")
     class CreateStudyTest {
 
-        Book book = makeBookWithId(1L);
+        private final Book book = makeBookWithId(1L);
+        private final StudyRequest.Create request = StudyRequest.Create.builder()
+            .bookId(1L)
+            .name("스터디 이름")
+            .thumbnail("https://adventure.co.kr/no-image-placeholder/")
+            .description("스터디입니다")
+            .maxParticipant(5)
+            .gatherStartDate(LocalDate.now())
+            .gatherEndDate(LocalDate.now())
+            .studyStartDate(LocalDate.now())
+            .studyEndDate(LocalDate.now())
+            .build();
+        private final Long userId = 1L;
 
         @Test
         @DisplayName("S 스터디 생성")
         void createStudy() {
-            Long userId = 1L;
-            StudyRequest.Create request = StudyRequest.Create.builder()
-                .bookId(1L)
-                .name("스터디 이름")
-                .thumbnail("https://adventure.co.kr/no-image-placeholder/")
-                .description("스터디입니다")
-                .maxParticipant(5)
-                .gatherStartDate(LocalDate.now())
-                .gatherEndDate(LocalDate.now())
-                .studyStartDate(LocalDate.now())
-                .studyEndDate(LocalDate.now())
-                .build();
             Long createdStudyId = 1L;
             BookInfo bookInfo = makeBookInfo(book);
+            int joinStudies = 1;
+
             given(bookQueryService.getById(anyLong()))
                 .willReturn(bookInfo);
+            given(userQueryService.userJoinedStudies(anyLong()))
+                .willReturn(joinStudies);
             given(studyCommandService.createStudy(any(Create.class), anyLong()))
                 .willReturn(createdStudyId);
 
             Long got = studyFacade.createStudy(request, userId);
 
             assertThat(got).isEqualTo(createdStudyId);
+        }
+
+        @Test
+        @DisplayName("F 책이 존재하지 않으면 예외 발생")
+        void notFoundBook() {
+            Long createdStudyId = 1L;
+            given(bookQueryService.getById(anyLong()))
+                .willThrow(BookNotFoundException.class);
+
+            assertThatExceptionOfType(BookNotFoundException.class)
+                .isThrownBy(() -> studyFacade.createStudy(request, userId));
+        }
+
+        @Test
+        @DisplayName("F 스터디 참여 개수가 10개 이상이라면 예외 발생")
+        void maximumJoinStudy() {
+            BookInfo bookInfo = makeBookInfo(book);
+            int maxJoinStudies = 10;
+
+            given(bookQueryService.getById(anyLong()))
+                .willReturn(bookInfo);
+            given(userQueryService.userJoinedStudies(anyLong()))
+                .willReturn(maxJoinStudies);
+            doThrow(StudyJoinMaximumReachedException.class)
+                .when(studyValidator)
+                .validateMaximumJoinStudy(maxJoinStudies);
+
+            assertThatExceptionOfType(StudyJoinMaximumReachedException.class)
+                .isThrownBy(() -> studyFacade.createStudy(request, userId));
         }
     }
 
