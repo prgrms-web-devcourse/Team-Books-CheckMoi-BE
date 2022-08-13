@@ -20,7 +20,7 @@ public class OAuthService {
     @Transactional
     public TokenWithUserInfo register(UserProfile userProfile) {
         Register registeredUser = userCommandService.registerAccount(userProfile);
-        return tokenService.createToken(registeredUser);
+        return tokenService.createTokenWithRegisterUser(registeredUser);
     }
 
 }

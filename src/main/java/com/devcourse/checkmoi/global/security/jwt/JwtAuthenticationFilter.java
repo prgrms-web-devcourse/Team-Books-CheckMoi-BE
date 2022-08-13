@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getAccessToken(HttpServletRequest request) {
         String token = AuthorizationExtractor.extract(request);
         if (token != null) {
-            jwtTokenProvider.validateToken(token);
+            jwtTokenProvider.validateAccessToken(token);
         }
         return token;
     }

@@ -1,5 +1,6 @@
 package com.devcourse.checkmoi.domain.token.api;
 
+import com.devcourse.checkmoi.domain.token.dto.TokenRequest.TestToken;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.AccessToken;
 import com.devcourse.checkmoi.domain.token.service.TokenService;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
@@ -27,7 +28,6 @@ public class TokenApi {
         HttpServletRequest httpServletRequest
     ) {
         String accessToken = AuthorizationExtractor.extract(httpServletRequest);
-
         return ResponseEntity.ok(
             new SuccessResponse<>(tokenService.refreshAccessToken(accessToken)));
     }
@@ -47,9 +47,13 @@ public class TokenApi {
     }
 
     // INFO: 테스트용 메서드 입니다.
-    @GetMapping("/tokens/test")
-    public String createTestToken() {
-        return tokenService.createTestToken();
+    @GetMapping("/tokens/{userId}/test")
+    public String createTestToken(
+        @PathVariable Long userId,
+        TestToken testToken
+    ) {
+        return tokenService.createTestToken(
+            userId, testToken.accessTime(), testToken.refreshTime());
     }
 
 }
