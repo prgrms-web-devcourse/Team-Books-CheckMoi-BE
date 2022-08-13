@@ -22,7 +22,7 @@ jwt:
   issuer: checkMoi
   secret-key: ${JWT_SECRET_KEY}
   access-token:
-    expire-length: 60_000 # 3600000 temporary 1분
+    expire-length: 3600000 # 3600000
   refresh-token:
     expire-length: 7200000
 

@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
-import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
 import com.devcourse.checkmoi.domain.comment.exception.CommentNotFoundException;
 import com.devcourse.checkmoi.domain.comment.facade.CommentFacade;
@@ -42,16 +41,13 @@ import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
 import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.study.model.Study;
-import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -111,7 +107,11 @@ class CommentApiTest extends IntegrationTest {
                     .description("댓글 검색에 사용되는 API").requestSchema(Schema.schema("댓글 검색 요청"))
                     .responseSchema(Schema.schema("댓글 검색 응답")), preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()), tokenRequestHeader(),
-                requestParameters(parameterWithName("postId").description("게시글 아이디").optional()),
+                requestParameters(
+                    parameterWithName("postId").description("게시글 아이디").optional(),
+                    parameterWithName("page").description("목록 페이지").optional(),
+                    parameterWithName("size").description("목록 크기").optional()
+                ),
                 responseFields(fieldWithPath(commentsPath + ".id").type(JsonFieldType.NUMBER)
                         .description("댓글 아이디"),
                     fieldWithPath(commentsPath + ".userId").type(JsonFieldType.NUMBER)
