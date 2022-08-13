@@ -31,8 +31,14 @@ public class StudyScheduleService implements ScheduleManager {
     }
 
     @Override
-    public ExpiredStudies getAllStudiesToBeProgressed() {
+    @Transactional
+    public void updateStudy(Long studyId, StudyStatus studyStatus) {
+        studyCommandService.updateStudyStatus(studyId, studyStatus);
+    }
 
-        return studyQueryService.getAllExpiredStudies(LocalDate.now(), StudyStatus.IN_PROGRESS);
+    @Override
+    public ExpiredStudies getAllStudiesToBeProcessed(StudyStatus toStatus) {
+
+        return studyQueryService.getAllExpiredStudies(LocalDate.now(), toStatus);
     }
 }

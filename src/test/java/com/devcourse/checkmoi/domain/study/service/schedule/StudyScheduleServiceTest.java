@@ -11,6 +11,7 @@ import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
 import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
 import java.time.LocalDate;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,20 +33,37 @@ class StudyScheduleServiceTest {
 
     private Study recruitingStudy;
 
+    private Study toBeFinishedStudy;
+
+    private Book book;
+
     @BeforeEach
     void setUp() {
-        Book book = makeBook();
+        LocalDate startDate = LocalDate.now().minusDays(2);
+        LocalDate endDate = LocalDate.now().minusDays(1);
+        LocalDate today = LocalDate.now();
+
+        book = makeBook();
         bookRepository.save(book);
 
         recruitingStudy = studyRepository.save(makeStudyWithStudyDate(book, StudyStatus.RECRUITING,
             LocalDate.of(2022, 8, 10), LocalDate.of(2022, 10, 20)));
-        Study recruitingFinishedStudy = studyRepository.save(
-            makeStudyWithStudyDate(book, StudyStatus.RECRUITING_FINISHED,
-                LocalDate.of(2022, 8, 10), LocalDate.of(2022, 10, 20)));
-        Study finishedStudy = studyRepository.save(
+        toBeFinishedStudy = studyRepository.save(
             makeStudyWithStudyDate(book, StudyStatus.IN_PROGRESS,
-                LocalDate.of(2022, 8, 10), LocalDate.of(2022, 10, 20)));
+                startDate, endDate));
 
+        studyRepository.save(makeStudyWithStudyDate(book, StudyStatus.RECRUITING_FINISHED,
+            LocalDate.of(2022, 8, 10), LocalDate.of(2022, 10, 20)));
+        studyRepository.save(makeStudyWithStudyDate(book, StudyStatus.IN_PROGRESS,
+            LocalDate.of(2022, 8, 10), LocalDate.of(2022, 10, 20)));
+        studyRepository.save(
+            makeStudyWithStudyDate(book, StudyStatus.IN_PROGRESS, startDate, today));
+    }
+
+    @AfterEach
+    void tearDown() {
+        studyRepository.deleteAllInBatch();
+        bookRepository.deleteAllInBatch();
     }
 
     @Nested
@@ -63,6 +81,17 @@ class StudyScheduleServiceTest {
             Assertions.assertThat(foundStudy.getStatus())
                 .isEqualTo(StudyStatus.IN_PROGRESS);
         }
+
+        @Test
+        @DisplayName("S 스터디 진행완료 날짜가 지난 스터디들을 '진행 완료'상태로 변경한다 ")
+        void changeToFinished() {
+            service.updateStudy(toBeFinishedStudy.getId(), StudyStatus.FINISHED);
+
+            Study foundStudy = studyRepository.findById(toBeFinishedStudy.getId()).get();
+
+            Assertions.assertThat(foundStudy.getStatus())
+                .isEqualTo(StudyStatus.FINISHED);
+        }
     }
 
     @Nested
@@ -72,10 +101,19 @@ class StudyScheduleServiceTest {
         @Test
         @DisplayName("S '진행중' 으로 변경할 모든 스터디들을 가져온다 ")
         void getAll() {
-            ExpiredStudies studies = service.getAllStudiesToBeProgressed();
+            ExpiredStudies studies = service.getAllStudiesToBeProcessed(StudyStatus.IN_PROGRESS);
 
             Assertions.assertThat(studies.studies())
                 .hasSize(2);
+        }
+
+        @Test
+        @DisplayName("S '진행완료' 로 변경할 모든 스터디들을 가져온다 ")
+        void getAllToBeFinished() {
+            ExpiredStudies studies = service.getAllStudiesToBeProcessed(StudyStatus.FINISHED);
+
+            Assertions.assertThat(studies.studies())
+                .hasSize(1);
         }
     }
 }

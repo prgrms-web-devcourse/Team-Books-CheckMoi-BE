@@ -160,9 +160,10 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     @Override
-    public ExpiredStudies getAllTobeProgressed(LocalDate current, StudyStatus toStatus) {
+    public ExpiredStudies getAllTobeProcessed(LocalDate current, StudyStatus toStatus) {
         return switch (toStatus) {
             case IN_PROGRESS -> findAllToBeProgressed(current);
+            case FINISHED -> findAllToBeFinished(current);
             default -> new ExpiredStudies(Collections.emptyList());
         };
     }
@@ -197,6 +198,18 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                     study.studyStartDate.between(null, current),
                     study.status.eq(RECRUITING)
                         .or(study.status.eq(RECRUITING_FINISHED))
+                ).fetch()
+        );
+    }
+
+    private ExpiredStudies findAllToBeFinished(LocalDate current) {
+        return new ExpiredStudies(
+            jpaQueryFactory
+                .select(study.id)
+                .from(study)
+                .where(
+                    study.studyEndDate.before(current),
+                    study.status.ne(StudyStatus.FINISHED)
                 ).fetch()
         );
     }
