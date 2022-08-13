@@ -80,6 +80,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request) {
+        StudyMemberStatus changeStatus = StudyMemberStatus.valueOf(request.status().toUpperCase());
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
         studyValidator.validateRecruitingStudy(study);
@@ -90,7 +91,11 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         );
         StudyMember studyMember = studyMemberRepository.findById(memberId)
             .orElseThrow(() -> new StudyJoinRequestNotFoundException(STUDY_JOIN_REQUEST_NOT_FOUND));
-        studyMember.changeStatus(StudyMemberStatus.valueOf(request.status().toUpperCase()));
+        if (changeStatus == StudyMemberStatus.ACCEPTED) {
+            int joinStudy = userRepository.userJoinedStudies(studyMember.getUser().getId());
+            studyValidator.validateMaximumJoinStudy(joinStudy);
+        }
+        studyMember.changeStatus(changeStatus);
     }
 
     @Override

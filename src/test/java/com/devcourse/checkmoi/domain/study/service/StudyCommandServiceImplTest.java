@@ -27,6 +27,7 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest;
 import com.devcourse.checkmoi.domain.study.exception.DuplicateStudyJoinRequestException;
 import com.devcourse.checkmoi.domain.study.exception.NotRecruitingStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
+import com.devcourse.checkmoi.domain.study.exception.StudyJoinMaximumReachedException;
 import com.devcourse.checkmoi.domain.study.exception.StudyJoinRequestNotFoundException;
 import com.devcourse.checkmoi.domain.study.exception.StudyMemberFullException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
@@ -228,12 +229,13 @@ class StudyCommandServiceImplTest {
         @DisplayName("S 스터디 가입 승낙 및 거절할 수 있다.")
         void auditStudyParticipationTest() {
             Long studyOwnerId = 1L;
-
+            int joinStudy = 1;
             given(studyRepository.findById(anyLong())).willReturn(Optional.of(study));
             given(studyRepository.findStudyOwner(anyLong())).willReturn(studyOwnerId);
             given(studyMemberRepository.findById(anyLong()))
                 .willReturn(Optional.of(studyMember));
-
+            given(userRepository.userJoinedStudies(anyLong()))
+                .willReturn(joinStudy);
             studyCommandService.auditStudyParticipation(studyId, memberId, userId, request);
 
             assertThat(studyMember.getStatus()).isEqualTo(StudyMemberStatus.ACCEPTED);
@@ -252,7 +254,7 @@ class StudyCommandServiceImplTest {
         }
 
         @Test
-        @DisplayName("현재 모집중인 스터디만 승인, 거절 값을 전달할 수 있습니다.")
+        @DisplayName("F 현재 모집중인 스터디만 승인, 거절할 수 있습니다.")
         void recruitingStudy() {
             Study inProgressStudy = makeStudyWithId(book, IN_PROGRESS, studyId);
 
@@ -268,7 +270,7 @@ class StudyCommandServiceImplTest {
         }
 
         @Test
-        @DisplayName("현재 스터디원이 최대치에 도달했을때 더 이상 승인을 할 수 없습니다")
+        @DisplayName("F 현재 스터디원이 최대치에 도달했을때 더 이상 승인을 할 수 없습니다")
         void fullMemberStudy() {
             Study inProgressStudy = makeStudyWithId(book, IN_PROGRESS, studyId);
 
@@ -333,6 +335,27 @@ class StudyCommandServiceImplTest {
                 .isThrownBy(() ->
                     studyCommandService
                         .auditStudyParticipation(studyId, memberId, userId, request));
+        }
+
+        @Test
+        @DisplayName("F 가입 하려는 유저가 이미 최대 스터디 수에 도달한 경우 예외발생")
+        void maximumJoinStudy() {
+            Long studyOwnerId = 1L;
+            int joinStudy = 10;
+            given(studyRepository.findById(anyLong())).willReturn(Optional.of(study));
+            given(studyRepository.findStudyOwner(anyLong())).willReturn(studyOwnerId);
+            given(studyMemberRepository.findById(anyLong()))
+                .willReturn(Optional.of(studyMember));
+            given(userRepository.userJoinedStudies(anyLong()))
+                .willReturn(joinStudy);
+            doThrow(StudyJoinMaximumReachedException.class)
+                .when(studyValidator)
+                .validateMaximumJoinStudy(joinStudy);
+
+            assertThatExceptionOfType(StudyJoinMaximumReachedException.class)
+                .isThrownBy(
+                    () -> studyCommandService.auditStudyParticipation(studyId, memberId, userId,
+                        request));
         }
     }
 
