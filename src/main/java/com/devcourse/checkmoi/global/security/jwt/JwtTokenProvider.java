@@ -38,6 +38,20 @@ public class JwtTokenProvider {
         this.refreshTokenValidTime = refreshTokenValidTime;
     }
 
+    public String createTestToken(long payload, String role, long time) {
+        Map<String, Object> claims = Map.of("userId", payload, "role", role);
+        Date now = new Date();
+        Date expiredDate = new Date(now.getTime() + time);
+
+        return Jwts.builder()
+            .setIssuer(issuer)
+            .setClaims(claims)
+            .setIssuedAt(now)
+            .setExpiration(expiredDate)
+            .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+            .compact();
+    }
+
     public String createAccessToken(long payload, String role) {
         Map<String, Object> claims = Map.of("userId", payload, "role", role);
         Date now = new Date();

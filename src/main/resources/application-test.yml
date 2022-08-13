@@ -41,9 +41,9 @@ jwt:
   issuer: test
   secret-key: XtvCnK/4CRsblAWCjeh22VAyXGjszJLR4xVQJ8CNTVk=
   access-token:
-    expire-length: 3600000
+    expire-length: 60_000
   refresh-token:
-    expire-length: 3600000
+    expire-length: 3_600_000
 cloud:
   aws:
     s3:
@@ -66,7 +66,8 @@ security:
       ALL:
         - /static/**
         - /favicon.ico
-      GET: [ ]
+      GET:
+        - /api/tokens/**
       POST: [ ]
       PATCH: [ ]
       PUT: [ ]

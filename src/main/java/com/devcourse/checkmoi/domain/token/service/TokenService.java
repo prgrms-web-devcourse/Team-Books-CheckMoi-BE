@@ -10,9 +10,11 @@ import com.devcourse.checkmoi.global.security.jwt.JwtTokenProvider;
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -51,11 +53,16 @@ public class TokenService {
         Long userId = claims.get("userId", Long.class);
         String role = claims.get("role", String.class);
 
+        log.warn("refresh Token을 재발급 하는 userId : {}", userId);
         String findRefreshToken = tokenRepository.findTokenByUserId(userId)
             .map(Token::getRefreshToken)
             .orElseThrow(InvalidTokenException::new);
 
+        log.warn("db에서 찾은 refresh Token  : {}", findRefreshToken);
+
         jwtTokenProvider.validateToken(findRefreshToken);
+        
+        log.warn("db에서 찾은 refresh Token  : {}", findRefreshToken);
 
         String newAccessToken = jwtTokenProvider.createAccessToken(userId, role);
         return new AccessToken(newAccessToken);
@@ -75,4 +82,12 @@ public class TokenService {
         token.refresh(refreshToken);
         return jwtTokenProvider.createAccessToken(userId, "ROLE_ADMIN");
     }
+
+    @Transactional
+    public String createTestToken() {
+        long fakeUser = 7;
+        long expireTime = 30_000; // 30초
+        return jwtTokenProvider.createTestToken(fakeUser, "ROLE_LOGIN", expireTime);
+    }
+
 }

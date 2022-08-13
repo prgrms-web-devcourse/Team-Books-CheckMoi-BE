@@ -27,7 +27,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
-            log.info("exception handler token error : {}", e.getMessage());
+            log.info("exception handler token error : {}", e.getErrorMessage());
             generateErrorResponse(response, e);
         }
     }

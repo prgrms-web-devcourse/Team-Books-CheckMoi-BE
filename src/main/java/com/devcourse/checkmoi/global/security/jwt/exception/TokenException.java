@@ -5,10 +5,6 @@ import com.devcourse.checkmoi.global.exception.error.ErrorMessage;
 
 public class TokenException extends BusinessException {
 
-    public TokenException(String message, ErrorMessage errorMessage) {
-        super(message, errorMessage);
-    }
-
     public TokenException(ErrorMessage errorCode) {
         super(errorCode);
     }
