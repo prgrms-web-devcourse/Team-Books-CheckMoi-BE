@@ -1,6 +1,8 @@
 package com.devcourse.checkmoi.domain.user.repository;
 
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
 import static com.devcourse.checkmoi.domain.user.model.QUser.user;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfoWithStudy;
@@ -20,7 +22,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
     @Override
     public UserInfoWithStudy findUserInfoWithStudy(Long userId) {
 
-        List<StudyInfo> studyInfos = getUserStudiesInfo(userId);
+        List<StudyInfo> studyInfos = getUserStudiesInfo(userId, 5);
         UserInfo user = getUserInfo(userId);
 
         return UserInfoWithStudy.builder()
@@ -33,7 +35,12 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             .build();
     }
 
-    private List<StudyInfo> getUserStudiesInfo(Long userId) {
+    @Override
+    public int userJoinedStudies(Long userId) {
+        return getUserStudiesInfo(userId, 10).size();
+    }
+
+    private List<StudyInfo> getUserStudiesInfo(Long userId, int limit) {
         return jpaQueryFactory.select(
                 Projections.constructor(
                     StudyInfo.class,
@@ -43,6 +50,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             .innerJoin(studyMember.study)
             .innerJoin(studyMember.user)
             .on(studyMember.user.id.eq(userId))
+            .where(
+                studyMember.status.in(OWNED, ACCEPTED)
+            )
+            .orderBy(studyMember.updatedAt.desc())
+            .limit(limit)
             .fetch();
     }
 

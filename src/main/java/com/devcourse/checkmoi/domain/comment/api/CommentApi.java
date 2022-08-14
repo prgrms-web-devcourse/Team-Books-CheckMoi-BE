@@ -4,13 +4,12 @@ import static com.devcourse.checkmoi.global.util.ApiUtil.generatedUri;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Create;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
-import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
-import com.devcourse.checkmoi.domain.comment.facade.CommentCommandFacade;
+import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
+import com.devcourse.checkmoi.domain.comment.facade.CommentFacade;
 import com.devcourse.checkmoi.domain.comment.service.CommentCommandService;
-import com.devcourse.checkmoi.domain.comment.service.CommentQueryService;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
-import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +29,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CommentApi {
 
-    private final CommentQueryService commentQueryService;
-
     private final CommentCommandService commentCommandService;
 
-    private final CommentCommandFacade commentCommandFacade;
+    private final CommentFacade commentFacade;
 
     @GetMapping("/comments")
-    public ResponseEntity<SuccessResponse<List<CommentInfo>>> findAllComments(
+    public ResponseEntity<SuccessResponse<Comments>> findAllComments(
         @AuthenticationPrincipal JwtAuthentication user,
-        Search request
+        @Valid Search request,
+        SimplePage simplePage
     ) {
         return ResponseEntity.ok()
-            .body(new SuccessResponse<>(commentQueryService.findAllComments(user.id(), request)));
+            .body(new SuccessResponse<>(
+                commentFacade.findAllComments(user.id(), request, simplePage.pageRequest()))
+            );
     }
 
     @PostMapping("/comments")
@@ -51,7 +51,7 @@ public class CommentApi {
         @RequestParam Long postId,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
-        Long id = commentCommandFacade.createComment(postId, user.id(), request);
+        Long id = commentFacade.createComment(postId, user.id(), request);
         return ResponseEntity.created(generatedUri(id)).body(new SuccessResponse<>(id));
     }
 

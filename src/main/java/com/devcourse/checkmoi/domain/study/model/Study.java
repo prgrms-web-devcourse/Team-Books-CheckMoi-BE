@@ -50,22 +50,16 @@ public class Study extends BaseEntity {
 
     private LocalDate studyEndDate;
 
-    public Study(String name, String thumbnailUrl, String description, Integer maxParticipant,
-        StudyStatus status, Book book, LocalDate gatherStartDate, LocalDate gatherEndDate,
-        LocalDate studyStartDate, LocalDate studyEndDate) {
-        this(null, name, thumbnailUrl, description, status, maxParticipant, book, gatherStartDate,
-            gatherEndDate, studyStartDate, studyEndDate);
-    }
-
     @Builder
     public Study(Long id, String name, String thumbnailUrl, String description, StudyStatus status,
-        Integer maxParticipant, Book book, LocalDate gatherStartDate, LocalDate gatherEndDate,
+        int currentParticipant, Integer maxParticipant, Book book, LocalDate gatherStartDate, LocalDate gatherEndDate,
         LocalDate studyStartDate, LocalDate studyEndDate) {
         this.id = id;
         this.name = name;
         this.thumbnailUrl = thumbnailUrl;
         this.description = description;
         this.status = status;
+        this.currentParticipant = currentParticipant;
         this.maxParticipant = maxParticipant;
         this.book = book;
         this.gatherStartDate = gatherStartDate;
@@ -144,5 +138,9 @@ public class Study extends BaseEntity {
 
     public boolean isFinished() {
         return this.status == StudyStatus.FINISHED;
+    }
+
+    public boolean isRecruiting() {
+        return this.status == StudyStatus.RECRUITING;
     }
 }

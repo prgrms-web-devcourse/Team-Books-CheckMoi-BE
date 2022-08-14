@@ -17,12 +17,10 @@ public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, St
         if (value == null) {
             return true;
         }
-        Object[] enumValues = this.annotation.enumClass().getEnumConstants();
+        Object[] enumValues = this.annotation.codeMappingEnumClass().getEnumConstants();
         if (enumValues != null) {
             for (Object enumValue : enumValues) {
-                if (value.equals(enumValue.toString())
-                    || (this.annotation.ignoreCase() && value.equalsIgnoreCase(
-                    enumValue.toString()))) {
+                if (value.equals(((CodeMappable) enumValue).getMappingCode())) {
                     return true;
                 }
             }
@@ -31,4 +29,3 @@ public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, St
     }
 
 }
-

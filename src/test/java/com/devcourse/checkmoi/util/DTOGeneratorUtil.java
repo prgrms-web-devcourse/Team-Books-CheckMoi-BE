@@ -3,7 +3,11 @@ package com.devcourse.checkmoi.util;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyWithId;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUserWithId;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
+import com.devcourse.checkmoi.domain.book.model.Book;
+import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
+import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
@@ -11,10 +15,29 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class DTOGeneratorUtil {
 
+
+    // book
+    public static BookInfo makeBookInfo(Book book) {
+        return BookInfo.builder()
+            .id(book.getId())
+            .description(book.getDescription())
+            .createdAt(book.getCreatedAt())
+            .image(book.getThumbnail())
+            .isbn(book.getIsbn())
+            .author(book.getAuthor())
+            .title(book.getTitle())
+            .pubDate(book.getPublishedAt().getPublishedAt())
+            .publisher(book.getPublisher())
+            .build();
+    }
+
+    // study
     public static StudyInfo makeStudyInfo(Study study) {
         return StudyInfo.builder()
             .id(study.getId())
@@ -32,6 +55,7 @@ public abstract class DTOGeneratorUtil {
 
     }
 
+    // post
     public static PostInfo makePostInfo() {
         return PostInfo.builder()
             .id(1L)
@@ -45,6 +69,7 @@ public abstract class DTOGeneratorUtil {
             .build();
     }
 
+    // user
     public static UserInfo makeUserInfo() {
         User user = makeUserWithId(1L);
         return UserInfo.builder()
@@ -56,6 +81,7 @@ public abstract class DTOGeneratorUtil {
             .build();
     }
 
+    // studies
     public static List<Studies> makeMyStudies() {
         return List.of(
             new Studies(
@@ -68,5 +94,23 @@ public abstract class DTOGeneratorUtil {
                 List.of(makeStudyInfo(makeStudyWithId(makeBook(), StudyStatus.RECRUITING, 3L))), 1
             )
         );
+    }
+
+    // comment
+    public static CommentInfo makeCommentInfo(Long commentId, Long postId, Long userId) {
+        return CommentInfo.builder()
+            .id(commentId)
+            .content("댓글 테스트")
+            .postId(postId)
+            .userId(userId)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
+    }
+
+    public static CommentInfo makeCommentInfoWithId(User user, Post post, Long commentId) {
+        return CommentInfo.builder().id(commentId).userId(user.getId()).userName(user.getName())
+            .userImage(user.getProfileImgUrl()).postId(post.getId()).content("댓글 - " + UUID.randomUUID())
+            .createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
     }
 }

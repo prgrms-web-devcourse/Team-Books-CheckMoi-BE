@@ -13,7 +13,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
-import com.devcourse.checkmoi.domain.study.service.validator.StudyServiceValidator;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import com.devcourse.checkmoi.domain.user.exception.UserNotFoundException;
 import com.devcourse.checkmoi.domain.user.model.User;
 import com.devcourse.checkmoi.domain.user.repository.UserRepository;
@@ -34,7 +34,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     private final UserRepository userRepository;
 
-    private final StudyServiceValidator studyValidator;
+    private final StudyValidator studyValidator;
 
     @Override
     public Long createStudy(Create request, Long userId) {
@@ -64,7 +64,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         study.editName(request.name());
         study.editThumbnail(request.thumbnail());
         study.editDescription(request.description());
-        study.changeStatus(StudyStatus.valueOf(request.status()));
+        study.changeStatus(StudyStatus.nameOf(request.status()));
 
         if (isNecessaryToDeny(beforeStatus, study.getStatus())) {
             studyRepository.updateAllApplicantsAsDenied(studyId);
@@ -80,23 +80,31 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request) {
-        studyValidator.validateExistStudy(studyRepository.existsById(studyId));
+        StudyMemberStatus changeStatus = StudyMemberStatus.valueOf(request.status().toUpperCase());
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(StudyNotFoundException::new);
+        studyValidator.validateRecruitingStudy(study);
+        studyValidator.validateFullMemberStudy(study);
         Long studyOwnerId = studyRepository.findStudyOwner(studyId);
         studyValidator.validateStudyOwner(userId, studyOwnerId,
             "스터디 승인 권한이 없습니다. 유저 Id : " + userId + " 스터디 장 Id : " + studyOwnerId
         );
         StudyMember studyMember = studyMemberRepository.findById(memberId)
             .orElseThrow(() -> new StudyJoinRequestNotFoundException(STUDY_JOIN_REQUEST_NOT_FOUND));
-        studyMember.changeStatus(StudyMemberStatus.valueOf(request.status()));
+        if (changeStatus == StudyMemberStatus.ACCEPTED) {
+            int joinStudy = userRepository.userJoinedStudies(studyMember.getUser().getId());
+            studyValidator.validateMaximumJoinStudy(joinStudy);
+        }
+        studyMember.changeStatus(changeStatus);
     }
 
     @Override
     public Long requestStudyJoin(Long studyId, Long userId) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
-        User user = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
-        StudyMember request = studyMemberRepository.findByUserAndStudy(user.getId(), studyId)
+        studyValidator.validateRecruitingStudy(study);
+        studyValidator.validateFullMemberStudy(study);
+        StudyMember request = studyMemberRepository.findByUserAndStudy(userId, studyId)
             .map(studyMember -> {
                 studyValidator.validateDuplicateStudyMemberRequest(studyMember);
                 studyMember.changeStatus(StudyMemberStatus.PENDING);
@@ -105,11 +113,23 @@ public class StudyCommandServiceImpl implements StudyCommandService {
             .orElseGet(() ->
                 StudyMember.builder()
                     .study(study)
-                    .user(user)
+                    .user(User.builder().id(userId).build())
                     .status(StudyMemberStatus.PENDING)
                     .build()
             );
 
         return studyMemberRepository.save(request).getId();
+    }
+
+    @Override
+    public void updateStudyStatus(Long studyId, StudyStatus toStatus) {
+        studyRepository.updateStudyStatus(studyId, toStatus);
+    }
+
+    @Override
+    public void updateApplicants(Long studyId, StudyMemberStatus toMemberStatus) {
+        if (toMemberStatus.equals(StudyMemberStatus.DENIED)) {
+            studyRepository.updateAllApplicantsAsDenied(studyId);
+        }
     }
 }

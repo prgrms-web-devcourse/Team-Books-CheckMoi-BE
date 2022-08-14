@@ -6,6 +6,9 @@ import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Edit;
 import com.devcourse.checkmoi.domain.comment.exception.CommentNotFoundException;
 import com.devcourse.checkmoi.domain.comment.model.Comment;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
+import com.devcourse.checkmoi.domain.comment.service.validator.CommentValidator;
+import com.devcourse.checkmoi.domain.study.repository.StudyRepository;
+import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,17 +22,24 @@ public class CommentCommandServiceImpl implements CommentCommandService {
 
     private final CommentConverter commentConverter;
 
+    private final CommentValidator commentValidator;
+
+    private final StudyRepository studyRepository;
+
+    private final StudyValidator studyValidator;
+
     @Override
     public void deleteById(Long userId, Long commentId) {
-        // TODO: validation 댓글을 작성한 본인과 스터디장만 삭제할 수 있다
-        // TODO: 스터디 종료상태인지 확인한다
+        Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(CommentNotFoundException::new);
+        Long ownerId = studyRepository.findStudyOwner(comment.getPost().getStudy().getId());
+        commentValidator.commentPermission(userId, ownerId, comment.getUser().getId());
+        studyValidator.validateOngoingStudy(comment.getPost().getStudy());
         commentRepository.deleteById(commentId);
     }
 
     @Override
     public Long createComment(Long postId, Long userId, Create request) {
-        // TODO: validation : 스터디 종료상태인지 확인한다
-        // TODO: 스터디원만 댓글을 작성할 수 있다
         return commentRepository.save(
             commentConverter.createToComment(request, postId, userId)
         ).getId();
@@ -37,12 +47,10 @@ public class CommentCommandServiceImpl implements CommentCommandService {
 
     @Override
     public void editComment(Long userId, Long commentId, Edit request) {
-        // TODO: validation 댓글을 작성한 본인만 수정할 수 있다.
-        // TODO: 스터디 종료 상태인지 확인한다
-
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFoundException::new);
-
+        commentValidator.commentPermission(userId, comment.getUser().getId());
+        studyValidator.validateOngoingStudy(comment.getPost().getStudy());
         comment.editComment(request.content());
     }
 

@@ -22,9 +22,9 @@ jwt:
   issuer: checkMoi
   secret-key: ${JWT_SECRET_KEY}
   access-token:
-    expire-length: 3600000
+    expire-length: 3_600_000 # 1시간
   refresh-token:
-    expire-length: 7200000
+    expire-length: 7_300_000 # 2시간 + a
 
 cors:
   allowed:
@@ -46,6 +46,7 @@ security:
         - /h2-console/**
       GET:
         - /
+        - /api/tokens/**
       POST: [ ]
       PATCH: [ ]
       PUT: [ ]
@@ -56,8 +57,8 @@ security:
         - /docs/**
       GET:
         - /api/tokens/**
-        - /api/books/**
-        - /api/studies/**
+        - /api/**/books/**
+        - /api/**/studies/**
         - /login
       POST: [ ]
       PATCH: [ ]

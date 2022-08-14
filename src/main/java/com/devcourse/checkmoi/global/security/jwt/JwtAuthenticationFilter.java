@@ -23,8 +23,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getRequestURI().endsWith("tokens") && request.getMethod()
-            .equalsIgnoreCase("POST");
+        return request.getRequestURI().endsWith("tokens")
+            && request.getMethod().equalsIgnoreCase("GET");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getAccessToken(HttpServletRequest request) {
         String token = AuthorizationExtractor.extract(request);
         if (token != null) {
-            jwtTokenProvider.validateToken(token);
+            jwtTokenProvider.validateAccessToken(token);
         }
         return token;
     }

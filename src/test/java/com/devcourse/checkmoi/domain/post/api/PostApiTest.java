@@ -30,6 +30,7 @@ import com.devcourse.checkmoi.domain.post.dto.PostRequest.Create;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Edit;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
+import com.devcourse.checkmoi.domain.post.dto.PostResponse.Posts;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.service.PostCommandService;
 import com.devcourse.checkmoi.domain.post.service.PostQueryService;
@@ -37,9 +38,11 @@ import com.devcourse.checkmoi.domain.study.model.Study;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
 import com.devcourse.checkmoi.domain.user.model.User;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.template.IntegrationTest;
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.epages.restdocs.apispec.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -55,6 +58,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 class PostApiTest extends IntegrationTest {
+
+    @Autowired
+    PostConverter postConverter;
 
     @MockBean
     private PostCommandService postCommandService;
@@ -93,7 +99,9 @@ class PostApiTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
                     .summary("게시글 생성 API")
-                    .description("게시글을 생성하는 API 입니다."),
+                    .description("게시글을 생성하는 API 입니다.")
+                    .requestSchema(Schema.schema("게시글 생성 요청"))
+                    .responseSchema(Schema.schema("게시글 생성 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
@@ -135,7 +143,6 @@ class PostApiTest extends IntegrationTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-            // TODO: IN_PROGRESS 중인 스터디에서만 포스트가 작성 가능하다
             given(postQueryService.findByPostId(anyLong(), anyLong())).willReturn(postInfo);
 
             mockMvc.perform(get("/api/posts/{postId}", postId)
@@ -149,7 +156,9 @@ class PostApiTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
                     .summary("게시글 단일 조회 API")
-                    .description("게시글을 단일 조회하는 API 입니다."),
+                    .description("게시글을 단일 조회하는 API 입니다.")
+                    .requestSchema(Schema.schema("게시글 단일 조회 요청"))
+                    .responseSchema(Schema.schema("게시글 단일 조회 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader()
@@ -161,15 +170,17 @@ class PostApiTest extends IntegrationTest {
     @DisplayName("게시글을 다중 조회할 수 있다 #86")
     class FindAllPostsTest {
 
-        @Autowired
-        PostConverter postConverter;
-
         @Test
         void findAllPosts() throws Exception {
             TokenWithUserInfo givenUser = getTokenWithUserInfo();
 
             Study study = makeStudyWithId(makeBook(), StudyStatus.IN_PROGRESS, 1L);
             User user = makeUserWithId(givenUser.userInfo().id());
+
+            int page = 0;
+            int size = 3;
+            String category = "GENERAL";
+            String direction = "ASC";
 
             List<PostInfo> postInfos = List.of(
                 makePostInfos(makePostWithId(GENERAL, study, user, 1L)),
@@ -178,10 +189,16 @@ class PostApiTest extends IntegrationTest {
             );
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("studyId", String.valueOf(study.getId()));
 
-            given(postQueryService.findAllByCondition(anyLong(), any(Search.class)))
-                .willReturn(postInfos);
+            params.add("studyId", String.valueOf(study.getId()));
+            params.add("page", String.valueOf(page));
+            params.add("size", String.valueOf(size));
+            params.add("category", category);
+            params.add("direction", direction);
+
+            given(postQueryService.findAllByCondition(anyLong(), any(Search.class),
+                any(SimplePage.class)))
+                .willReturn(new Posts(1L, postInfos));
 
             mockMvc.perform(get("/api/posts")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenUser.accessToken())
@@ -197,6 +214,7 @@ class PostApiTest extends IntegrationTest {
                 .content(post.getContent())
                 .category(post.getCategory())
                 .studyId(post.getStudy().getId())
+                .writerId(post.getWriter().getId())
                 .writer(post.getWriter().getName())
                 .writerImage(post.getWriter().getProfileImgUrl())
                 .commentCount(post.getCommentCount())
@@ -209,26 +227,35 @@ class PostApiTest extends IntegrationTest {
             return MockMvcRestDocumentationWrapper.document("many-post-detail",
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
-                    .summary("게시글 검색 API (준비중)")
-                    .description("게시글을 검색하는 API 입니다."),
+                    .summary("게시글 검색 API ")
+                    .description("게시글을 검색하는 API 입니다.")
+                    .requestSchema(Schema.schema("게시글 검색 요청"))
+                    .responseSchema(Schema.schema("게시글 검색 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader(),
                 requestParameters(
-                    parameterWithName("studyId").description("스터디 아이디").optional()
+                    parameterWithName("studyId").description("스터디 아이디").optional(),
+                    parameterWithName("page").description("목록 페이지").optional(),
+                    parameterWithName("size").description("목록 크기").optional(),
+                    parameterWithName("category").description("게시글 카테고리리(NOTICE,GENERAL)")
+                        .optional(),
+                    parameterWithName("direction").description("정렬조건(최신순,오래된순: DESC,ASC)")
+                        .optional()
                 ),
                 responseFields(
-                    // post infos
-                    fieldWithPath("data[].id").description("게시글 아이디"),
-                    fieldWithPath("data[].title").description("게시글 제목"),
-                    fieldWithPath("data[].content").description("게시글 본문"),
-                    fieldWithPath("data[].category").description("게시글 카테고리"),
-                    fieldWithPath("data[].studyId").description("게시글이 작성된 스터디"),
-                    fieldWithPath("data[].writer").description("게시글을 작성한 유저 이름"),
-                    fieldWithPath("data[].writerImage").description("게시글을 작성한 유저 프로필 사진"),
-                    fieldWithPath("data[].commentCount").description("게시글 댓글 수"),
-                    fieldWithPath("data[].createdAt").description("게시글 작성 일자"),
-                    fieldWithPath("data[].updatedAt").description("게시글 수정 일자")
+                    fieldWithPath("data.totalPage").description("게시글 페이지 총 개수"),
+                    fieldWithPath("data.posts[].id").description("게시글 아이디"),
+                    fieldWithPath("data.posts[].title").description("게시글 제목"),
+                    fieldWithPath("data.posts[].content").description("게시글 본문"),
+                    fieldWithPath("data.posts[].category").description("게시글 카테고리"),
+                    fieldWithPath("data.posts[].studyId").description("게시글이 작성된 스터디"),
+                    fieldWithPath("data.posts[].writer").description("게시글을 작성한 유저 이름"),
+                    fieldWithPath("data.posts[].writerId").description("게시글을 작성한 유저 식별자"),
+                    fieldWithPath("data.posts[].writerImage").description("게시글을 작성한 유저 프로필 사진"),
+                    fieldWithPath("data.posts[].commentCount").description("게시글 댓글 수"),
+                    fieldWithPath("data.posts[].createdAt").description("게시글 작성 일자"),
+                    fieldWithPath("data.posts[].updatedAt").description("게시글 수정 일자")
                 )
             );
         }
@@ -237,9 +264,6 @@ class PostApiTest extends IntegrationTest {
     @Nested
     @DisplayName("게시글을 수정할 수 있다 #86")
     class EditPostTest {
-
-        @Autowired
-        PostConverter postConverter;
 
         @Test
         void editPost() throws Exception {
@@ -294,7 +318,9 @@ class PostApiTest extends IntegrationTest {
                 ResourceSnippetParameters.builder()
                     .tag("Post API")
                     .summary("게시글 삭제 API")
-                    .description("게시글을 삭제하는 API 입니다."),
+                    .description("게시글을 삭제하는 API 입니다.")
+                    .requestSchema(Schema.schema("게시글 삭제 요청"))
+                    .responseSchema(Schema.schema("게시글 삭제 응답")),
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 tokenRequestHeader()

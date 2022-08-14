@@ -16,7 +16,8 @@ import javax.validation.Payload;
 @Retention(RUNTIME)
 @Constraint(validatedBy = ValueOfEnumValidator.class)
 public @interface ValueOfEnum {
-    Class<? extends Enum<?>> enumClass();
+
+    Class<? extends CodeMappable> codeMappingEnumClass();
 
     String message() default "존재하지 않는 enum 값 입니다";
 

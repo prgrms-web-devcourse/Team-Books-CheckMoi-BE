@@ -1,12 +1,11 @@
 package com.devcourse.checkmoi.domain.book.service;
 
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.LatestAllBooks;
-import com.devcourse.checkmoi.domain.book.dto.SimplePage;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.exception.BookNotFoundException;
 import com.devcourse.checkmoi.domain.book.model.Book;
-import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -46,9 +45,12 @@ class BookQueryServiceImplTest {
         @Test
         @DisplayName("최신순으로 책 목록을 가져온다")
         void getTopBooks() {
-            SimplePage simplePage = SimplePage.defaultPage();
+            SimplePage simplePage = SimplePage.builder()
+                .page(1)
+                .size(4)
+                .build();
 
-            LatestAllBooks allTopBooks = bookQueryService.getAllTop(simplePage);
+            LatestAllBooks allTopBooks = bookQueryService.getAllTop(simplePage.pageRequest());
 
             Assertions.assertThat(allTopBooks.latestBooks().get(0).id())
                 .isEqualTo(lastCatBook.getId());
@@ -73,10 +75,11 @@ class BookQueryServiceImplTest {
     @Nested
     @DisplayName("ISBN을 기준으로 책 단일 조회")
     class GetByIsbnTest {
+
         @Test
         @DisplayName("ISBN 기준으로 책을 조회한다.")
         void getByIsbn() {
-            BookSpecification book = bookQueryService.getByIsbn(lastCatBook.getIsbn());
+            BookInfo book = bookQueryService.getByIsbn(lastCatBook.getIsbn());
 
             Assertions.assertThat(book.id()).isEqualTo(lastCatBook.getId());
         }

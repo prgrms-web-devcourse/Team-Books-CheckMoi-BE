@@ -1,21 +1,21 @@
 package com.devcourse.checkmoi.domain.book.stub;
 
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public record NewDummyData(String author, String title, String thumbnail, Long bookId, String category,
+public record NewDummyData(String author, String title, String thumbnail, Long bookId,
+                           String category,
                            String description, String isbn, String publisher,
                            String publishedAt) {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    public SimpleBook simple() {
-        return SimpleBook.builder()
+    public BookInfo simple() {
+        return BookInfo.builder()
             .author(this.author)
             .title(this.title)
             .image(this.thumbnail)
@@ -55,17 +55,4 @@ public record NewDummyData(String author, String title, String thumbnail, Long b
             .build();
     }
 
-    public BookSpecification specification() {
-        return BookSpecification.builder()
-            .author(this.author)
-            .isbn(this.isbn)
-            .publisher(this.publisher)
-            .pubDate(LocalDate.parse(this.publishedAt,
-                formatter))
-            .id(this.bookId)
-            .image(this.thumbnail)
-            .description(this.description)
-            .title(this.title)
-            .build();
-    }
 }

@@ -1,8 +1,7 @@
 package com.devcourse.checkmoi.domain.book.stub;
 
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import java.time.LocalDate;
@@ -24,8 +23,8 @@ public record PersistedDummyData(String author, String title, String thumbnail, 
             LocalDateTime.now());
     }
 
-    public SimpleBook simple() {
-        return SimpleBook.builder()
+    public BookInfo simple() {
+        return BookInfo.builder()
             .author(this.author)
             .createdAt(this.createdAt)
             .title(this.title)
@@ -63,18 +62,5 @@ public record PersistedDummyData(String author, String title, String thumbnail, 
             .build();
     }
 
-    public BookSpecification specification() {
-        return BookSpecification.builder()
-            .author(this.author)
-            .isbn(this.isbn)
-            .publisher(this.publisher)
-            .pubDate(LocalDate.parse(this.publishedAt, formatter))
-            .id(this.bookId)
-            .image(this.thumbnail)
-            .description(this.description)
-            .title(this.title)
-            .createdAt(this.createdAt)
-            .build();
-    }
 
 }

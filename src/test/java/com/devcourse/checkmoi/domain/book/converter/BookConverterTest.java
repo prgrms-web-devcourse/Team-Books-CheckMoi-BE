@@ -4,8 +4,7 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeBookWithId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.stub.NewDummyData;
 import org.junit.jupiter.api.DisplayName;
@@ -21,9 +20,9 @@ class BookConverterTest {
         NewDummyData bookRelatedInfo = createDummyWithoutId();
 
         Book whaleBook = bookRelatedInfo.book();
-        SimpleBook expectedSimple = bookRelatedInfo.simple();
+        BookInfo expectedSimple = bookRelatedInfo.simple();
 
-        SimpleBook convertedToSimple = bookconverter.bookToSimple(whaleBook);
+        BookInfo convertedToSimple = bookconverter.bookToInfo(whaleBook);
 
         assertThat(convertedToSimple)
             .usingRecursiveComparison()
@@ -34,16 +33,16 @@ class BookConverterTest {
     @DisplayName("Book 엔티티를  책 목록의 단일 책으로 변환한다2")
     void bookToCreate2() {
         Book book = makeBookWithId(1L);
-        SimpleBook simpleBook = bookconverter.bookToSimple(book);
+        BookInfo bookInfo = bookconverter.bookToInfo(book);
 
         assertAll(
-            () -> assertThat(simpleBook.id()).isEqualTo(book.getId()),
-            () -> assertThat(simpleBook.isbn()).isEqualTo(book.getIsbn()),
-            () -> assertThat(simpleBook.title()).isEqualTo(book.getTitle()),
-            () -> assertThat(simpleBook.author()).isEqualTo(book.getAuthor()),
+            () -> assertThat(bookInfo.id()).isEqualTo(book.getId()),
+            () -> assertThat(bookInfo.isbn()).isEqualTo(book.getIsbn()),
+            () -> assertThat(bookInfo.title()).isEqualTo(book.getTitle()),
+            () -> assertThat(bookInfo.author()).isEqualTo(book.getAuthor()),
             () -> assertThat(
-                simpleBook.pubDate()).isEqualTo(book.getPublishedAt().getPublishedAt()),
-            () -> assertThat(simpleBook.description()).isEqualTo(book.getDescription())
+                bookInfo.pubDate()).isEqualTo(book.getPublishedAt().getPublishedAt()),
+            () -> assertThat(bookInfo.description()).isEqualTo(book.getDescription())
         );
     }
 
@@ -68,9 +67,9 @@ class BookConverterTest {
         NewDummyData bookRelatedInfo = createDummyWithoutId();
 
         Book book = bookRelatedInfo.book();
-        BookSpecification expectedSpecification = bookRelatedInfo.specification();
+        BookInfo expectedSpecification = bookRelatedInfo.simple();
 
-        BookSpecification specification = bookconverter.bookToSpecification(book);
+        BookInfo specification = bookconverter.bookToInfo(book);
 
         assertThat(specification)
             .usingRecursiveComparison()

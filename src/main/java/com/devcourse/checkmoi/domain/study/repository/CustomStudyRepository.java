@@ -2,23 +2,23 @@ package com.devcourse.checkmoi.domain.study.repository;
 
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
+import com.devcourse.checkmoi.domain.study.model.StudyStatus;
+import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
+import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CustomStudyRepository {
 
-    Long findStudyOwner(Long studyId);
-
     Page<StudyInfo> findRecruitingStudyByBookId(Long bookId, Pageable pageable);
 
     StudyDetailWithMembers getStudyDetailWithMembers(Long studyId);
 
-    StudyAppliers getStudyApplicants(Long studyId);
+    StudyMembers getStudyApplicants(Long studyId);
 
-    void updateAllApplicantsAsDenied(Long studyId);
 
     Studies getParticipationStudies(Long userId);
 
@@ -26,5 +26,12 @@ public interface CustomStudyRepository {
 
     Studies getOwnedStudies(Long userId);
 
-    Page<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable);
+
+    Page<StudyInfo> findAllByCondition(Search search, Pageable pageable);
+
+    ExpiredStudies getAllTobeProcessed(LocalDate current, StudyStatus toStatus);
+
+    void updateStudyStatus(Long studyId, StudyStatus studyStatus);
+
+    void updateAllApplicantsAsDenied(Long studyId);
 }

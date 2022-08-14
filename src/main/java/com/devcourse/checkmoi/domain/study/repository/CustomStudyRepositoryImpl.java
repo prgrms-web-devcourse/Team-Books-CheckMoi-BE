@@ -4,21 +4,34 @@ import static com.devcourse.checkmoi.domain.study.model.QStudy.study;
 import static com.devcourse.checkmoi.domain.study.model.QStudyMember.studyMember;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.ACCEPTED;
 import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.OWNED;
-import static com.devcourse.checkmoi.domain.study.model.StudyStatus.FINISHED;
+import static com.devcourse.checkmoi.domain.study.model.StudyMemberStatus.PENDING;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING;
+import static com.devcourse.checkmoi.domain.study.model.StudyStatus.RECRUITING_FINISHED;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.StudyMemberInfoConstructor;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.eqBookId;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.eqStudyId;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.eqStudyMemberStatus;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.eqStudyStatus;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.eqUserId;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.isFinished;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.isMember;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.isStudyParticipant;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.studyDetailConstructor;
+import static com.devcourse.checkmoi.domain.study.repository.CustomRepositoryUtil.studyInfoConstructor;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyBookInfo;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetail;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyInfo;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyUserInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMemberInfo;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
 import com.devcourse.checkmoi.domain.study.model.StudyMemberStatus;
 import com.devcourse.checkmoi.domain.study.model.StudyStatus;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.devcourse.checkmoi.domain.study.service.dto.ExpiredStudies;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,21 +45,11 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+
     @Override
-    public Page<StudyInfo> findAllByCondition(Long userId, Search search, Pageable pageable) {
-        JPQLQuery<StudyInfo> query = jpaQueryFactory.select(
-                Projections.constructor(
-                    StudyInfo.class,
-                    study.id,
-                    study.name,
-                    study.thumbnailUrl,
-                    study.description,
-                    study.status,
-                    study.currentParticipant, study.maxParticipant,
-                    study.gatherStartDate, study.gatherEndDate,
-                    study.studyStartDate, study.studyEndDate
-                )
-            )
+    public Page<StudyInfo> findAllByCondition(Search search, Pageable pageable) {
+        JPQLQuery<StudyInfo> query = jpaQueryFactory
+            .select(studyInfoConstructor())
             .from(study)
             .innerJoin(studyMember)
             .on(study.id.eq(studyMember.study.id))
@@ -59,39 +62,23 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
                 eqStudyStatus(search.studyStatus())
             )
             .groupBy(study.id);
-        long totalCount = query.fetchCount();
+
         List<StudyInfo> studies = query
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
-        return new PageImpl<>(studies, pageable, totalCount);
-    }
 
-    @Override
-    public Long findStudyOwner(Long studyId) {
-        return jpaQueryFactory.select(studyMember.user.id)
-            .from(studyMember)
-            .where(
-                study.id.eq(studyId),
-                studyMember.status.eq(StudyMemberStatus.OWNED)
-            )
-            .fetchOne();
+        return new PageImpl<>(studies, pageable, query.fetchCount());
     }
 
     @Override
     public Page<StudyInfo> findRecruitingStudyByBookId(Long bookId, Pageable pageable) {
-        JPQLQuery<StudyInfo> query = jpaQueryFactory.select(
-                Projections.constructor(
-                    StudyInfo.class,
-                    study.id, study.name, study.thumbnailUrl, study.description, study.status,
-                    study.currentParticipant, study.maxParticipant,
-                    study.gatherStartDate, study.gatherEndDate,
-                    study.studyStartDate, study.studyEndDate
-                ))
+        JPQLQuery<StudyInfo> query = jpaQueryFactory
+            .select(studyInfoConstructor())
             .from(study)
             .where(
-                study.book.id.eq(bookId),
-                study.status.eq(StudyStatus.RECRUITING)
+                eqBookId(bookId),
+                eqStudyStatus(RECRUITING.getMappingCode())
             );
 
         List<StudyInfo> studies = query
@@ -99,17 +86,13 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
             .limit(pageable.getPageSize())
             .fetch();
 
-        long totalCount = query.fetchCount();
-        return new PageImpl<>(studies, pageable, totalCount);
+        return new PageImpl<>(studies, pageable, query.fetchCount());
     }
 
     @Override
     public StudyDetailWithMembers getStudyDetailWithMembers(Long studyId) {
         StudyDetail studyDetail = getStudyDetailInfo(studyId);
-
-        List<StudyUserInfo> members =
-            getStudyMembers(studyId, ACCEPTED, StudyMemberStatus.OWNED);
-
+        List<StudyMemberInfo> members = getStudyMembers(studyId, ACCEPTED, OWNED);
         return StudyDetailWithMembers.builder()
             .study(studyDetail.study())
             .book(studyDetail.book())
@@ -118,44 +101,26 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     }
 
     @Override
-    public StudyAppliers getStudyApplicants(Long studyId) {
-        List<StudyUserInfo> appliers = getStudyMembers(studyId, StudyMemberStatus.PENDING, null);
+    public StudyMembers getStudyApplicants(Long studyId) {
+        List<StudyMemberInfo> members = getStudyMembers(studyId, PENDING);
 
-        return StudyAppliers.builder()
-            .appliers(appliers)
+        return StudyMembers.builder()
+            .members(members)
             .build();
-    }
-
-    @Override
-    public void updateAllApplicantsAsDenied(Long studyId) {
-        jpaQueryFactory.update(studyMember)
-            .where(studyMember.study.id.eq(studyId),
-                studyMember.status.eq(StudyMemberStatus.PENDING))
-            .set(studyMember.status, StudyMemberStatus.DENIED)
-            .execute();
     }
 
     @Override
     public Studies getParticipationStudies(Long userId) {
         return new Studies(
-            jpaQueryFactory.select(
-                    Projections.constructor(
-                        StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
-                        study.currentParticipant, study.maxParticipant,
-                        study.gatherStartDate, study.gatherEndDate,
-                        study.studyStartDate, study.studyEndDate
-                    )
-                )
+            jpaQueryFactory
+                .select(studyInfoConstructor())
                 .from(study)
                 .innerJoin(studyMember)
                 .on(studyMember.study.id.eq(study.id))
                 .where(
-                    studyMember.user.id.eq(userId),
-                    studyMember.status.eq(ACCEPTED)
-                        .or(studyMember.status.eq(OWNED)),
-                    study.status.eq(StudyStatus.IN_PROGRESS)
-                        .or(study.status.eq(StudyStatus.RECRUITING))
+                    eqUserId(userId),
+                    isStudyParticipant(true),
+                    isFinished(false)
                 )
                 .fetch(), 0
         );
@@ -164,22 +129,15 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     @Override
     public Studies getFinishedStudies(Long userId) {
         return new Studies(
-            jpaQueryFactory.select(
-                    Projections.constructor(
-                        StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
-                        study.currentParticipant, study.maxParticipant, study.gatherStartDate,
-                        study.gatherEndDate, study.studyStartDate, study.studyEndDate
-                    )
-                )
+            jpaQueryFactory
+                .select(studyInfoConstructor())
                 .from(study)
                 .innerJoin(studyMember)
                 .on(studyMember.study.id.eq(study.id))
                 .where(
-                    studyMember.user.id.eq(userId),
-                    studyMember.status.eq(ACCEPTED)
-                        .or(studyMember.status.eq(OWNED)),
-                    study.status.eq(FINISHED)
+                    eqUserId(userId),
+                    isStudyParticipant(true),
+                    isFinished(true)
                 )
                 .fetch(), 0
         );
@@ -188,130 +146,99 @@ public class CustomStudyRepositoryImpl implements CustomStudyRepository {
     @Override
     public Studies getOwnedStudies(Long userId) {
         return new Studies(
-            jpaQueryFactory.select(
-                    Projections.constructor(
-                        StudyInfo.class,
-                        study.id, study.name, study.thumbnailUrl, study.description, study.status,
-                        study.currentParticipant, study.maxParticipant, study.gatherStartDate,
-                        study.gatherEndDate, study.studyStartDate, study.studyEndDate
-                    )
-                )
+            jpaQueryFactory
+                .select(studyInfoConstructor())
                 .from(study)
                 .innerJoin(studyMember)
                 .on(studyMember.study.id.eq(study.id))
                 .where(
-                    studyMember.user.id.eq(userId),
-                    studyMember.status.eq(OWNED)
+                    eqUserId(userId),
+                    eqStudyMemberStatus(OWNED.name())
                 )
                 .fetch(), 0
         );
     }
 
+    @Override
+    public ExpiredStudies getAllTobeProcessed(LocalDate current, StudyStatus toStatus) {
+        return switch (toStatus) {
+            case IN_PROGRESS -> findAllToBeProgressed(current);
+            case FINISHED -> findAllToBeFinished(current);
+            default -> new ExpiredStudies(Collections.emptyList());
+        };
+    }
+
+    /***** update ********/
+    @Override
+    public void updateStudyStatus(Long studyId, StudyStatus studyStatus) {
+        jpaQueryFactory.update(study)
+            .set(study.status, studyStatus)
+            .where(study.id.eq(studyId))
+            .execute();
+    }
+
+    @Override
+    public void updateAllApplicantsAsDenied(Long studyId) {
+        jpaQueryFactory
+            .update(studyMember)
+            .where(
+                studyMember.study.id.eq(studyId),
+                eqStudyMemberStatus(PENDING)
+            )
+            .set(studyMember.status, StudyMemberStatus.DENIED)
+            .execute();
+    }
+
+    private ExpiredStudies findAllToBeProgressed(LocalDate current) {
+        return new ExpiredStudies(
+            jpaQueryFactory
+                .select(study.id)
+                .from(study)
+                .where(
+                    study.studyStartDate.between(null, current),
+                    study.status.eq(RECRUITING)
+                        .or(study.status.eq(RECRUITING_FINISHED))
+                ).fetch()
+        );
+    }
+
+    private ExpiredStudies findAllToBeFinished(LocalDate current) {
+        return new ExpiredStudies(
+            jpaQueryFactory
+                .select(study.id)
+                .from(study)
+                .where(
+                    study.studyEndDate.before(current),
+                    study.status.ne(StudyStatus.FINISHED)
+                ).fetch()
+        );
+    }
+
+    /****** helper *******/
 
     private StudyDetail getStudyDetailInfo(Long studyId) {
-        return jpaQueryFactory.select(
-                Projections.constructor(StudyDetail.class,
-                    Projections.constructor(StudyInfo.class,
-                        study.id,
-                        study.name,
-                        study.thumbnailUrl,
-                        study.description,
-                        study.status,
-                        study.currentParticipant, study.maxParticipant,
-                        study.gatherStartDate, study.gatherEndDate,
-                        study.studyStartDate, study.studyEndDate
-                    ),
-                    Projections.constructor(StudyBookInfo.class,
-                        study.book.id,
-                        study.book.title,
-                        study.book.thumbnail,
-                        study.book.author,
-                        study.book.publisher,
-                        study.book.publishedAt.publishedAt,
-                        study.book.isbn,
-                        study.book.description,
-                        study.book.createdAt
-                    )
-                ))
+        return jpaQueryFactory
+            .select(studyDetailConstructor())
             .from(study)
             .innerJoin(study.book)
             .where(study.id.eq(studyId))
             .fetchOne();
     }
 
-    private List<StudyUserInfo> getStudyMembers(
-        Long studyId, StudyMemberStatus requiredStatus, StudyMemberStatus optionalStatus) {
-        return jpaQueryFactory.select(
-                Projections.constructor(
-                    StudyUserInfo.class,
-                    studyMember.user.id,
-                    studyMember.user.name,
-                    studyMember.user.email.value.as("email"),
-                    studyMember.user.profileImgUrl,
-                    studyMember.user.temperature
-                )
-            )
+    private List<StudyMemberInfo> getStudyMembers(
+        Long studyId, StudyMemberStatus... memberStatuses
+    ) {
+        return jpaQueryFactory
+            .select(StudyMemberInfoConstructor())
             .from(studyMember)
             .innerJoin(studyMember.user)
             .where(
                 eqStudyId(studyId),
-                eqStudyMemberStatus(requiredStatus)
-                    .or(eqStudyMemberStatus(optionalStatus)))
+                eqStudyMemberStatus(memberStatuses)
+            )
             .orderBy(studyMember.createdAt.asc())
             .fetch();
     }
 
-    private BooleanExpression eqStudyMemberStatus(StudyMemberStatus status) {
-        if (status == null) {
-            return null;
-        }
-        return studyMember.status.eq(status);
-    }
 
-    private BooleanExpression eqStudyMemberStatus(String status) {
-        if (status == null) {
-            return null;
-        }
-        return studyMember.status.eq(StudyMemberStatus.valueOf(status.toUpperCase()));
-    }
-
-    private BooleanExpression eqStudyId(Long studyId) {
-        if (studyId == null) {
-            return null;
-        }
-        return studyMember.study.id.eq(studyId);
-    }
-
-    private BooleanExpression eqUserId(Long userId) {
-        if (userId == null) {
-            return null;
-        }
-        return studyMember.user.id.eq(userId);
-    }
-
-    private BooleanExpression eqStudyStatus(String status) {
-        if (status == null) {
-            return null;
-        }
-        return study.status.eq(StudyStatus.nameOf(status));
-    }
-
-    private BooleanExpression eqBookId(Long bookId) {
-        if (bookId == null) {
-            return null;
-        }
-        return study.book.id.eq(bookId);
-    }
-
-    private BooleanExpression isMember(Boolean condition) {
-        if (condition == null) {
-            return null;
-        }
-
-        if (condition.equals(Boolean.FALSE)) {
-            return studyMember.status.notIn(OWNED, ACCEPTED).or(study.status.eq(FINISHED));
-        }
-        
-        return studyMember.status.in(OWNED, ACCEPTED).and(study.status.notIn(FINISHED));
-    }
 }

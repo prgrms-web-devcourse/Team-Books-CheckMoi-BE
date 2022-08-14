@@ -23,8 +23,8 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
         @Nullable Long studyId,
         @Nullable Long bookId,
         @Nullable Boolean isMember,
-        @Nullable @ValueOfEnum(enumClass = StudyMemberStatus.class) String memberStatus,
-        @Nullable @ValueOfEnum(enumClass = StudyStatus.class) String studyStatus
+        @Nullable @ValueOfEnum(codeMappingEnumClass = StudyMemberStatus.class) String memberStatus,
+        @Nullable @ValueOfEnum(codeMappingEnumClass = StudyStatus.class) String studyStatus
     ) implements StudyRequest {
 
         @Builder
@@ -41,8 +41,8 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
         String thumbnail,
         @Size(max = 500, message = "스터디 설명은 500자를 넘길 수 없습니다.")
         String description,
-        @Min(value = 1, message = "최대 참여 인원은 1명 이상이어야 합니다.")
-        @Max(value = 10, message = "최대 참여 인원이 10명 이상일 수 없습니다.")
+        @Min(value = 1, message = "최소 참여 인원은 1명 이상이어야 합니다.")
+        @Max(value = 10, message = "최대 참여 인원은 10명을 초과할 수 없습니다.")
         Integer maxParticipant,
         LocalDate gatherStartDate,
         @FutureOrPresent(message = "모집 종료일자가 현재보다 과거일 수 없습니다.")
@@ -74,7 +74,7 @@ public sealed interface StudyRequest permits Create, Edit, Audit, Search {
     }
 
     record Audit(
-        @ValueOfEnum(enumClass = StudyMemberStatus.class) String status
+        @ValueOfEnum(codeMappingEnumClass = StudyMemberStatus.class) String status
     ) implements StudyRequest {
 
         @Builder

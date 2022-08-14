@@ -10,9 +10,11 @@ import com.devcourse.checkmoi.global.security.jwt.JwtTokenProvider;
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -23,7 +25,7 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public TokenWithUserInfo createToken(Register user) {
+    public TokenWithUserInfo createTokenWithRegisterUser(Register user) {
         String accessToken = jwtTokenProvider.createAccessToken(user.id(), user.role());
         String refreshToken = jwtTokenProvider.createRefreshToken();
 
@@ -45,9 +47,9 @@ public class TokenService {
 
     @Transactional
     public AccessToken refreshAccessToken(String accessToken) {
-        jwtTokenProvider.validateAccessToken(accessToken);
 
-        Claims claims = jwtTokenProvider.getClaims(accessToken);
+        Claims claims = jwtTokenProvider.parseUserClaimsFromExpiredAccessToken(accessToken)
+            .orElseThrow(InvalidTokenException::new);
         Long userId = claims.get("userId", Long.class);
         String role = claims.get("role", String.class);
 
@@ -55,7 +57,7 @@ public class TokenService {
             .map(Token::getRefreshToken)
             .orElseThrow(InvalidTokenException::new);
 
-        jwtTokenProvider.validateToken(findRefreshToken);
+        jwtTokenProvider.validateRefreshToken(findRefreshToken);
 
         String newAccessToken = jwtTokenProvider.createAccessToken(userId, role);
         return new AccessToken(newAccessToken);
@@ -69,10 +71,27 @@ public class TokenService {
     @Transactional
     public String createTemporaryAccessToken(Long userId) {
         String refreshToken = jwtTokenProvider.createRefreshToken();
+
         Token token = tokenRepository.findTokenByUserId(userId)
             .orElseGet(() -> tokenRepository.save(new Token(refreshToken, userId)));
 
         token.refresh(refreshToken);
         return jwtTokenProvider.createAccessToken(userId, "ROLE_ADMIN");
     }
+
+    @Transactional
+    public String createTestToken(Long userId, Long accessTime, Long refreshTime) {
+        log.info("테스트용 토큰을 발급합니다 - userId : {}, "
+            + "액세스 토큰 만료시간 {}, 리프레시 토큰 만료시간 {}", userId, accessTime, refreshTime);
+
+        String refreshToken = jwtTokenProvider.createTestToken(
+            userId, "ROLE_LOGIN", refreshTime);
+
+        Token token = tokenRepository.findTokenByUserId(userId)
+            .orElseGet(() -> tokenRepository.save(new Token(refreshToken, userId)));
+        token.refresh(refreshToken);
+
+        return jwtTokenProvider.createTestToken(userId, "ROLE_LOGIN", accessTime);
+    }
+
 }

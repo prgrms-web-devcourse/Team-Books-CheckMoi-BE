@@ -1,8 +1,7 @@
 package com.devcourse.checkmoi.domain.book.converter;
 
 import com.devcourse.checkmoi.domain.book.dto.BookRequest.CreateBook;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookSpecification;
-import com.devcourse.checkmoi.domain.book.dto.BookResponse.SimpleBook;
+import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.model.PublishedDate;
 import org.springframework.stereotype.Component;
@@ -10,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class BookConverter {
 
-    public SimpleBook bookToSimple(Book book) {
-        return SimpleBook.builder()
+    public BookInfo bookToInfo(Book book) {
+        return BookInfo.builder()
             .id(book.getId())
             .title(book.getTitle())
             .author(book.getAuthor())
@@ -36,17 +35,4 @@ public class BookConverter {
             .build();
     }
 
-    public BookSpecification bookToSpecification(Book book) {
-        return BookSpecification.builder()
-            .author(book.getAuthor())
-            .description(book.getDescription())
-            .image(book.getThumbnail())
-            .isbn(book.getIsbn())
-            .id(book.getId())
-            .createdAt(book.getCreatedAt())
-            .pubDate(book.getPublishedAt().getPublishedAt())
-            .publisher(book.getPublisher())
-            .title(book.getTitle())
-            .build();
-    }
 }

@@ -6,6 +6,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.devcourse.checkmoi.domain.token.dto.TokenResponse.TokenWithUserInfo;
@@ -87,4 +89,35 @@ class TokenApiTest extends IntegrationTest {
         }
 
     }
+
+    @Nested
+    @DisplayName("토큰 발급")
+    class CreateAccessToken {
+
+        @Test
+        @DisplayName("S 스웨거에 accessToken 을 발급받는 문서를 작성한다")
+        void refreshAccessToken() throws Exception {
+            TokenWithUserInfo givenUser = getTokenWithUserInfo();
+
+            mockMvc.perform(get("/api/tokens/{userId}", givenUser.userInfo().id())
+                    .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andDo(documentation());
+        }
+
+        private RestDocumentationResultHandler documentation() {
+            return MockMvcRestDocumentationWrapper.document("create-temporary-token",
+                ResourceSnippetParameters.builder()
+                    .tag("Token API")
+                    .summary("토큰 발급 API")
+                    .description("매번 발급받기 귀찮은 토큰을 생성해주는 API"),
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("userId").description("토큰을 발급받을 유저 아이디")
+                )
+            );
+        }
+    }
+
 }

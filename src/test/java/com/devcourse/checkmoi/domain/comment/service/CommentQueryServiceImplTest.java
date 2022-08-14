@@ -12,11 +12,13 @@ import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudy;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeStudyMember;
 import static com.devcourse.checkmoi.util.EntityGeneratorUtil.makeUser;
 import static org.assertj.core.api.Assertions.assertThat;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.domain.book.model.Book;
 import com.devcourse.checkmoi.domain.book.repository.BookRepository;
 import com.devcourse.checkmoi.domain.comment.converter.CommentConverter;
 import com.devcourse.checkmoi.domain.comment.dto.CommentRequest.Search;
 import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
+import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.Comments;
 import com.devcourse.checkmoi.domain.comment.repository.CommentRepository;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.repository.PostRepository;
@@ -102,26 +104,28 @@ class CommentQueryServiceImplTest extends IntegrationTest {
 
         }
 
-        // TODO: 권한체크
         @Test
-        @DisplayName("S 해당 포스트에 작성한 글을 조회할 수 있다")
+        @DisplayName("S 해당 포스트에 작성한 댓글을 조회할 수 있다")
         void findAllComments() {
-            commentRepository.save(makeComment(givenPost, user3));
             List<CommentInfo> commentInfos = Stream.of(
                 commentRepository.save(makeComment(givenPost, user2)),
-                commentRepository.save(makeComment(givenPost, user2))
+                commentRepository.save(makeComment(givenPost, user2)),
+                commentRepository.save(makeComment(givenPost, user3))
             ).map(commentConverter::commentToInfo).toList();
-
-            var search = Search.builder()
+            Long totalPage = 1L;
+            Search search = Search.builder()
                 .postId(givenPost.getId())
                 .build();
+            SimplePage simplePage = SimplePage.builder()
+                .size(3)
+                .page(1)
+                .build();
+            Comments comments =
+                commentQueryService.findAllComments(search, simplePage.pageRequest());
 
-            List<CommentInfo> comments =
-                commentQueryService.findAllComments(user2.getId(), search);
-
-            assertThat(comments)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("createdAt", "updatedAt")
-                .hasSameElementsAs(commentInfos);
+            assertThat(comments.comments()).hasSize(3);
+            assertThat(comments.totalPage())
+                .isEqualTo(totalPage);
         }
     }
 }

@@ -7,17 +7,16 @@ import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Edit;
 import com.devcourse.checkmoi.domain.study.dto.StudyRequest.Search;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.MyStudies;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
-import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyAppliers;
 import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyDetailWithMembers;
-import com.devcourse.checkmoi.domain.study.facade.StudyUserFacade;
+import com.devcourse.checkmoi.domain.study.dto.StudyResponse.StudyMembers;
+import com.devcourse.checkmoi.domain.study.facade.StudyFacade;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
-import com.devcourse.checkmoi.global.model.PageRequest;
+import com.devcourse.checkmoi.global.model.SimplePage;
 import com.devcourse.checkmoi.global.model.SuccessResponse;
 import com.devcourse.checkmoi.global.security.jwt.JwtAuthentication;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +37,7 @@ public class StudyApi {
 
     private final StudyQueryService studyQueryService;
 
-    private final StudyUserFacade studyUserFacade;
+    private final StudyFacade studyFacade;
 
     @GetMapping("/studies/{studyId}")
     public ResponseEntity<SuccessResponse<StudyDetailWithMembers>> getDetailInfo(
@@ -53,7 +52,7 @@ public class StudyApi {
     public ResponseEntity<SuccessResponse<Long>> createStudy(
         @Valid @RequestBody Create request,
         @AuthenticationPrincipal JwtAuthentication user) {
-        Long studyId = studyCommandService.createStudy(request, user.id());
+        Long studyId = studyFacade.createStudy(request, user.id());
         return ResponseEntity
             .created(generatedUri(studyId))
             .body(new SuccessResponse<>(studyId));
@@ -66,6 +65,48 @@ public class StudyApi {
         @AuthenticationPrincipal JwtAuthentication user) {
         return ResponseEntity.ok(
             new SuccessResponse<>(studyCommandService.editStudyInfo(studyId, user.id(), request)));
+    }
+
+
+    @GetMapping("/studies/me")
+    public ResponseEntity<SuccessResponse<MyStudies>> getMyStudies(
+        @AuthenticationPrincipal JwtAuthentication user
+    ) {
+        MyStudies response = studyFacade.getMyStudies(user.id());
+
+        return ResponseEntity.ok(
+            new SuccessResponse<>(response)
+        );
+    }
+
+    @GetMapping("/studies")
+    public ResponseEntity<SuccessResponse<Studies>> getStudies(
+        @RequestParam Long bookId,
+        SimplePage simplePage
+    ) {
+        Studies response = studyFacade.getStudies(bookId, simplePage.pageRequest());
+        return ResponseEntity.ok(new SuccessResponse<>(response));
+    }
+
+    @PutMapping("/studies/{studyId}/members")
+    public ResponseEntity<SuccessResponse<Long>> requestStudyJoin(
+        @PathVariable Long studyId,
+        @AuthenticationPrincipal JwtAuthentication user
+    ) {
+        Long studyMemberId = studyFacade.requestStudyJoin(studyId, user.id());
+        return ResponseEntity.ok()
+            .body(new SuccessResponse<>(studyMemberId));
+    }
+
+    /********************************* StudyMember  ****************************************/
+
+    @GetMapping("/studies/{studyId}/members")
+    public ResponseEntity<SuccessResponse<StudyMembers>> getStudyAppliers(
+        @PathVariable Long studyId,
+        @AuthenticationPrincipal JwtAuthentication user
+    ) {
+        return ResponseEntity.ok()
+            .body(new SuccessResponse<>(studyQueryService.getStudyAppliers(user.id(), studyId)));
     }
 
     @PutMapping("/studies/{studyId}/members/{memberId}")
@@ -81,57 +122,16 @@ public class StudyApi {
             .build();
     }
 
-    @GetMapping("/studies")
-    public ResponseEntity<SuccessResponse<Studies>> getStudies(
-        @RequestParam Long bookId,
-        PageRequest pageRequest
-    ) {
-        Pageable pageable = pageRequest.of();
-        Studies response = studyQueryService.getStudies(bookId, pageable);
-        return ResponseEntity.ok(new SuccessResponse<>(response));
-    }
-
-    @PutMapping("/studies/{studyId}/members")
-    public ResponseEntity<SuccessResponse<Long>> requestStudyJoin(
-        @PathVariable Long studyId,
-        @AuthenticationPrincipal JwtAuthentication user
-    ) {
-        Long studyMemberId = studyCommandService.requestStudyJoin(studyId, user.id());
-        return ResponseEntity.ok()
-            .body(new SuccessResponse<>(studyMemberId));
-    }
-
-    @GetMapping("/studies/{studyId}/members")
-    public ResponseEntity<SuccessResponse<StudyAppliers>> getStudyAppliers(
-        @PathVariable Long studyId,
-        @AuthenticationPrincipal JwtAuthentication user
-    ) {
-        return ResponseEntity.ok()
-            .body(new SuccessResponse<>(studyQueryService.getStudyAppliers(user.id(), studyId)));
-    }
-
-    @GetMapping("/studies/me")
-    public ResponseEntity<SuccessResponse<MyStudies>> getMyStudies(
-        @AuthenticationPrincipal JwtAuthentication user
-    ) {
-        MyStudies response = studyUserFacade.getMyStudies(user.id());
-
-        return ResponseEntity.ok(
-            new SuccessResponse<>(response)
-        );
-    }
-
     /********************************* API v2  ****************************************/
 
     @GetMapping("/v2/studies")
     public ResponseEntity<SuccessResponse<Studies>> getDetailInfo(
-        @AuthenticationPrincipal JwtAuthentication user,
         @Valid Search search,
-        PageRequest pageable
+        SimplePage pageable
     ) {
         return ResponseEntity.ok()
             .body(new SuccessResponse<>(
-                studyQueryService.findAllByCondition(user.id(), search, pageable.of())));
+                studyQueryService.findAllByCondition(search, pageable.pageRequest())));
     }
 
 }

@@ -1,17 +1,25 @@
 package com.devcourse.checkmoi.domain.token.dto;
 
-import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 import lombok.Builder;
 
-public sealed interface TokenRequest permits TokenRequest.RefreshToken {
+public sealed interface TokenRequest permits TokenRequest.TestToken {
 
-    record RefreshToken(
-        @NotBlank(message = "refreshToken은 비어있을 수 없습니다.")
-        String refreshToken
+    record TestToken(
+        Long accessTime,
+        Long refreshTime
     ) implements TokenRequest {
 
         @Builder
-        public RefreshToken {
+        public TestToken(Long accessTime, Long refreshTime) {
+            if (Objects.isNull(accessTime)) {
+                accessTime = 30_000L;
+            }
+            if (Objects.isNull(refreshTime)) {
+                refreshTime = accessTime + 60_000L; // access 만료시간 + 1분
+            }
+            this.accessTime = accessTime;
+            this.refreshTime = refreshTime;
         }
     }
 }
