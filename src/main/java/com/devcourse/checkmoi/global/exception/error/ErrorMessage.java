@@ -12,9 +12,9 @@ public enum ErrorMessage {
     // authentication error
     ACCESS_DENIED("접근 권한이 없습니다", HttpStatus.FORBIDDEN),
     LOGIN_REQUIRED("로그인이 필요합니다", HttpStatus.UNAUTHORIZED),
-    EXPIRED_TOKEN("만료된 토큰입니다", HttpStatus.UNAUTHORIZED),
+    EXPIRED_ACCESS_TOKEN("만료된 액세스 토큰입니다", HttpStatus.UNAUTHORIZED),
+    EXPIRED_REFRESH_TOKEN("만료된 리프레쉬 토큰입니다", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN("유효하지 않은 토큰입니다", HttpStatus.UNAUTHORIZED),
-
 
     // not found error
     STUDY_NOT_FOUND("해당하는 스터디를 찾을 수 없습니다", HttpStatus.NOT_FOUND),
@@ -24,7 +24,6 @@ public enum ErrorMessage {
     USER_NOT_FOUND("존재하지 않는 사용자입니다", HttpStatus.NOT_FOUND),
     COMMENT_NOT_FOUND("해당하는 댓글을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
 
-    // no permission
     // duplicate error
     STUDY_JOIN_REQUEST_DUPLICATE("이미 스터디 가입 요청을 완료했습니다.", HttpStatus.CONFLICT),
 
