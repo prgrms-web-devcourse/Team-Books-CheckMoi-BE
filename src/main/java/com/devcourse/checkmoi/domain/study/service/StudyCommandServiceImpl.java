@@ -80,6 +80,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
 
     @Override
     public void auditStudyParticipation(Long studyId, Long memberId, Long userId, Audit request) {
+        StudyMemberStatus changeStatus = StudyMemberStatus.valueOf(request.status().toUpperCase());
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
         studyValidator.validateRecruitingStudy(study);
@@ -90,18 +91,20 @@ public class StudyCommandServiceImpl implements StudyCommandService {
         );
         StudyMember studyMember = studyMemberRepository.findById(memberId)
             .orElseThrow(() -> new StudyJoinRequestNotFoundException(STUDY_JOIN_REQUEST_NOT_FOUND));
-        studyMember.changeStatus(StudyMemberStatus.valueOf(request.status().toUpperCase()));
+        if (changeStatus == StudyMemberStatus.ACCEPTED) {
+            int joinStudy = userRepository.userJoinedStudies(studyMember.getUser().getId());
+            studyValidator.validateMaximumJoinStudy(joinStudy);
+        }
+        studyMember.changeStatus(changeStatus);
     }
 
     @Override
     public Long requestStudyJoin(Long studyId, Long userId) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(StudyNotFoundException::new);
-        User user = userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
         studyValidator.validateRecruitingStudy(study);
         studyValidator.validateFullMemberStudy(study);
-        StudyMember request = studyMemberRepository.findByUserAndStudy(user.getId(), studyId)
+        StudyMember request = studyMemberRepository.findByUserAndStudy(userId, studyId)
             .map(studyMember -> {
                 studyValidator.validateDuplicateStudyMemberRequest(studyMember);
                 studyMember.changeStatus(StudyMemberStatus.PENDING);
@@ -110,7 +113,7 @@ public class StudyCommandServiceImpl implements StudyCommandService {
             .orElseGet(() ->
                 StudyMember.builder()
                     .study(study)
-                    .user(user)
+                    .user(User.builder().id(userId).build())
                     .status(StudyMemberStatus.PENDING)
                     .build()
             );

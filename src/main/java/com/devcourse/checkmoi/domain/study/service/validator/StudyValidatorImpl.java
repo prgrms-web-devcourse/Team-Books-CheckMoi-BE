@@ -7,6 +7,7 @@ import com.devcourse.checkmoi.domain.study.exception.FinishedStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotJoinedMemberException;
 import com.devcourse.checkmoi.domain.study.exception.NotRecruitingStudyException;
 import com.devcourse.checkmoi.domain.study.exception.NotStudyOwnerException;
+import com.devcourse.checkmoi.domain.study.exception.StudyJoinMaximumReachedException;
 import com.devcourse.checkmoi.domain.study.exception.StudyMemberFullException;
 import com.devcourse.checkmoi.domain.study.exception.StudyNotFoundException;
 import com.devcourse.checkmoi.domain.study.model.Study;
@@ -63,6 +64,14 @@ public class StudyValidatorImpl implements StudyValidator {
     public void validateFullMemberStudy(Study study) {
         if (study.getCurrentParticipant() >= study.getMaxParticipant()) {
             throw new StudyMemberFullException();
+        }
+    }
+
+    @Override
+    public void validateMaximumJoinStudy(int joinStudy) {
+        final int JOIN_MAX_STUDY = 10;
+        if (joinStudy >= JOIN_MAX_STUDY) {
+            throw new StudyJoinMaximumReachedException();
         }
     }
 }
