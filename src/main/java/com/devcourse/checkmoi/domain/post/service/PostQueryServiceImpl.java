@@ -14,6 +14,7 @@ import com.devcourse.checkmoi.domain.study.model.StudyMember;
 import com.devcourse.checkmoi.domain.study.repository.StudyMemberRepository;
 import com.devcourse.checkmoi.global.model.SimplePage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.NullHandling;
@@ -45,11 +46,13 @@ public class PostQueryServiceImpl implements PostQueryService {
             page.getSize(),
             Sort.by(new Order(page.getDirection(), "createdAt", NullHandling.NATIVE)));
 
-        return postRepository.findAllByCondition(
+        Page<PostInfo> posts = postRepository.findAllByCondition(
             userId,
             request,
             pageRequest
         );
+
+        return new Posts(posts.getTotalPages(), posts.getContent());
     }
 
     @Override
