@@ -33,7 +33,7 @@ public sealed interface PostResponse permits PostInfo, Posts {
     }
 
     record Posts(
-        Long totalPage,
+        long totalPage,
         List<PostInfo> posts
     ) implements PostResponse {
 

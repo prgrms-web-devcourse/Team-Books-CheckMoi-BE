@@ -2,9 +2,7 @@ package com.devcourse.checkmoi.domain.post.repository;
 
 import static com.devcourse.checkmoi.domain.post.model.QPost.post;
 import com.devcourse.checkmoi.domain.post.dto.PostRequest.Search;
-import com.devcourse.checkmoi.domain.post.dto.PostResponse;
 import com.devcourse.checkmoi.domain.post.dto.PostResponse.PostInfo;
-import com.devcourse.checkmoi.domain.post.dto.PostResponse.Posts;
 import com.devcourse.checkmoi.domain.post.model.Post;
 import com.devcourse.checkmoi.domain.post.model.PostCategory;
 import com.querydsl.core.types.Order;
@@ -16,6 +14,8 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -27,7 +27,7 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Posts findAllByCondition(Long userId,
+    public Page<PostInfo> findAllByCondition(Long userId,
         Search search,
         Pageable pageable) {
 
@@ -54,8 +54,6 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                 eqCategory(search.category())
             );
 
-        long totalPage = query.fetchCount() / pageable.getPageSize();
-
         List<PostInfo> postInfos = query
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -64,7 +62,8 @@ public class CustomPostRepositoryImpl implements CustomPostRepository {
                     .toArray(OrderSpecifier[]::new))
             .fetch();
 
-        return new PostResponse.Posts(totalPage, postInfos);
+        return new PageImpl<>(postInfos, pageable, query.fetchCount());
+
     }
 
     private List<OrderSpecifier> getOrderSpecifier(Sort sort) {
