@@ -1,9 +1,10 @@
 # 📖 CheckMoi-BE
+### 도서 기반 스터디 관리 플랫폼
+
 <p align="center">
 <img src="https://user-images.githubusercontent.com/41179265/184524017-beed4f4a-27a2-4545-8a0e-f59b19853b0f.png" alt="checkmoi"/>
 </p>
 
-### 📕 도서 기반 스터디 관리 플랫폼
 
 ## 🧑‍🤝‍🧑 팀구성
 
