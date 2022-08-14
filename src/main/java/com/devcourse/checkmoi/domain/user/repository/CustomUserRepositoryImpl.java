@@ -49,13 +49,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
             ).from(studyMember)
             .innerJoin(studyMember.study)
             .innerJoin(studyMember.user)
-            .where(
-                studyMember.status.in(OWNED, ACCEPTED)
-            )
             .on(studyMember.user.id.eq(userId))
             .where(
                 studyMember.status.in(OWNED, ACCEPTED)
             )
+            .orderBy(studyMember.updatedAt.desc())
             .limit(limit)
             .fetch();
     }
