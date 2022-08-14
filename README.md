@@ -4,7 +4,7 @@
 
 <p align="center">
     <a href="https://checkmoi.vercel.app/" >
-    <img src="https://user-images.githubusercontent.com/41179265/184531603-77aabb78-349a-484a-adc2-fd7bde8a9b64.png" alt="checkmoi"/>
+    <img src="https://user-images.githubusercontent.com/41179265/184533239-4800c7d8-9acf-47ca-b402-c1e0ef74b63c.png" alt="checkmoi"/>
     </a>
 <p align="center">북쩍이를 눌러 서비스로 이동해 보세요</p>
 </p>
@@ -104,32 +104,6 @@
   </tr>
 </table>
 
-## 기획
-
-**꾸준하게 증가하고 있는 책을 이용한 스터디 수요**
-
-현재 온라인에서 스터디를 진행하는 것이 계속해서 증가하고 있습니다.
-
-스터디를 하게 되면 스터디에 특화된 서비스가 아닌 , 주로 Zoom 과 같은 온라인 협업툴을 통해 진행합니다. 이런 툴들은 스터디를 진행할 공간은 제공해주지만 스터디 운영을 지원해
-주는 툴은 아닙니다
-
-책모이는 "스터디 운영과 소통을 한 곳에서 지원해 주는 곳이 있으면 좋겠다"는 기획에서 시작되었습니다
-
-스터디를 운영하는 것
-
-- 스터디를 개설하고, 비동기식 소통의 공간을 제공
-
-스터디를 관리하는 것
-
-- 출석체크, 예치금과 같은 강제성을 부여
-
-스터디를 모집하는 것
-
-- 원하는 책, 원하는 시간에, 본인과 맞는 사람들을 찾을 수 있도록 지원
-
-하지만 개발기간상 모든 종류의 스터디를 지원하기는 힘들다고 판단하여,
-**책을 중심으로 모이는 스터디를 중점적으로 지원해주는 서비스**를 기획하였습니다.
-
 ## 💻 기술 스택
 
 카테고리 | 사용 툴
@@ -149,22 +123,15 @@ Infra | AWS EC2, S3, RDS, Docker, Nginx
 
 ## 🏗️ Architecture
 
-<img width="1068" alt="image" src="https://user-images.githubusercontent.com/41960243/184530706-07d26d1d-9fe3-45e4-bf5c-6d717268effd.png">
+<img width="1068" alt="image" src="https://user-images.githubusercontent.com/41179265/184533049-f6a068b1-a4d6-4e51-8167-855181fa7cf8.png">
 
 ## 📏 ERD
 
 <img width="1015" alt="image" src="https://user-images.githubusercontent.com/41960243/184529686-2355dbd1-f5df-45c5-9c70-96057ad870e7.png">
 
-## Git 브랜치 전략
+## [📜 프로젝트 위키](https://github.com/prgrms-web-devcourse/Team-Books-CheckMoi-BE/wiki)
 
-<img width="706" alt="image" src="https://user-images.githubusercontent.com/41960243/184529886-5e033677-8b32-4737-ac1c-f900ab0462f6.png">
-
-- main 브랜치 : 운영 서버에 배포될때 사용하는 브랜치입니다. 스프린트 단위로 배포가 됩니다.
-- develop 브랜치 : 개발 서버에 배포될때 사용하는 브랜치입니다. 코드를 작성할 때마다 develop 브랜치에 해당 내용을 merge합니다.
-- feat 브랜치 : 특정 기능을 구현할때 사용하는 브랜치입니다. 예를들어 게시글 작성같은 경우 feat 브랜치에서 작업한 후 develop에 merge하게 됩니다.
-
-## 📜 API 문서
-
-- [**책모이 API 문서**](https://checkmoi.ga/docs/index.html)
+## [📜 책모이 API 문서](https://checkmoi.ga/docs/index.html)
 
 ## 회고
+
