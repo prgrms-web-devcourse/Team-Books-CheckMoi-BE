@@ -4,7 +4,7 @@
 
 <p align="center">
     <a href="https://checkmoi.vercel.app/" >
-    <img src="https://user-images.githubusercontent.com/41179265/184531603-77aabb78-349a-484a-adc2-fd7bde8a9b64.png" alt="checkmoi"/>
+    <img src="https://user-images.githubusercontent.com/41179265/184532787-dd7e7717-d461-4037-ab07-f1c8000babce.png" alt="checkmoi"/>
     </a>
 <p align="center">북쩍이를 눌러 서비스로 이동해 보세요</p>
 </p>
@@ -123,7 +123,7 @@ Infra | AWS EC2, S3, RDS, Docker, Nginx
 
 ## 🏗️ Architecture
 
-<img width="1068" alt="image" src="https://user-images.githubusercontent.com/41960243/184530706-07d26d1d-9fe3-45e4-bf5c-6d717268effd.png">
+<img width="1068" alt="image" src="https://user-images.githubusercontent.com/41179265/184533049-f6a068b1-a4d6-4e51-8167-855181fa7cf8.png">
 
 ## 📏 ERD
 
