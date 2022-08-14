@@ -6,7 +6,6 @@ import com.devcourse.checkmoi.domain.comment.dto.CommentResponse.CommentInfo;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,8 @@ public class CustomCommentRepositoryImpl implements CustomCommentRepository {
             .from(comment)
             .where(
                 eqPostId(request.postId())
-            );
+            )
+            .orderBy(comment.createdAt.asc());
         long totalCount = query.fetchCount();
         List<CommentInfo> comments = query
             .offset(pageable.getOffset())
