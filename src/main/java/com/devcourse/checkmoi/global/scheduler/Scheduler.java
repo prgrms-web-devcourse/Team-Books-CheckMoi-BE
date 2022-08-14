@@ -18,7 +18,7 @@ public class Scheduler {
         this.studyManager = studyManager;
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 30 * * * *")
     void changeStudyAsInProgress() {
         log.info(message + " 스터디 상태 변경 작업 (-> 진행 중 ) 시작");
 
@@ -31,7 +31,7 @@ public class Scheduler {
         log.info(message + " 스터디 상태 변경 작업 완료!!");
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 30 * * * *")
     void changeStudyAsFinished() {
         log.info(message + " 스터디 상태 변경 작업 (-> 진행 완료 ) 시작");
 
