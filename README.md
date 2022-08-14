@@ -94,7 +94,7 @@ Infra | AWS EC2, S3, RDS, Docker, Nginx
 <img width="1158" alt="image" src="https://user-images.githubusercontent.com/41960243/184510401-738cfdf5-a733-4f22-a256-395950635391.png">
 
 ## 📏 ERD
-![image](https://user-images.githubusercontent.com/41179265/184468382-f959d046-5d2f-4f68-b73a-e19fdd0bdfd6.png)
+<img width="1015" alt="image" src="https://user-images.githubusercontent.com/41960243/184529686-2355dbd1-f5df-45c5-9c70-96057ad870e7.png">
 
 ## Git 브랜치 전략
 ![git_브랜치_전략](image/img.png)
