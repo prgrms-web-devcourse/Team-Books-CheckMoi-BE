@@ -1,6 +1,7 @@
 package com.devcourse.checkmoi.global.security.jwt;
 
-import com.devcourse.checkmoi.global.security.jwt.exception.ExpiredTokenException;
+import com.devcourse.checkmoi.global.security.jwt.exception.ExpiredAccessTokenException;
+import com.devcourse.checkmoi.global.security.jwt.exception.ExpiredRefreshTokenException;
 import com.devcourse.checkmoi.global.security.jwt.exception.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -80,7 +81,7 @@ public class JwtTokenProvider {
         try {
             parsingToken(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new ExpiredTokenException();
+            throw new ExpiredRefreshTokenException();
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException();
         }
@@ -91,7 +92,7 @@ public class JwtTokenProvider {
         try {
             parsingToken(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new ExpiredTokenException();
+            throw new ExpiredAccessTokenException();
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException();
         }
