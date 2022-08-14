@@ -97,7 +97,7 @@ Infra | AWS EC2, S3, RDS, Docker, Nginx
 <img width="1015" alt="image" src="https://user-images.githubusercontent.com/41960243/184529686-2355dbd1-f5df-45c5-9c70-96057ad870e7.png">
 
 ## Git 브랜치 전략
-![git_브랜치_전략](image/img.png)
+<img width="706" alt="image" src="https://user-images.githubusercontent.com/41960243/184529886-5e033677-8b32-4737-ac1c-f900ab0462f6.png">
 
 - main 브랜치 : 운영 서버에 배포될때 사용하는 브랜치입니다. 스프린트 단위로 배포가 됩니다.
 - develop 브랜치 : 개발 서버에 배포될때 사용하는 브랜치입니다. 코드를 작성할 때마다 develop 브랜치에 해당 내용을 merge합니다.
