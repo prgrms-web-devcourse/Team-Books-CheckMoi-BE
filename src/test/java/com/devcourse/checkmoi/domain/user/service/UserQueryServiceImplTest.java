@@ -32,7 +32,7 @@ class UserQueryServiceImplTest {
             given(userRepository.userJoinedStudies(userId))
                 .willReturn(want);
 
-            int got = userQueryService.userJoinedStudies(userId);
+            int got = userQueryService.getUserJoinedStudies(userId);
 
             assertThat(got).isEqualTo(want);
         }

@@ -13,7 +13,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import com.devcourse.checkmoi.domain.book.dto.BookResponse.BookInfo;
@@ -35,8 +34,6 @@ import com.devcourse.checkmoi.domain.user.service.UserQueryService;
 import com.devcourse.checkmoi.global.model.SimplePage;
 import java.time.LocalDate;
 import java.util.List;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -138,7 +135,7 @@ class StudyFacadeImplTest {
 
             given(bookQueryService.getById(anyLong()))
                 .willReturn(bookInfo);
-            given(userQueryService.userJoinedStudies(anyLong()))
+            given(userQueryService.getUserJoinedStudies(anyLong()))
                 .willReturn(joinStudies);
             given(studyCommandService.createStudy(any(Create.class), anyLong()))
                 .willReturn(createdStudyId);
@@ -167,7 +164,7 @@ class StudyFacadeImplTest {
 
             given(bookQueryService.getById(anyLong()))
                 .willReturn(bookInfo);
-            given(userQueryService.userJoinedStudies(anyLong()))
+            given(userQueryService.getUserJoinedStudies(anyLong()))
                 .willReturn(maxJoinStudies);
             doThrow(StudyJoinMaximumReachedException.class)
                 .when(studyValidator)
@@ -224,7 +221,7 @@ class StudyFacadeImplTest {
         void requestStudyJoin() {
             Long studyMemberId = 1L;
             int joinStudies = 5;
-            given(userQueryService.userJoinedStudies(anyLong()))
+            given(userQueryService.getUserJoinedStudies(anyLong()))
                 .willReturn(joinStudies);
             given(studyCommandService.requestStudyJoin(anyLong(), anyLong()))
                 .willReturn(studyMemberId);
@@ -242,7 +239,7 @@ class StudyFacadeImplTest {
         void maximumJoinStudy() {
             int maxJoinStudies = 10;
 
-            given(userQueryService.userJoinedStudies(anyLong()))
+            given(userQueryService.getUserJoinedStudies(anyLong()))
                 .willReturn(maxJoinStudies);
             doThrow(StudyJoinMaximumReachedException.class)
                 .when(studyValidator)

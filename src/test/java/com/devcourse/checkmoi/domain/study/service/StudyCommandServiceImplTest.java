@@ -418,7 +418,7 @@ class StudyCommandServiceImplTest {
         }
 
         @Test
-        @DisplayName("현재 모집중인 스터디만 가입 신청을 할 수 있습니다.")
+        @DisplayName("F 현재 모집중인 스터디가 아니라면 예외 발생")
         void recruitingStudy() {
             Study inProgressStudy = makeStudyWithId(book, IN_PROGRESS, study.getId());
 
@@ -433,7 +433,7 @@ class StudyCommandServiceImplTest {
         }
 
         @Test
-        @DisplayName("현재 스터디원이 최대치에 도달했을때 더 이상 신청을 할 수 없습니다")
+        @DisplayName("F 현재 스터디원이 최대치에 도달했을때 더 이상 신청을 할 수 없습니다")
         void fullMemberStudy() {
             given(studyRepository.findById(anyLong()))
                 .willReturn(Optional.of(study));

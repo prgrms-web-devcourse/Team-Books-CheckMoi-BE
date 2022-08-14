@@ -7,7 +7,6 @@ import com.devcourse.checkmoi.domain.study.dto.StudyResponse.Studies;
 import com.devcourse.checkmoi.domain.study.service.StudyCommandService;
 import com.devcourse.checkmoi.domain.study.service.StudyQueryService;
 import com.devcourse.checkmoi.domain.study.service.validator.StudyValidator;
-import com.devcourse.checkmoi.domain.user.dto.UserResponse.UserInfoWithStudy;
 import com.devcourse.checkmoi.domain.user.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +39,7 @@ public class StudyFacadeImpl implements StudyFacade {
     @Override
     public Long createStudy(Create request, Long userId) {
         bookQueryService.getById(request.bookId());
-        int joinStudies = userQueryService.userJoinedStudies(userId);
+        int joinStudies = userQueryService.getUserJoinedStudies(userId);
         studyValidator.validateMaximumJoinStudy(joinStudies);
         return studyCommandService.createStudy(request, userId);
     }
@@ -53,7 +52,7 @@ public class StudyFacadeImpl implements StudyFacade {
 
     @Override
     public Long requestStudyJoin(Long studyId, Long userId) {
-        int joinStudies = userQueryService.userJoinedStudies(userId);
+        int joinStudies = userQueryService.getUserJoinedStudies(userId);
         studyValidator.validateMaximumJoinStudy(joinStudies);
         return studyCommandService.requestStudyJoin(studyId, userId);
     }
