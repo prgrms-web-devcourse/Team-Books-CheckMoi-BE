@@ -4,7 +4,7 @@
 
 <p align="center">
     <a href="https://checkmoi.vercel.app/" >
-    <img src="https://user-images.githubusercontent.com/41179265/184533239-4800c7d8-9acf-47ca-b402-c1e0ef74b63c.png" alt="checkmoi"/>
+    <img src="https://user-images.githubusercontent.com/41179265/184542056-45781c8c-378a-4e47-b6d0-804a5106256a.png" alt="checkmoi"/>
     </a>
 <p align="center">북쩍이를 눌러 서비스로 이동해 보세요</p>
 </p>
@@ -104,11 +104,13 @@
   </tr>
 </table>
 
+[📁 프론트 레포 링크](https://github.com/prgrms-web-devcourse/Team-Books-CheckMoi-FE)
+
 ## 💻 기술 스택
 
 카테고리 | 사용 툴
 --- | ---
-환경 | Ubuntu 18.04
+OS | Ubuntu 18.04
 언어 | Java JDK 17
 빌드 | Gradle 7.5
 프레임워크 | Spring Boot 2.7.2
@@ -129,9 +131,9 @@ Infra | AWS EC2, S3, RDS, Docker, Nginx
 
 <img width="1015" alt="image" src="https://user-images.githubusercontent.com/41960243/184529686-2355dbd1-f5df-45c5-9c70-96057ad870e7.png">
 
-## [📜 프로젝트 위키](https://github.com/prgrms-web-devcourse/Team-Books-CheckMoi-BE/wiki)
+## [📑 프로젝트 위키](https://github.com/prgrms-web-devcourse/Team-Books-CheckMoi-BE/wiki)
 
-## [📜 책모이 API 문서](https://checkmoi.ga/docs/index.html)
+## [📑 책모이 API 문서](https://checkmoi.ga/docs/index.html)
 
-## 회고
+## [📑 회고](https://github.com/prgrms-web-devcourse/Team-Books-CheckMoi-BE/wiki/%F0%9F%93%98-%ED%9A%8C%EA%B3%A0)
 
