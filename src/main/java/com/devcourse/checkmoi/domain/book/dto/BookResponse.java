@@ -17,7 +17,7 @@ public sealed interface BookResponse permits BookInfo, BookInfos, LatestAllBooks
         String author,
         String publisher,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate pubDate,
+        LocalDate pubdate,
         String isbn,
         String image,
         String description,
