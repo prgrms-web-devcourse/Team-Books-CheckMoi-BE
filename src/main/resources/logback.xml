@@ -1,0 +1,63 @@
+<configuration>
+    <conversionRule
+            conversionWord="clr"
+            converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <property name="LOG_PATH" value="./logs"/>
+
+    <property name="CONSOLE_LOG_PATTERN"
+            value="%clr(%d{HH:mm:ss.SSS}){yellow} [%thread][LoginUserId-%X{LoginUserId}] %clr(%-5level) %logger{36} - %msg%n"/>
+
+    <property name="ERROR_FILE_LOG_PATTERN"
+            value="%d{dd}th %d{HH:mm:ss.SSS} [%thread][LoginUserId-%X{LoginUserId}] %-5level %logger{36} - %msg%n"/>
+
+
+    <property name="INFO_FILE_LOG_PATTERN"
+            value="%d{HH:mm:ss.SSS} [%thread][LoginUserId-%X{LoginUserId}] %-5level %logger{36} - %msg%n"/>
+
+    <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ERROR_ROLLING_FILE">
+        <encoder>
+            <pattern>${ERROR_FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/error-%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100mb</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="INFO_ROLLING_FILE">
+        <encoder>
+            <pattern>${INFO_FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/%d{yyyyMMdd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100mb</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ERROR_ROLLING_FILE"/>
+        <appender-ref ref="INFO_ROLLING_FILE"/>
+    </root>
+
+</configuration>
