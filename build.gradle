@@ -16,7 +16,7 @@ plugins {
 }
 
 group = 'com.devcourse'
-version = '3.0.0'
+version = '3.1.0'
 sourceCompatibility = '17'
 
 configurations {
@@ -118,6 +118,7 @@ jacocoTestCoverageVerification {
                     "com.devcourse.checkmoi.domain.*.model.vo.Q*",
                     "com.devcourse.checkmoi.domain.token.*",
                     "com.devcourse.checkmoi.domain.user.*",
+                    "com.devcourse.checkmoi.domain.study.api.Schedule*",
                     "com.devcourse.checkmoi.global.*",
             ]
         }
@@ -148,6 +149,7 @@ sonarqube {
                 """
                 src/main/java/com/devcourse/checkmoi/global/**,
                 src/main/java/com/devcourse/checkmoi/domain/user/api/AuthApi.java,
+                src/main/java/com/devcourse/checkmoi/domain/study/api/ScheduleApi.java,
                 src/main/java/com/devcourse/checkmoi/domain/token/**
                 """
     }

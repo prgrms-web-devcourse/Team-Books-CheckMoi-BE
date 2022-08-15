@@ -452,7 +452,7 @@ class StudyApiTest extends IntegrationTest {
                     fieldWithPath("data.book.author").description("스터디 책 저자"),
                     fieldWithPath("data.book.publisher").description("스터디 책 출판사"),
                     fieldWithPath("data.book.isbn").description("스터디 책 ISBN"),
-                    fieldWithPath("data.book.pubDate").description("스터디 책 출판일"),
+                    fieldWithPath("data.book.pubdate").description("스터디 책 출판일"),
                     fieldWithPath("data.book.description").description("스터디 책 설명"),
                     fieldWithPath("data.book.createdAt").description("스터디 책 썸네일"),
 
@@ -491,7 +491,7 @@ class StudyApiTest extends IntegrationTest {
                 .image("책 썸네일")
                 .author("책 저자")
                 .publisher("출판사")
-                .pubDate(LocalDate.now())
+                .pubdate(LocalDate.now())
                 .isbn("1111122222333")
                 .description("책 설명설명")
                 .createdAt(LocalDateTime.now())
