@@ -33,7 +33,7 @@ public record PersistedDummyData(String author, String title, String thumbnail, 
             .id(this.bookId)
             .isbn(this.isbn)
             .publisher(this.publisher)
-            .pubDate(LocalDate.parse(this.publishedAt, formatter))
+            .pubdate(LocalDate.parse(this.publishedAt, formatter))
             .build();
     }
 

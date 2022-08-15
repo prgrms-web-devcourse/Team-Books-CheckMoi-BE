@@ -84,7 +84,11 @@ public class StudyApi {
         @RequestParam Long bookId,
         SimplePage simplePage
     ) {
+
         Studies response = studyFacade.getStudies(bookId, simplePage.pageRequest());
+        System.out.println(response.studies());
+        System.out.println(simplePage.getSize());
+        System.out.println(simplePage.getPage());
         return ResponseEntity.ok(new SuccessResponse<>(response));
     }
 

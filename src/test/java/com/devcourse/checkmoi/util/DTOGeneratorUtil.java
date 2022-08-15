@@ -32,7 +32,7 @@ public abstract class DTOGeneratorUtil {
             .isbn(book.getIsbn())
             .author(book.getAuthor())
             .title(book.getTitle())
-            .pubDate(book.getPublishedAt().getPublishedAt())
+            .pubdate(book.getPublishedAt().getPublishedAt())
             .publisher(book.getPublisher())
             .build();
     }
