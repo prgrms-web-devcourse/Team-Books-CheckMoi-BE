@@ -19,7 +19,7 @@ public class Scheduler {
     }
 
     @Scheduled(cron = "0 0 * * * *")
-    void changeStudyAsInProgress() {
+    public void changeStudyAsInProgress() {
         log.info(message + " 스터디 상태 변경 작업 (-> 진행 중 ) 시작");
 
         try {
@@ -32,7 +32,7 @@ public class Scheduler {
     }
 
     @Scheduled(cron = "0 0 * * * *")
-    void changeStudyAsFinished() {
+    public void changeStudyAsFinished() {
         log.info(message + " 스터디 상태 변경 작업 (-> 진행 완료 ) 시작");
 
         try {
