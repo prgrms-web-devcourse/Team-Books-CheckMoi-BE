@@ -1,4 +1,4 @@
-package com.devcourse.checkmoi.global.aop;
+package com.devcourse.checkmoi.global.log.aop;
 
 import java.util.Date;
 import java.util.Enumeration;

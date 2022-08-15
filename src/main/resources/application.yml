@@ -16,5 +16,8 @@ spring:
     scheduling:
       pool:
         size: 2
+logging:
+  file:
+    path: logs
 front-url:
   http://localhost:8080
