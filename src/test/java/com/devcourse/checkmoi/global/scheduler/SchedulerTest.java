@@ -86,8 +86,8 @@ class SchedulerTest {
             .getStudyApplicants(study.getId())
             .members();
 
-        Assertions.assertThat(appliers.isEmpty())
-            .isTrue();
+        Assertions.assertThat(appliers)
+            .isEmpty();
     }
 
 
