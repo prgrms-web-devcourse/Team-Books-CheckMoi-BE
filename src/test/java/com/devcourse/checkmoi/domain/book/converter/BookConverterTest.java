@@ -41,7 +41,7 @@ class BookConverterTest {
             () -> assertThat(bookInfo.title()).isEqualTo(book.getTitle()),
             () -> assertThat(bookInfo.author()).isEqualTo(book.getAuthor()),
             () -> assertThat(
-                bookInfo.pubDate()).isEqualTo(book.getPublishedAt().getPublishedAt()),
+                bookInfo.pubdate()).isEqualTo(book.getPublishedAt().getPublishedAt()),
             () -> assertThat(bookInfo.description()).isEqualTo(book.getDescription())
         );
     }

@@ -72,7 +72,7 @@ public sealed interface StudyResponse permits
         String author,
         String publisher,
         @JsonFormat(pattern = "yyyy/MM/dd")
-        LocalDate pubDate,
+        LocalDate pubdate,
         String isbn,
         String description,
         @JsonFormat(pattern = "yyyy/MM/dd")

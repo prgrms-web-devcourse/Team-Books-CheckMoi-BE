@@ -182,7 +182,7 @@ class BookApiTest extends IntegrationTest {
                         .description("책 설명"),
                     fieldWithPath(latestPath + ".createdAt").type(JsonFieldType.STRING)
                         .description("책 등록날자"),
-                    fieldWithPath(latestPath + ".pubDate").type(JsonFieldType.STRING)
+                    fieldWithPath(latestPath + ".pubdate").type(JsonFieldType.STRING)
                         .description("책 발행날자"),
                     fieldWithPath("data.studyLatestBooks").type(JsonFieldType.ARRAY)
                         .description("최근에 스터디가 개설된 책 목록"),
@@ -202,7 +202,7 @@ class BookApiTest extends IntegrationTest {
                         .description("책 설명"),
                     fieldWithPath(studyLatestPath + ".createdAt").type(JsonFieldType.STRING)
                         .description("책 등록날자"),
-                    fieldWithPath(studyLatestPath + ".pubDate").type(JsonFieldType.STRING)
+                    fieldWithPath(studyLatestPath + ".pubdate").type(JsonFieldType.STRING)
                         .description("책 발행날자")
                 ));
         }
@@ -242,7 +242,7 @@ class BookApiTest extends IntegrationTest {
                     fieldWithPath("data.author").type(JsonFieldType.STRING).description("책 저자"),
                     fieldWithPath("data.publisher").type(JsonFieldType.STRING).description("책 출판사"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("책 제목"),
-                    fieldWithPath("data.pubDate").type(JsonFieldType.STRING).description("책 발행날자"),
+                    fieldWithPath("data.pubdate").type(JsonFieldType.STRING).description("책 발행날자"),
                     fieldWithPath("data.isbn").type(JsonFieldType.STRING).description("책 isbn13"),
                     fieldWithPath("data.description").type(JsonFieldType.STRING)
                         .description("책에 대한 설명"),
@@ -288,7 +288,7 @@ class BookApiTest extends IntegrationTest {
                     fieldWithPath("data.author").type(JsonFieldType.STRING).description("책 저자"),
                     fieldWithPath("data.publisher").type(JsonFieldType.STRING).description("책 출판사"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("책 제목"),
-                    fieldWithPath("data.pubDate").type(JsonFieldType.STRING).description("책 발행날자"),
+                    fieldWithPath("data.pubdate").type(JsonFieldType.STRING).description("책 발행날자"),
                     fieldWithPath("data.isbn").type(JsonFieldType.STRING).description("책 isbn13"),
                     fieldWithPath("data.description").type(JsonFieldType.STRING)
                         .description("책에 대한 설명"),
@@ -308,7 +308,7 @@ class BookApiTest extends IntegrationTest {
                 .title(book.getTitle())
                 .author(book.getAuthor())
                 .publisher(book.getPublisher())
-                .pubDate(book.getPublishedAt().getPublishedAt())
+                .pubdate(book.getPublishedAt().getPublishedAt())
                 .isbn(book.getIsbn())
                 .image(book.getThumbnail())
                 .description(book.getDescription())
@@ -387,7 +387,7 @@ class BookApiTest extends IntegrationTest {
                         .description("책 저자"),
                     fieldWithPath(bookPath + ".publisher").type(JsonFieldType.STRING)
                         .description("출판사"),
-                    fieldWithPath(bookPath + ".pubDate").type(JsonFieldType.STRING)
+                    fieldWithPath(bookPath + ".pubdate").type(JsonFieldType.STRING)
                         .description("출판일자"),
                     fieldWithPath(bookPath + ".isbn").type(JsonFieldType.STRING)
                         .description("ISBN"),

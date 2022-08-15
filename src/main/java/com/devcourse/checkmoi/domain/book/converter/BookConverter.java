@@ -19,7 +19,7 @@ public class BookConverter {
             .description(book.getDescription())
             .image(book.getThumbnail())
             .createdAt(book.getCreatedAt())
-            .pubDate(book.getPublishedAt().getPublishedAt())
+            .pubdate(book.getPublishedAt().getPublishedAt())
             .build();
     }
 
