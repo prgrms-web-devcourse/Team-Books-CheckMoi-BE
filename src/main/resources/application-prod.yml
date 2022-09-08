@@ -17,4 +17,4 @@ spring:
       ddl-auto: update
 
 front-url:
-  https://checkmoi.vercel.app
+  - https://app.checkmoi.ga

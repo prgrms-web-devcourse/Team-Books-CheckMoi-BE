@@ -34,6 +34,7 @@ cors:
       - http://localhost:3000
       - https://checkmoi.vercel.app
       - http://localhost:6006
+      - https://app.checkmoi.ga
       - https://dev.checkmoi.ga
       - https://checkmoi.ga
 
