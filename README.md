@@ -3,7 +3,7 @@
 ### [도서 기반 스터디 관리 플랫폼](https://github.com/prgrms-web-devcourse/Team-Books-CheckMoi-BE/wiki)
 
 <p align="center">
-    <a href="https://checkmoi.vercel.app/" >
+    <a href="https://app.checkmoi.ga/" >
     <img src="https://user-images.githubusercontent.com/41179265/184542056-45781c8c-378a-4e47-b6d0-804a5106256a.png" alt="checkmoi"/>
     </a>
 <p align="center">북쩍이를 눌러 서비스로 이동해 보세요</p>
